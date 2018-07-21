@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bzb"
+    tools:context="com.szxb.buspay.MainActivity">
+
+    <include
+        android:id="@+id/main_main"
+        layout="@layout/main_main" />
+
+
+    <TextView
+        android:id="@+id/net_status"
+        android:layout_width="match_parent"
+        android:layout_height="23dp"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="网络连接异常"
+        android:textColor="@color/colorWhite"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:overScrollMode="never"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/main_sign"
+        layout="@layout/main_sign"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/main_record"
+        layout="@layout/main_record"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/main_cnt"
+        layout="@layout/main_cnt"
+        android:visibility="gone" />
+</RelativeLayout>

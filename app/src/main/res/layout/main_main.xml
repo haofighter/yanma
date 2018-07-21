@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@mipmap/bzb"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linear_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/currentTime"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/station_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLength="10"
+            android:text="请先设置线路信息"
+            android:textColor="#F7F7F7"
+            android:textSize="60sp" />
+
+        <TextView
+            android:id="@+id/prices"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="票价:0.00元"
+            android:textColor="#F7F7F7"
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/currentTime"
+        android:layout_width="wrap_content"
+        android:layout_height="73dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="10dp"
+        android:background="@mipmap/kuang"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="2017年8月26日 21 :19 : 19"
+        android:textColor="@color/colorWhite"
+        android:textSize="28sp" />
+
+
+    <TextView
+        android:id="@+id/bus_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="15dp"
+        android:lineSpacingExtra="2dp"
+        android:text="车辆号:000000\n司机号:000000"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/version_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:text="[1.0]"
+        android:textColor="@color/colorWhite"
+        android:textSize="17sp" />
+
+</RelativeLayout>

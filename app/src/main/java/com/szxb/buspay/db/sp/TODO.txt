@@ -1,0 +1,28 @@
+1.CommonSharedPreferences 公钥列表、AppId、起始站、终点站、票价的保存/获取
+      Key-名称
+  公钥列表
+      key_1:公钥1
+      key_2:公钥2
+  基础设置
+      appId:AppId
+      startStationName:起始站
+      endStationName:终点站
+      ticketPrice:票价
+      DriverCard:司机卡号
+      BluetoothDevice:连接的蓝牙设备名
+      BusPrice：票价
+      snNo:SN号
+      ParameterVersion：参数版本号
+      chinese_name：线路名称
+      is_fixed_price：固定票价
+      coefficient：折扣
+      shortcut_price：快速票价
+      FTPParameter:FTP参数路径
+      FTPBlackList：FTP黑名单路径
+      FTPLocalPath：FTP保存路径
+      ParameterName：保存参数文件名
+      BlackListName:保存黑名单文件名
+      lastTimePushFile 上次提交文件到服务器的时间,如果为空说明未提交过,则全查询提交
+      FileRecordName:上传记录路径
+      FristNo：是否选择过线路名
+
