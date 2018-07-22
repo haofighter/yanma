@@ -103,6 +103,43 @@ public class DateUtil {
     }
 
     /**
+     *
+     * @param type 0：公交卡，1：微信、银联卡
+     * @return .
+     */
+    public static String[] time(int type){
+        if (type==0){
+            String startTime=DateUtil.getTime("yyyyMMddHHmmss",0,0,0,0);
+            String endTime=DateUtil.getTime("yyyyMMddHHmmss",23,59,59,999);
+            return new String[]{startTime,endTime};
+        }else {
+            String startTime=DateUtil.getTime("yyyy-MM-dd HH:mm:ss",0,0,0,0);
+            String endTime=DateUtil.getTime("yyyy-MM-dd HH:mm:ss",23,59,59,999);
+            return new String[]{startTime,endTime};
+        }
+    }
+
+    /**
+     *
+     * @param format 格式：公交卡：yyyyMMddHHmmss,其他yyyy-MM-dd HH:mm:ss
+     * @param hour_of_day_value 小时
+     * @param minute_value 分钟
+     * @param second_value 秒
+     * @param millisecond_value 毫秒
+     * @return 当前开始时间|结束时间
+     */
+    private static String getTime(String format,int hour_of_day_value,
+                                 int minute_value,int second_value,int millisecond_value ){
+        SimpleDateFormat ft=new SimpleDateFormat(format, new Locale("zh", "CN"));
+        Calendar calendar=Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,hour_of_day_value);
+        calendar.set(Calendar.MINUTE,minute_value);
+        calendar.set(Calendar.SECOND,second_value);
+        calendar.set(Calendar.MILLISECOND,millisecond_value);
+        return ft.format(calendar.getTime());
+    }
+
+    /**
      * 设置k21时间
      */
     public static void setK21Time() {

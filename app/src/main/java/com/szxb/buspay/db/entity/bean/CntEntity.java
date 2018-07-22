@@ -9,19 +9,11 @@ package com.szxb.buspay.db.entity.bean;
 
 public class CntEntity {
 
-    public String ic_card_swipe_cnt;
-    public String ic_card_amount_cnt;
-    public String ic_card_up_status;
+    public String[] ic_card_swipe_cnt;
 
-    public String scan_cnt;
-    public String scan_amount_cnt;
-    public String scan_up_status;
+    public String[] scan_cnt;
 
-    public String union_cnt;
-    public String union_amount_cnt;
-    public String union_un_status;
+    public String[] union_cnt;
 
-
-
-
+    public String[] cnt;
 }
