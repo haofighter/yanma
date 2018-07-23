@@ -1,25 +1,128 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in D:\Users\Tangren\AppData\Local\Android\sdk/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-optimizationpasses 5          # 指定代码的压缩级别
+-dontusemixedcaseclassnames   # 是否使用大小写混合
+-dontpreverify           # 混淆时是否做预校验
+-verbose                # 混淆时是否记录日志
 
-# Add any project specific keep options here:
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-keep public class * extends android.app.Activity      # 保持哪些类不被混淆
+-keep public class * extends android.app.Application   # 保持哪些类不被混淆
+-keep public class * extends android.app.Service       # 保持哪些类不被混淆
+-keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
+-keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
+-keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
+-keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
+-keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 保留support下的所有类及其内部类
+-keep class android.support.** {*;}
+# 保留R下面的资源
+-keep class **.R$* {*;}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
+    native <methods>;
+}
+-keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
+    public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class * {# 保持自定义控件类不被混淆
+    public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+-keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
+    public void *(android.view.View);
+}
+-keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
+    public static final android.os.Parcelable$Creator *;
+}
+-dontwarn android.net.**  #忽略某个包的警告
+-keep class android.net.SSLCertificateSocketFactory{*;}
+-keepattributes *Annotation*
+
+#ftp
+-keep class org.apache.commons.net.** { *; }
+
+#so
+-libraryjars ../app/src/main/jniLibs/armeabi/libcrypto.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libdriver.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libhalcrypto.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libnative-lib.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libssl.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libszxb.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libwlxsdkcore.so
+-libraryjars ../app/src/main/jniLibs/armeabi/libymodem.so
+
+#不混淆指定类
+-keep class com.szxb.jni.libszxb {*;}
+-keep class com.tencent.wlxsdk.WlxSdk {*;}
+-keep class com.szxb.buspay.db.entity.bean.card.ConsumeCard {*;}
+-keep class com.szxb.buspay.db.entity.bean.card.SearchCard {*;}
+-keep class com.szxb.buspay.db.entity.scan.** {*;}
+-keep class com.com.szxb.unionpay.config.**{*;}
+
+
+#Gson
+#如果有用到Gson解析包的，直接添加下面这几行就能成功混淆，不然会报错。
+-keepattributes Signature
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.** { *; }
+-keep class com.google.gson.stream.** { *; }
+
+#nohttp
+-dontwarn com.yolanda.nohttp.**
+-keep class com.yolanda.nohttp.**{*;}
+
+#nohttp-okhttp
+-dontwarn com.yanzhenjie.nohttp.**
+-keep class com.yanzhenjie.nohttp.**{*;}
+
+# okhttp
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *;}
+-dontwarn okio.**
+-keep class okio.** { *;}
+
+#Rx
+-dontwarn sun.misc.**
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+   long producerIndex;
+   long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+
+#GreenDao
+-keep class org.greenrobot.greendao.**{*;}
+-keep public interface org.greenrobot.greendao.**
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
+public static java.lang.String TABLENAME;
+}
+-keep class **$Properties
+-keep class net.sqlcipher.database.**{*;}
+-keep public interface net.sqlcipher.database.**
+-dontwarn net.sqlcipher.database.**
+-dontwarn org.greenrobot.greendao.**
+
+#fastjson
+-dontwarn com.alibaba.fastjson.**
+-dontskipnonpubliclibraryclassmembers
+-dontskipnonpubliclibraryclasses
+
+-keep class com.alibaba.fastjson.**{*;}
+-keep class * implements java.io.Serializable { *; }
+
+-keepattributes *Annotation
+-keepattributes Signature
+
+#第三方jar
+-keep class org.apache.commons.net.**{*;}
+

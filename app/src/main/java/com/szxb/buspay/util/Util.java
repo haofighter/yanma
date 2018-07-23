@@ -115,15 +115,15 @@ public class Util {
         return (!TextUtils.equals(temCardNo, cardNo) //不是相同的卡
                 || checkSwipe(SystemClock.elapsedRealtime(), lastTime)//或者间隔超过5S
         )
-                && filter(SystemClock.elapsedRealtime(), lastTime);//两次刷卡间隔大于2S(防止语音叠加)
+                && filter(SystemClock.elapsedRealtime(), lastTime);//两次刷卡间隔大于1S(防止语音叠加)
     }
 
-    private static boolean filter(long currentTime, long lastTime) {
-        return currentTime - lastTime > 2000;
+    public static boolean filter(long currentTime, long lastTime) {
+        return currentTime - lastTime > 1200;
     }
 
     private static boolean checkSwipe(long currentTime, long lastTime) {
-        return currentTime - lastTime > 5000;
+        return currentTime - lastTime > 3000;
     }
 
     /**

@@ -14,6 +14,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
 import com.szxb.buspay.R;
+import com.szxb.buspay.db.entity.bean.CntEntity;
 import com.szxb.buspay.db.entity.bean.MainEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
@@ -21,11 +22,17 @@ import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.interfaces.OnKeyListener;
+import com.szxb.buspay.task.CalibrateTime;
 import com.szxb.buspay.task.key.LoopKeyTask;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.WriteRecordToSD;
 import com.szxb.buspay.util.adapter.HomeParentAdapter;
 import com.szxb.buspay.util.adapter.RecordAdapter;
 import com.szxb.buspay.util.rx.RxBus;
+import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
 
@@ -37,6 +44,18 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import static com.szxb.buspay.db.manager.DBManager.queryScanRecord;
+import static com.szxb.buspay.util.Config.POSITION_BUS_RECORD;
+import static com.szxb.buspay.util.Config.POSITION_CHECK_NET;
+import static com.szxb.buspay.util.Config.POSITION_CNT;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_1_M;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_3_M;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_7;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_DB;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_LOG;
+import static com.szxb.buspay.util.Config.POSITION_PUSH_RECORD;
+import static com.szxb.buspay.util.Config.POSITION_SCAN_RECORD;
+import static com.szxb.buspay.util.Config.POSITION_TIME;
+import static com.szxb.buspay.util.Config.POSITION_UNION_RECORD;
 import static com.szxb.buspay.util.Util.fen2Yuan;
 import static com.szxb.buspay.util.Util.hex2Int;
 import static com.szxb.buspay.util.Util.string2Int;
@@ -150,7 +169,11 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                     public void call(QRScanMessage qrScanMessage) {
                         message(qrScanMessage);
                         if (qrScanMessage.getResult() == QRCode.STOP_CNT) {
+                            //关闭菜单页
                             onKeyCancel();
+                        } else if (qrScanMessage.getResult() == QRCode.CNT) {
+                            //汇总
+                            showCnt(qrScanMessage.getCntEntity());
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -236,7 +259,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         }
         int position = mAdapter.getCurrentItemPosition();
         //刷卡记录
-        if (position == 0) {
+        if (position == POSITION_BUS_RECORD) {
             onKeyCancel();
             childViewShow = true;
             main_record.setVisibility(View.VISIBLE);
@@ -258,7 +281,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             }
 
             recordAdapter.refreshData(mRecordList);
-        } else if (position == 1) {//扫码记录
+        } else if (position == POSITION_SCAN_RECORD) {//扫码记录
             onKeyCancel();
             childViewShow = true;
             main_record.setVisibility(View.VISIBLE);
@@ -278,7 +301,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 mRecordList.add(mainEntity);
             }
             recordAdapter.refreshData(mRecordList);
-        } else if (position == 2) {//银联卡记录
+        } else if (position == POSITION_UNION_RECORD) {//银联卡记录
             onKeyCancel();
             childViewShow = true;
             main_record.setVisibility(View.VISIBLE);
@@ -299,30 +322,45 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             }
 
             recordAdapter.refreshData(mRecordList);
-        } else if (position == 3) {//当天汇总
+        } else if (position == POSITION_CNT) {//当天汇总
             onKeyCancel();
             childViewShow = true;
             main_cnt.setVisibility(View.VISIBLE);
             record_type_cnt.setText("当天汇总");
-        } else if (position == 4) {//上传记录
+            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("cnt"));
+        } else if (position == POSITION_PUSH_RECORD) {//上传记录
 
-        } else if (position == 5) {//数据库导出
-
-        } else if (position == 6) {//日志导出
-
-        } else if (position == 7) {//检测网络
-
-        } else if (position == 8) {//校准时间
-
-        } else if (position == 9) {//检查上传状态
-
-        } else if (position == 10) {//导出7天记录
-
-        } else if (position == 11) {//导出1个月记录
-
-        } else if (position == 12) {//导出3个月记录
-
+        } else if (position == POSITION_EXPORT_DB) {//数据库导出
+            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_db"));
+        } else if (position == POSITION_EXPORT_LOG) {//日志导出
+            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_log"));
+        } else if (position == POSITION_CHECK_NET) {//检测网络
+            boolean b = AppUtil.checkNetStatus();
+            BusToast.showToast(getApplicationContext(), b ? "网络已连接" : "未检测到网络", b);
+            onKeyCancel();
+        } else if (position == POSITION_TIME) {//校准时间
+            BusToast.showToast(getApplicationContext(), "开始校准时间", true);
+            CalibrateTime.getInstance().request();
+            onKeyCancel();
+        } else if (position == POSITION_EXPORT_7) {//导出7天记录
+            export(7);
+        } else if (position == POSITION_EXPORT_1_M) {//导出1个月记录
+            export(30);
+        } else if (position == POSITION_EXPORT_3_M) {//导出3个月记录
+            export(90);
         }
+    }
+
+    /**
+     * 导出数据
+     *
+     * @param day 天数
+     */
+    private void export(int day) {
+        String scanPath = "/storage/sdcard1/scan";
+        String cardPath = "/storage/sdcard1/card";
+        String unionPath = "/storage/sdcard1/union";
+        WriteRecordToSD.getInstance().writer(day, scanPath, cardPath, unionPath);
     }
 
     @Override
@@ -330,23 +368,39 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         if (recyclerView.getVisibility() == View.VISIBLE) {
             recyclerView.setVisibility(View.GONE);
             recyclerView.startAnimation(mHiddenAnimation);
-            SLog.d("BaseActivity(onKeyCancel.java:229)关闭菜单");
         }
 
         if (main_record.getVisibility() == View.VISIBLE) {
             main_record.setVisibility(View.GONE);
             main_record.startAnimation(mHiddenAnimation);
             childViewShow = false;
-            SLog.d("BaseActivity(onKeyCancel.java:235)关闭交易记录");
         }
 
         if (main_cnt.getVisibility() == View.VISIBLE) {
             main_cnt.setVisibility(View.GONE);
             main_cnt.startAnimation(mHiddenAnimation);
             childViewShow = false;
-            SLog.d("BaseActivity(onKeyCancel.java:255)关闭当天汇总");
         }
     }
+
+    private void showCnt(CntEntity cntEntity) {
+        ic_card_swipe_cnt.setText(cntEntity.ic_card_swipe_cnt[0]);
+        ic_card_amount_cnt.setText(cntEntity.ic_card_swipe_cnt[1]);
+        ic_card_up_status.setText(cntEntity.ic_card_swipe_cnt[2]);
+
+        scan_cnt.setText(cntEntity.scan_cnt[0]);
+        scan_amount_cnt.setText(cntEntity.scan_cnt[1]);
+        scan_up_status.setText(cntEntity.scan_cnt[2]);
+
+        union_cnt.setText(cntEntity.union_cnt[0]);
+        union_amount_cnt.setText(cntEntity.union_cnt[1]);
+        union_un_status.setText(cntEntity.union_cnt[2]);
+
+        sum_cnt.setText(cntEntity.cnt[0]);
+        sum_amount_cnt.setText(cntEntity.cnt[1]);
+        sum_up_status.setText(cntEntity.cnt[2]);
+    }
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {

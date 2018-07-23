@@ -1,7 +1,13 @@
 package com.szxb.buspay;
 
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
+import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
@@ -28,12 +34,15 @@ import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
 public class BusApp extends Application {
     private static BusApp instance;
     private static PosManager manager;
+    //服务操作
+    private IToolInterface mService;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
-        DBCore.init(this, "BUS_INFO");
+
+        DBCore.init(this, "databases_bus.db");
 
         UnionPayManager unionPayManager = new UnionPayManager();
         BusllPosManage.init(unionPayManager);
@@ -48,7 +57,37 @@ public class BusApp extends Application {
                 .connectionTimeout(10 * 1000)
                 .build());
         Logger.setDebug(true);
+
+        initService();
     }
+
+    //连接服务
+    private void initService() {
+        Intent i = new Intent();
+        i.setAction("com.lypeer.aidl");
+        i.setPackage("com.lilei.tool.tool");
+        boolean ret = bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public IToolInterface getmService() {
+        return mService;
+    }
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            // TODO Auto-generated method stub
+            mService = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // TODO Auto-generated method stub
+            mService = IToolInterface.Stub.asInterface(service);
+        }
+    };
+
 
     public static BusApp getInstance() {
         return instance;

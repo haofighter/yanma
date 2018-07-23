@@ -1,13 +1,13 @@
 package com.szxb.buspay.db.entity.bean.card;
 
 /**
- * 作者：Tangren on 2018-07-19
+ * 作者：Tangren on 2018-07-23
  * 包名：com.szxb.buspay.db.entity.bean.card
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:莱芜卡类型
  */
 
-public class CardType {
+public class CardTypeLw {
 
     //普通卡
     public static final String CARD_NORMAL = "01";
@@ -27,35 +27,53 @@ public class CardType {
     //员工卡
     public static final String CARD_EMP = "06";
 
+    //优惠卡
+    public static final String CARD_DIS = "07";
+
+    //下班卡
+    public static final String CARD_OFF_WORK = "10";
+
     //采集卡
     public static final String CARD_GATHER = "11";
 
     //签点卡
+    @Deprecated
     public static final String CARD_SIGNED = "12";
 
     //检测卡
+    @Deprecated
     public static final String CARD_CHECKED = "13";
 
     //稽查卡
+    @Deprecated
     public static final String CARD_CHECK = "18";
 
+    //CPU普通卡
+    public static final String CARD_CPU_NORMAL="41";
 
-    private String cardType;
-    private int pay_fee;
+    //CPU学生卡
+    public static final String CARD_CPU_STUDENT="42";
 
-    public String getCardType() {
-        return cardType;
-    }
+    //CPU老年卡
+    public static final String CARD_CPU_OLD="43";
 
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
-    }
+    //CPU免费卡
+    public static final String CARD_CPU_FREE="44";
 
-    public int getPay_fee() {
-        return pay_fee;
-    }
+    //CPU残疾人卡
+    public static final String CARD_CPU_DEFECT="45";
 
-    public void setPay_fee(int pay_fee) {
-        this.pay_fee = pay_fee;
-    }
+    //CPU特殊卡
+    public static final String CARD_CPU_SPECIAL="88";
+
+    //济南CPU普通卡
+    public static final String CARD_CPU_JN="04";
+
+
+
+
+
+
+
+
 }

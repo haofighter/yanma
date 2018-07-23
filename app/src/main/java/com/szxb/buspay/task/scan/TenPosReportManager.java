@@ -54,10 +54,10 @@ public class TenPosReportManager {
             if (DBManager.filterOpenID(open_id)) {
                 BusToast.showToast(BusApp.getInstance(), "禁止频繁刷码", false);
             } else if (DBManager.filterSameQR(qrcode)) {
-                RxBus.getInstance().send(new QRScanMessage(null, QRCode.REFRESH_QR_CODE));
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_QR_CODE));
             } else if (DBManager.filterBlackName(open_id)) {
                 //是黑名单里面的成员
-                RxBus.getInstance().send(new QRScanMessage(null, QRCode.QR_ERROR));
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.QR_ERROR));
             } else {
                 if (init == 0 && key_id > 0) {
                     //String open_id, String pub_key, int payfee, byte scene, byte scantype, String pos_id, String pos_trx_id, String aes_mac_root

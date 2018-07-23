@@ -4,6 +4,7 @@ import android.os.CountDownTimer;
 
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.MainLooper;
 
@@ -69,7 +70,7 @@ public class CountTime {
             timeCount.cancel();
         }
         canceled = true;
-        RxBus.getInstance().send(new QRScanMessage(null, QRCode.STOP_CNT));
+        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.STOP_CNT));
     }
 
     private TimeTask timeCount;

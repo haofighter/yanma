@@ -7,11 +7,11 @@ import com.szxb.buspay.MainActivity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.util.rx.RxBus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.DecimalFormat;
 
 import static java.lang.System.arraycopy;
 
@@ -183,7 +183,7 @@ public class HexUtil {
             BusApp.getPosManager().setBusNo(busNo);
         }
         if (AppUtil.isForeground(MainActivity.class.getName())) {
-            RxBus.getInstance().send(new QRScanMessage(null, QRCode.REFRESH_VIEW));
+            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_VIEW));
         }
     }
 }

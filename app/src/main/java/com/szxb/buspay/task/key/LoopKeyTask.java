@@ -8,6 +8,7 @@ import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.CountTime;
 import com.szxb.buspay.util.tip.MainLooper;
 import com.szxb.jni.libszxb;
+import com.szxb.mlog.SLog;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -51,12 +52,17 @@ public class LoopKeyTask {
                 .getService().scheduleAtFixedRate(new Runnable() {
                     @Override
                     public void run() {
-                        enterKey();
+                        try {
+                            enterKey();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            SLog.d("LoopKeyTask(run.java:58)按键出现异常>>" + e.toString());
+                        }
+
                     }
                 }, 500, 200, TimeUnit.MILLISECONDS);
 
     }
-
 
 
     private void enterKey() {

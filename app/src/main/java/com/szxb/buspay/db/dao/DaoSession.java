@@ -10,7 +10,6 @@ import org.greenrobot.greendao.internal.DaoConfig;
 
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.card.BlackListCard;
-import com.szxb.buspay.db.entity.card.CardRecord;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.BlackListEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
@@ -21,7 +20,6 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 
 import com.szxb.buspay.db.dao.ConsumeCardDao;
 import com.szxb.buspay.db.dao.BlackListCardDao;
-import com.szxb.buspay.db.dao.CardRecordDao;
 import com.szxb.buspay.db.dao.LineInfoEntityDao;
 import com.szxb.buspay.db.dao.BlackListEntityDao;
 import com.szxb.buspay.db.dao.MacKeyEntityDao;
@@ -41,7 +39,6 @@ public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig consumeCardDaoConfig;
     private final DaoConfig blackListCardDaoConfig;
-    private final DaoConfig cardRecordDaoConfig;
     private final DaoConfig lineInfoEntityDaoConfig;
     private final DaoConfig blackListEntityDaoConfig;
     private final DaoConfig macKeyEntityDaoConfig;
@@ -52,7 +49,6 @@ public class DaoSession extends AbstractDaoSession {
 
     private final ConsumeCardDao consumeCardDao;
     private final BlackListCardDao blackListCardDao;
-    private final CardRecordDao cardRecordDao;
     private final LineInfoEntityDao lineInfoEntityDao;
     private final BlackListEntityDao blackListEntityDao;
     private final MacKeyEntityDao macKeyEntityDao;
@@ -70,9 +66,6 @@ public class DaoSession extends AbstractDaoSession {
 
         blackListCardDaoConfig = daoConfigMap.get(BlackListCardDao.class).clone();
         blackListCardDaoConfig.initIdentityScope(type);
-
-        cardRecordDaoConfig = daoConfigMap.get(CardRecordDao.class).clone();
-        cardRecordDaoConfig.initIdentityScope(type);
 
         lineInfoEntityDaoConfig = daoConfigMap.get(LineInfoEntityDao.class).clone();
         lineInfoEntityDaoConfig.initIdentityScope(type);
@@ -97,7 +90,6 @@ public class DaoSession extends AbstractDaoSession {
 
         consumeCardDao = new ConsumeCardDao(consumeCardDaoConfig, this);
         blackListCardDao = new BlackListCardDao(blackListCardDaoConfig, this);
-        cardRecordDao = new CardRecordDao(cardRecordDaoConfig, this);
         lineInfoEntityDao = new LineInfoEntityDao(lineInfoEntityDaoConfig, this);
         blackListEntityDao = new BlackListEntityDao(blackListEntityDaoConfig, this);
         macKeyEntityDao = new MacKeyEntityDao(macKeyEntityDaoConfig, this);
@@ -108,7 +100,6 @@ public class DaoSession extends AbstractDaoSession {
 
         registerDao(ConsumeCard.class, consumeCardDao);
         registerDao(BlackListCard.class, blackListCardDao);
-        registerDao(CardRecord.class, cardRecordDao);
         registerDao(LineInfoEntity.class, lineInfoEntityDao);
         registerDao(BlackListEntity.class, blackListEntityDao);
         registerDao(MacKeyEntity.class, macKeyEntityDao);
@@ -121,7 +112,6 @@ public class DaoSession extends AbstractDaoSession {
     public void clear() {
         consumeCardDaoConfig.clearIdentityScope();
         blackListCardDaoConfig.clearIdentityScope();
-        cardRecordDaoConfig.clearIdentityScope();
         lineInfoEntityDaoConfig.clearIdentityScope();
         blackListEntityDaoConfig.clearIdentityScope();
         macKeyEntityDaoConfig.clearIdentityScope();
@@ -137,10 +127,6 @@ public class DaoSession extends AbstractDaoSession {
 
     public BlackListCardDao getBlackListCardDao() {
         return blackListCardDao;
-    }
-
-    public CardRecordDao getCardRecordDao() {
-        return cardRecordDao;
     }
 
     public LineInfoEntityDao getLineInfoEntityDao() {

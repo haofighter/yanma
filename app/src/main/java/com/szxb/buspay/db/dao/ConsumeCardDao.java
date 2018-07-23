@@ -42,12 +42,16 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         public final static Property Direction = new Property(15, String.class, "direction", false, "DIRECTION");
         public final static Property StationId = new Property(16, String.class, "stationId", false, "STATION_ID");
         public final static Property FareFlag = new Property(17, String.class, "fareFlag", false, "FARE_FLAG");
-        public final static Property UniqueFlag = new Property(18, String.class, "uniqueFlag", false, "UNIQUE_FLAG");
-        public final static Property UpStatus = new Property(19, Integer.class, "upStatus", false, "UP_STATUS");
-        public final static Property SingleRecord = new Property(20, String.class, "singleRecord", false, "SINGLE_RECORD");
-        public final static Property Reserve_1 = new Property(21, String.class, "reserve_1", false, "RESERVE_1");
-        public final static Property Reserve_2 = new Property(22, String.class, "reserve_2", false, "RESERVE_2");
-        public final static Property Reserve_3 = new Property(23, String.class, "reserve_3", false, "RESERVE_3");
+        public final static Property AlgFlag = new Property(18, String.class, "algFlag", false, "ALG_FLAG");
+        public final static Property IssuerFlag = new Property(19, String.class, "issuerFlag", false, "ISSUER_FLAG");
+        public final static Property CardChildType = new Property(20, String.class, "cardChildType", false, "CARD_CHILD_TYPE");
+        public final static Property CpuVersion = new Property(21, String.class, "cpuVersion", false, "CPU_VERSION");
+        public final static Property UniqueFlag = new Property(22, String.class, "uniqueFlag", false, "UNIQUE_FLAG");
+        public final static Property UpStatus = new Property(23, Integer.class, "upStatus", false, "UP_STATUS");
+        public final static Property SingleRecord = new Property(24, String.class, "singleRecord", false, "SINGLE_RECORD");
+        public final static Property Reserve_1 = new Property(25, String.class, "reserve_1", false, "RESERVE_1");
+        public final static Property Reserve_2 = new Property(26, String.class, "reserve_2", false, "RESERVE_2");
+        public final static Property Reserve_3 = new Property(27, String.class, "reserve_3", false, "RESERVE_3");
     }
 
 
@@ -81,12 +85,16 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
                 "\"DIRECTION\" TEXT," + // 15: direction
                 "\"STATION_ID\" TEXT," + // 16: stationId
                 "\"FARE_FLAG\" TEXT," + // 17: fareFlag
-                "\"UNIQUE_FLAG\" TEXT UNIQUE ," + // 18: uniqueFlag
-                "\"UP_STATUS\" INTEGER," + // 19: upStatus
-                "\"SINGLE_RECORD\" TEXT," + // 20: singleRecord
-                "\"RESERVE_1\" TEXT," + // 21: reserve_1
-                "\"RESERVE_2\" TEXT," + // 22: reserve_2
-                "\"RESERVE_3\" TEXT);"); // 23: reserve_3
+                "\"ALG_FLAG\" TEXT," + // 18: algFlag
+                "\"ISSUER_FLAG\" TEXT," + // 19: issuerFlag
+                "\"CARD_CHILD_TYPE\" TEXT," + // 20: cardChildType
+                "\"CPU_VERSION\" TEXT," + // 21: cpuVersion
+                "\"UNIQUE_FLAG\" TEXT UNIQUE ," + // 22: uniqueFlag
+                "\"UP_STATUS\" INTEGER," + // 23: upStatus
+                "\"SINGLE_RECORD\" TEXT," + // 24: singleRecord
+                "\"RESERVE_1\" TEXT," + // 25: reserve_1
+                "\"RESERVE_2\" TEXT," + // 26: reserve_2
+                "\"RESERVE_3\" TEXT);"); // 27: reserve_3
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_CONSUME_CARD_CARD_NO ON CONSUME_CARD" +
                 " (\"CARD_NO\" ASC);");
@@ -192,34 +200,54 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(18, fareFlag);
         }
  
+        String algFlag = entity.getAlgFlag();
+        if (algFlag != null) {
+            stmt.bindString(19, algFlag);
+        }
+ 
+        String issuerFlag = entity.getIssuerFlag();
+        if (issuerFlag != null) {
+            stmt.bindString(20, issuerFlag);
+        }
+ 
+        String cardChildType = entity.getCardChildType();
+        if (cardChildType != null) {
+            stmt.bindString(21, cardChildType);
+        }
+ 
+        String cpuVersion = entity.getCpuVersion();
+        if (cpuVersion != null) {
+            stmt.bindString(22, cpuVersion);
+        }
+ 
         String uniqueFlag = entity.getUniqueFlag();
         if (uniqueFlag != null) {
-            stmt.bindString(19, uniqueFlag);
+            stmt.bindString(23, uniqueFlag);
         }
  
         Integer upStatus = entity.getUpStatus();
         if (upStatus != null) {
-            stmt.bindLong(20, upStatus);
+            stmt.bindLong(24, upStatus);
         }
  
         String singleRecord = entity.getSingleRecord();
         if (singleRecord != null) {
-            stmt.bindString(21, singleRecord);
+            stmt.bindString(25, singleRecord);
         }
  
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(22, reserve_1);
+            stmt.bindString(26, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(23, reserve_2);
+            stmt.bindString(27, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(24, reserve_3);
+            stmt.bindString(28, reserve_3);
         }
     }
 
@@ -317,34 +345,54 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(18, fareFlag);
         }
  
+        String algFlag = entity.getAlgFlag();
+        if (algFlag != null) {
+            stmt.bindString(19, algFlag);
+        }
+ 
+        String issuerFlag = entity.getIssuerFlag();
+        if (issuerFlag != null) {
+            stmt.bindString(20, issuerFlag);
+        }
+ 
+        String cardChildType = entity.getCardChildType();
+        if (cardChildType != null) {
+            stmt.bindString(21, cardChildType);
+        }
+ 
+        String cpuVersion = entity.getCpuVersion();
+        if (cpuVersion != null) {
+            stmt.bindString(22, cpuVersion);
+        }
+ 
         String uniqueFlag = entity.getUniqueFlag();
         if (uniqueFlag != null) {
-            stmt.bindString(19, uniqueFlag);
+            stmt.bindString(23, uniqueFlag);
         }
  
         Integer upStatus = entity.getUpStatus();
         if (upStatus != null) {
-            stmt.bindLong(20, upStatus);
+            stmt.bindLong(24, upStatus);
         }
  
         String singleRecord = entity.getSingleRecord();
         if (singleRecord != null) {
-            stmt.bindString(21, singleRecord);
+            stmt.bindString(25, singleRecord);
         }
  
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(22, reserve_1);
+            stmt.bindString(26, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(23, reserve_2);
+            stmt.bindString(27, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(24, reserve_3);
+            stmt.bindString(28, reserve_3);
         }
     }
 
@@ -374,12 +422,16 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // direction
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // stationId
             cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // fareFlag
-            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // uniqueFlag
-            cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19), // upStatus
-            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // singleRecord
-            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // reserve_1
-            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // reserve_2
-            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23) // reserve_3
+            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // algFlag
+            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // issuerFlag
+            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // cardChildType
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // cpuVersion
+            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // uniqueFlag
+            cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23), // upStatus
+            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24), // singleRecord
+            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25), // reserve_1
+            cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26), // reserve_2
+            cursor.isNull(offset + 27) ? null : cursor.getString(offset + 27) // reserve_3
         );
         return entity;
     }
@@ -404,12 +456,16 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         entity.setDirection(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
         entity.setStationId(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
         entity.setFareFlag(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
-        entity.setUniqueFlag(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
-        entity.setUpStatus(cursor.isNull(offset + 19) ? null : cursor.getInt(offset + 19));
-        entity.setSingleRecord(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
-        entity.setReserve_1(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
-        entity.setReserve_2(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
-        entity.setReserve_3(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
+        entity.setAlgFlag(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
+        entity.setIssuerFlag(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
+        entity.setCardChildType(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
+        entity.setCpuVersion(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
+        entity.setUniqueFlag(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
+        entity.setUpStatus(cursor.isNull(offset + 23) ? null : cursor.getInt(offset + 23));
+        entity.setSingleRecord(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
+        entity.setReserve_1(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
+        entity.setReserve_2(cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26));
+        entity.setReserve_3(cursor.isNull(offset + 27) ? null : cursor.getString(offset + 27));
      }
     
     @Override

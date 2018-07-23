@@ -1,13 +1,17 @@
 package com.szxb.buspay.db.entity.bean.card;
 
+import android.text.TextUtils;
+
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.mlog.SLog;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Unique;
+
+import static java.lang.System.arraycopy;
 
 /**
  * 作者：Tangren on 2018-07-19
@@ -48,12 +52,25 @@ public class ConsumeCard {
     private String driverNo;
     //PSAM卡号
     private String pasmNo;
+    //*****************淄博***********************/
     //行驶方向
     private String direction;
     //站点号
     private String stationId;
     //补票标志
     private String fareFlag;
+    //*****************淄博***********************/
+
+    //*****************莱芜***********************/
+    //算法表示
+    private String algFlag;
+    //发卡机构标示
+    private String issuerFlag;
+    //卡子类型
+    private String cardChildType;
+    //CPU卡应用版本
+    private String cpuVersion;
+    //*****************莱芜***********************/
 
     //唯一标示
     @Unique
@@ -69,86 +86,200 @@ public class ConsumeCard {
     public ConsumeCard(byte[] receDatas, boolean isSignOrBack) {
         int index = 0;
         byte[] status_byte = new byte[1];
-        System.arraycopy(receDatas, index, status_byte, 0, status_byte.length);
+        arraycopy(receDatas, index, status_byte, 0, status_byte.length);
         status = HexUtil.printHexBinary(status_byte);
 
         byte[] cardType_byte = new byte[1];
-        System.arraycopy(receDatas, index += status_byte.length, cardType_byte, 0, cardType_byte.length);
+        arraycopy(receDatas, index += status_byte.length, cardType_byte, 0, cardType_byte.length);
         cardType = HexUtil.printHexBinary(cardType_byte);
 
         byte[] transType_byte = new byte[1];
-        System.arraycopy(receDatas, index += cardType_byte.length, transType_byte, 0, transType_byte.length);
+        arraycopy(receDatas, index += cardType_byte.length, transType_byte, 0, transType_byte.length);
         transType = HexUtil.printHexBinary(transType_byte);
 
         byte[] transNo_byte = new byte[3];
-        System.arraycopy(receDatas, index += transType_byte.length, transNo_byte, 0, transNo_byte.length);
+        arraycopy(receDatas, index += transType_byte.length, transNo_byte, 0, transNo_byte.length);
         transNo = HexUtil.printHexBinary(transNo_byte);
 
         byte[] cardNo_byte = new byte[8];
-        System.arraycopy(receDatas, index += transNo_byte.length, cardNo_byte, 0, cardNo_byte.length);
+        arraycopy(receDatas, index += transNo_byte.length, cardNo_byte, 0, cardNo_byte.length);
         cardNo = HexUtil.bcd2Str(cardNo_byte);
 
         byte[] cardBalance_byte = new byte[3];
-        System.arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
+        arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
         cardBalance = HexUtil.printHexBinary(cardBalance_byte);
 
         byte[] payFee_byte = new byte[3];
-        System.arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
+        arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
         payFee = HexUtil.printHexBinary(payFee_byte);
 
         byte[] transTime_byte = new byte[7];
-        System.arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
+        arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
         transTime = HexUtil.bcd2Str(transTime_byte);
 
         byte[] transNo2_byte = new byte[2];
-        System.arraycopy(receDatas, index += transTime_byte.length, transNo2_byte, 0, transNo2_byte.length);
+        arraycopy(receDatas, index += transTime_byte.length, transNo2_byte, 0, transNo2_byte.length);
         transNo2 = HexUtil.printHexBinary(transNo2_byte);
 
         byte[] tac_byte = new byte[4];
-        System.arraycopy(receDatas, index += transNo2_byte.length, tac_byte, 0, tac_byte.length);
+        arraycopy(receDatas, index += transNo2_byte.length, tac_byte, 0, tac_byte.length);
         tac = isSignOrBack ? HexUtil.bcd2Str(tac_byte) : HexUtil.printHexBinary(tac_byte);
 
         byte[] lineNoe_byte = new byte[2];
-        System.arraycopy(receDatas, index += tac_byte.length, lineNoe_byte, 0, lineNoe_byte.length);
+        arraycopy(receDatas, index += tac_byte.length, lineNoe_byte, 0, lineNoe_byte.length);
         lineNo = HexUtil.printHexBinary(lineNoe_byte);
 
         byte[] busNo_byte = new byte[3];
-        System.arraycopy(receDatas, index += lineNoe_byte.length, busNo_byte, 0, busNo_byte.length);
+        arraycopy(receDatas, index += lineNoe_byte.length, busNo_byte, 0, busNo_byte.length);
         busNo = HexUtil.bcd2Str(busNo_byte);
 
         byte[] driverNo_byte = new byte[4];
-        System.arraycopy(receDatas, index += busNo_byte.length, driverNo_byte, 0, driverNo_byte.length);
+        arraycopy(receDatas, index += busNo_byte.length, driverNo_byte, 0, driverNo_byte.length);
         driverNo = HexUtil.bcd2Str(driverNo_byte);
 
         byte[] pasmNo_byte = new byte[6];
-        System.arraycopy(receDatas, index += driverNo_byte.length, pasmNo_byte, 0, pasmNo_byte.length);
+        arraycopy(receDatas, index += driverNo_byte.length, pasmNo_byte, 0, pasmNo_byte.length);
         pasmNo = HexUtil.bcd2Str(pasmNo_byte);
 
         byte[] direction_byte = new byte[1];
-        System.arraycopy(receDatas, index += pasmNo_byte.length, direction_byte, 0, direction_byte.length);
+        arraycopy(receDatas, index += pasmNo_byte.length, direction_byte, 0, direction_byte.length);
         direction = HexUtil.printHexBinary(direction_byte);
 
         byte[] stationId_byte = new byte[1];
-        System.arraycopy(receDatas, index += direction_byte.length, stationId_byte, 0, stationId_byte.length);
+        arraycopy(receDatas, index += direction_byte.length, stationId_byte, 0, stationId_byte.length);
         stationId = HexUtil.printHexBinary(stationId_byte);
 
         byte[] fareFlag_byte = new byte[1];
-        System.arraycopy(receDatas, index + stationId_byte.length, fareFlag_byte, 0, fareFlag_byte.length);
+        arraycopy(receDatas, index + stationId_byte.length, fareFlag_byte, 0, fareFlag_byte.length);
         fareFlag = HexUtil.printHexBinary(fareFlag_byte);
 
-        upStatus = 1;
+        upStatus = 0;
         uniqueFlag = pasmNo + transNo + transTime;
         byte[] recordData = new byte[50];
-        System.arraycopy(receDatas, 0, recordData, 0, recordData.length);
+        arraycopy(receDatas, 0, recordData, 0, recordData.length);
         singleRecord = HexUtil.printHexBinary(recordData);
         SLog.d("ConsumeCard(ConsumeCard.java:119)" + toString());
     }
 
-    @Generated(hash = 1510813124)
-    public ConsumeCard(Long id, String status, String cardType, String transType, String transNo, String cardNo, String cardBalance,
-                       String payFee, String transTime, String transNo2, String tac, String lineNo, String busNo, String driverNo, String pasmNo,
-                       String direction, String stationId, String fareFlag, String uniqueFlag, Integer upStatus, String singleRecord,
-                       String reserve_1, String reserve_2, String reserve_3) {
+    public ConsumeCard(byte[] receDatas, boolean isSignOrBack, String city) {
+        int index = 0;
+        byte[] status_byte = new byte[1];
+        arraycopy(receDatas, index, status_byte, 0, status_byte.length);
+        status = HexUtil.printHexBinary(status_byte);
+
+        byte[] cardType_byte = new byte[1];
+        arraycopy(receDatas, index += status_byte.length, cardType_byte, 0, cardType_byte.length);
+        cardType = HexUtil.printHexBinary(cardType_byte);
+
+        byte[] transType_byte = new byte[1];
+        arraycopy(receDatas, index += cardType_byte.length, transType_byte, 0, transType_byte.length);
+        transType = HexUtil.printHexBinary(transType_byte);
+
+        byte[] transNo_byte = new byte[3];
+        arraycopy(receDatas, index += transType_byte.length, transNo_byte, 0, transNo_byte.length);
+        transNo = HexUtil.printHexBinary(transNo_byte);
+
+        byte[] cardNo_byte = new byte[8];
+        arraycopy(receDatas, index += transNo_byte.length, cardNo_byte, 0, cardNo_byte.length);
+        cardNo = HexUtil.bcd2Str(cardNo_byte);
+
+        byte[] cardBalance_byte = new byte[3];
+        arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
+        cardBalance = HexUtil.printHexBinary(cardBalance_byte);
+
+        byte[] payFee_byte = new byte[3];
+        arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
+        payFee = HexUtil.printHexBinary(payFee_byte);
+
+        byte[] transTime_byte = new byte[7];
+        arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
+        transTime = HexUtil.bcd2Str(transTime_byte);
+
+        byte[] transNo2_byte = new byte[2];
+        arraycopy(receDatas, index += transTime_byte.length, transNo2_byte, 0, transNo2_byte.length);
+        transNo2 = HexUtil.printHexBinary(transNo2_byte);
+
+        byte[] tac_byte = new byte[4];
+        arraycopy(receDatas, index += transNo2_byte.length, tac_byte, 0, tac_byte.length);
+        tac = isSignOrBack ? HexUtil.bcd2Str(tac_byte) : HexUtil.printHexBinary(tac_byte);
+
+        byte[] lineNoe_byte = new byte[2];
+        arraycopy(receDatas, index += tac_byte.length, lineNoe_byte, 0, lineNoe_byte.length);
+        lineNo = HexUtil.printHexBinary(lineNoe_byte);
+
+        byte[] busNo_byte = new byte[3];
+        arraycopy(receDatas, index += lineNoe_byte.length, busNo_byte, 0, busNo_byte.length);
+        busNo = HexUtil.bcd2Str(busNo_byte);
+
+        byte[] driverNo_byte = new byte[4];
+        arraycopy(receDatas, index += busNo_byte.length, driverNo_byte, 0, driverNo_byte.length);
+        driverNo = HexUtil.bcd2Str(driverNo_byte);
+
+        byte[] pasmNo_byte = new byte[6];
+        arraycopy(receDatas, index += driverNo_byte.length, pasmNo_byte, 0, pasmNo_byte.length);
+        pasmNo = HexUtil.bcd2Str(pasmNo_byte);
+
+        if (TextUtils.equals(city, "zibo")) {
+            getZibo(receDatas, index + pasmNo_byte.length);
+        } else if (TextUtils.equals(city, "laiwu")) {
+            getLw(receDatas, index + pasmNo_byte.length);
+        }
+
+    }
+
+    /**
+     * @param ziboDatas 淄博独有的数据
+     * @param index     下标
+     */
+    private void getZibo(byte[] ziboDatas, int index) {
+        byte[] direction_byte = new byte[1];
+        arraycopy(ziboDatas, index, direction_byte, 0, direction_byte.length);
+        direction = HexUtil.printHexBinary(direction_byte);
+
+        byte[] stationId_byte = new byte[1];
+        arraycopy(ziboDatas, index += direction_byte.length, stationId_byte, 0, stationId_byte.length);
+        stationId = HexUtil.printHexBinary(stationId_byte);
+
+        byte[] fareFlag_byte = new byte[1];
+        arraycopy(ziboDatas, index + stationId_byte.length, fareFlag_byte, 0, fareFlag_byte.length);
+        fareFlag = HexUtil.printHexBinary(fareFlag_byte);
+
+        upStatus = 0;
+        uniqueFlag = pasmNo + transNo + transTime;
+        byte[] recordData = new byte[50];
+        arraycopy(ziboDatas, 0, recordData, 0, recordData.length);
+        singleRecord = HexUtil.printHexBinary(recordData);
+
+        SLog.d("ConsumeCard(ConsumeCard.java:119)淄博>>" + toString());
+    }
+
+
+    private void getLw(byte[] lwDatas, int index) {
+        byte[] algFlag_bytes = new byte[1];
+        arraycopy(lwDatas, index, lwDatas, 0, algFlag_bytes.length);
+        algFlag = HexUtil.printHexBinary(algFlag_bytes);
+
+        byte[] issuerFlag_bytes = new byte[8];
+        arraycopy(lwDatas, index += algFlag_bytes.length, issuerFlag_bytes, 0, issuerFlag_bytes.length);
+        issuerFlag = HexUtil.printHexBinary(issuerFlag_bytes);
+
+        byte[] cardChildType_bytes = new byte[1];
+        arraycopy(lwDatas, index += issuerFlag_bytes.length, cardChildType_bytes, 0, cardChildType_bytes.length);
+        cardChildType = HexUtil.printHexBinary(cardChildType_bytes);
+
+        byte[] cpuVersion_bytes = new byte[1];
+        arraycopy(lwDatas, index + cardChildType_bytes.length, cpuVersion_bytes, 0, cpuVersion_bytes.length);
+        cpuVersion = HexUtil.printHexBinary(cpuVersion_bytes);
+
+        SLog.d("ConsumeCard(getLw.java:271)莱芜>>" + toString());
+    }
+
+    @Generated(hash = 364552961)
+    public ConsumeCard(Long id, String status, String cardType, String transType, String transNo, String cardNo,
+                       String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo,
+                       String busNo, String driverNo, String pasmNo, String direction, String stationId, String fareFlag,
+                       String algFlag, String issuerFlag, String cardChildType, String cpuVersion, String uniqueFlag,
+                       Integer upStatus, String singleRecord, String reserve_1, String reserve_2, String reserve_3) {
         this.id = id;
         this.status = status;
         this.cardType = cardType;
@@ -167,6 +298,10 @@ public class ConsumeCard {
         this.direction = direction;
         this.stationId = stationId;
         this.fareFlag = fareFlag;
+        this.algFlag = algFlag;
+        this.issuerFlag = issuerFlag;
+        this.cardChildType = cardChildType;
+        this.cpuVersion = cpuVersion;
         this.uniqueFlag = uniqueFlag;
         this.upStatus = upStatus;
         this.singleRecord = singleRecord;
@@ -371,6 +506,38 @@ public class ConsumeCard {
         this.singleRecord = singleRecord;
     }
 
+    public String getAlgFlag() {
+        return this.algFlag;
+    }
+
+    public void setAlgFlag(String algFlag) {
+        this.algFlag = algFlag;
+    }
+
+    public String getIssuerFlag() {
+        return this.issuerFlag;
+    }
+
+    public void setIssuerFlag(String issuerFlag) {
+        this.issuerFlag = issuerFlag;
+    }
+
+    public String getCardChildType() {
+        return this.cardChildType;
+    }
+
+    public void setCardChildType(String cardChildType) {
+        this.cardChildType = cardChildType;
+    }
+
+    public String getCpuVersion() {
+        return this.cpuVersion;
+    }
+
+    public void setCpuVersion(String cpuVersion) {
+        this.cpuVersion = cpuVersion;
+    }
+
     @Override
     public String toString() {
         return "ConsumeCard{" +
@@ -392,6 +559,10 @@ public class ConsumeCard {
                 ", direction='" + direction + '\'' +
                 ", stationId='" + stationId + '\'' +
                 ", fareFlag='" + fareFlag + '\'' +
+                ", algFlag='" + algFlag + '\'' +
+                ", issuerFlag='" + issuerFlag + '\'' +
+                ", cardChildType='" + cardChildType + '\'' +
+                ", cpuVersion='" + cpuVersion + '\'' +
                 ", uniqueFlag='" + uniqueFlag + '\'' +
                 ", upStatus=" + upStatus +
                 ", singleRecord='" + singleRecord + '\'' +

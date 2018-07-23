@@ -19,9 +19,10 @@ import com.szxb.buspay.db.entity.scan.BlackListEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
 import com.szxb.buspay.db.entity.scan.PublicKeyEntity;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
-import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
 
 import org.greenrobot.greendao.query.Query;
@@ -48,7 +49,6 @@ public class DBManager {
      */
     public static void insert(JSONObject object, String mch_trx_id, String openID,
                               String qrCode, int pay_fee) {
-        SLog.d("DBManager(insert.java:24)验码成功,保存数据：" + object.toJSONString());
         ScanInfoEntity infoEntity = new ScanInfoEntity();
         infoEntity.setStatus(1);//1表示未扣款
         infoEntity.setBiz_data_single(object.toJSONString());
@@ -57,7 +57,7 @@ public class DBManager {
         infoEntity.setOpenid(openID);
         infoEntity.setQrcode(qrCode);
         infoEntity.setPay_fee(pay_fee);
-        getDaoSession().getScanInfoEntityDao().insert(infoEntity);
+        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("weChat",infoEntity));
     }
 
     /**
@@ -218,162 +218,194 @@ public class DBManager {
     /**
      * @return 拦截某种卡1分钟内连刷
      */
-    public static boolean filterBrush() {
+    public static boolean filterBrush(String cardNo) {
         ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
         return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50)
-                .where(ConsumeCardDao.Properties.TransTime.ge(DateUtil.getCurrentDateLastMi(1, "yyyyMMddHHmmss")))
+                .where(ConsumeCardDao.Properties.CardNo.eq(cardNo),ConsumeCardDao.Properties.TransTime.ge(DateUtil.getCurrentDateLastMi(1, "yyyyMMddHHmmss")))
                 .count() > 0;
     }
 
 
     /**
-     *
      * @return 汇总
      */
     public static CntEntity getCnt() {
-        CntEntity cntEntity=new CntEntity();
-        String[] icTime=time(0);
-        String[]time=time(1);
-        int[] ic=getIcCnt(icTime[0],icTime[1]);
-        int[]weChat=getWcCnt(time[0],time[1]);
-        int[]union=getUnionCnt(time[0],time[1]);
+        CntEntity cntEntity = new CntEntity();
+        String[] icTime = time(0);
+        String[] time = time(1);
+        int[] ic = getIcCnt(icTime[0], icTime[1]);
+        int[] weChat = getWcCnt(time[0], time[1]);
+        int[] union = getUnionCnt(time[0], time[1]);
 
-        int[]cnt=getCnt(ic,weChat,union);
+        int[] cnt = getCnt(ic, weChat, union);
 
-        cntEntity.ic_card_swipe_cnt=new String[]{
+        cntEntity.ic_card_swipe_cnt = new String[]{
                 String.valueOf(ic[0]),
                 Util.fen2Yuan(ic[1]),
-                ic[2]+" | "+ic[3]};
+                ic[2] + " | " + ic[3]};
 
-        cntEntity.scan_cnt=new String[]{
+        cntEntity.scan_cnt = new String[]{
                 String.valueOf(weChat[0]),
                 Util.fen2Yuan(weChat[1]),
-                weChat[2]+" | "+weChat[3]};
+                weChat[2] + " | " + weChat[3]};
 
-        cntEntity.union_cnt=new String[]{
+        cntEntity.union_cnt = new String[]{
                 String.valueOf(union[0]),
                 Util.fen2Yuan(union[1]),
-                union[2]+" | "+union[3]};
+                union[2] + " | " + union[3]};
 
-        cntEntity.cnt=new String[]{
+        cntEntity.cnt = new String[]{
                 String.valueOf(cnt[0]),
                 Util.fen2Yuan(cnt[1]),
-                cnt[2]+" | "+cnt[3]};
+                cnt[2] + " | " + cnt[3]};
 
         return cntEntity;
     }
 
 
     /**
-     *
      * @return 汇总[今日总笔数，今日总金额，全部未上传总数，今日未上传总数]
      */
-    private static int[]getCnt(int[] ic, int[]weChat,int[]union){
-        int transCnt=ic[0]+weChat[0]+union[0];
-        int payCnt=ic[1]+weChat[1]+union[1];
-        int allUnUpCnt=ic[2]+weChat[2]+union[3];
-        int dayUnUpCnt=ic[3]+weChat[3]+union[3];
-        return new int[]{transCnt,payCnt,allUnUpCnt,dayUnUpCnt};
+    private static int[] getCnt(int[] ic, int[] weChat, int[] union) {
+        int transCnt = ic[0] + weChat[0] + union[0];
+        int payCnt = ic[1] + weChat[1] + union[1];
+        int allUnUpCnt = ic[2] + weChat[2] + union[3];
+        int dayUnUpCnt = ic[3] + weChat[3] + union[3];
+        return new int[]{transCnt, payCnt, allUnUpCnt, dayUnUpCnt};
     }
 
     /**
-     *
      * @param startTime 今日起始时间
-     * @param endTime 今日结束时间
+     * @param endTime   今日结束时间
      * @return 公交卡汇总信息[今日总笔数，今日总金额，全部未上传总数，今日未上传总数]
      */
-    private static int[]getIcCnt(String startTime,String endTime){
-        String icSql=" SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from CONSUME_CARD WHERE TRANS_TIME BETWEEN "
-                +startTime
-                +" AND "
-                +endTime;
+    public static int[] getIcCnt(String startTime, String endTime) {
+        String icSql = " SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from CONSUME_CARD WHERE TRANS_TIME BETWEEN "
+                + startTime
+                + " AND "
+                + endTime;
 
-        int[]cnt= cnt(icSql);
+        int[] cnt = cnt(icSql);
 
-        ConsumeCardDao dao=DBCore.getDaoSession().getConsumeCardDao();
+        ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
         //所有未上传数据
         long allUnUpCnt = dao.queryBuilder().where(ConsumeCardDao.Properties.UpStatus.eq("1")).count();
         //今日未上传数据
-        long currentUnUpCnt=dao.queryBuilder()
+        long currentUnUpCnt = dao.queryBuilder()
                 .where(ConsumeCardDao.Properties.TransTime.between(
                         startTime,
                         endTime))
                 .where(ConsumeCardDao.Properties.UpStatus.eq("1")).count();
-         return new int[]{cnt[0],cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
+        return new int[]{cnt[0], cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
     }
 
     /**
-     *
      * @param startTime 今日起始时间
-     * @param endTime 今日结束时间
+     * @param endTime   今日结束时间
      * @return 微信汇总信息
      */
-    private static int[]getWcCnt(String startTime,String endTime){
-        String sql=" SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from SCAN_INFO_ENTITY WHERE TIME BETWEEN "
-                +startTime
-                +" AND "
-                +endTime;
+    public static int[] getWcCnt(String startTime, String endTime) {
+        String sql = " SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from SCAN_INFO_ENTITY WHERE TIME BETWEEN "
+                + "'" + startTime + "'"
+                + " AND "
+                + "'" + endTime + "'";
 
-        int[]cnt= cnt(sql);
+        int[] cnt = cnt(sql);
 
-        ScanInfoEntityDao dao=DBCore.getDaoSession().getScanInfoEntityDao();
+        ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
         //所有未上传数据
         long allUnUpCnt = dao.queryBuilder().where(ScanInfoEntityDao.Properties.Status.eq("1")).count();
         //今日未上传数据
-        long currentUnUpCnt=dao.queryBuilder()
+        long currentUnUpCnt = dao.queryBuilder()
                 .where(ScanInfoEntityDao.Properties.Time.between(
                         startTime,
                         endTime))
                 .where(ScanInfoEntityDao.Properties.Status.eq("1")).count();
-        return new int[]{cnt[0],cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
+        return new int[]{cnt[0], cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
     }
 
     /**
-     *
      * @param startTime 今日起始时间
-     * @param endTime 今日结束时间
+     * @param endTime   今日结束时间
      * @return 银联汇总信息
      */
-    private static int[]getUnionCnt(String startTime,String endTime){
+    public static int[] getUnionCnt(String startTime, String endTime) {
 
-        String sql=" SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from UNION_PAY_ENTITY WHERE TIME BETWEEN "
-                +startTime
-                +" AND "
-                +endTime
-                +" AND ( RES_CODE='00' OR RES_CODE='A2' OR RES_CODE='A4' OR RES_CODE='A5' OR RES_CODE='A6'  ) ";
+        String sql = " SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from UNION_PAY_ENTITY WHERE TIME BETWEEN "
+                + "'" + startTime + "'"
+                + " AND "
+                + "'" + endTime + "'"
+                + " AND ( RES_CODE='00' OR RES_CODE='A2' OR RES_CODE='A4' OR RES_CODE='A5' OR RES_CODE='A6'  ) ";
 
-        int[]cnt= cnt(sql);
+        int[] cnt = cnt(sql);
 
-        UnionPayEntityDao dao=DBCore.getDaoSession().getUnionPayEntityDao();
+        UnionPayEntityDao dao = DBCore.getDaoSession().getUnionPayEntityDao();
         //所有未上传数据
         long allUnUpCnt = dao.queryBuilder().where(UnionPayEntityDao.Properties.UpStatus.eq("1")).count();
         //今日未上传数据
-        long currentUnUpCnt=dao.queryBuilder()
+        long currentUnUpCnt = dao.queryBuilder()
                 .where(UnionPayEntityDao.Properties.Time.between(
                         startTime,
                         endTime))
                 .where(UnionPayEntityDao.Properties.UpStatus.eq("1")).count();
-        return new int[]{cnt[0],cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
+        return new int[]{cnt[0], cnt[1], (int) allUnUpCnt, (int) currentUnUpCnt};
     }
 
     /**
-     *
      * @param sql sql
      * @return 总笔数、总金额
      */
-    private static int[]cnt(String sql){
+    public static int[] cnt(String sql) {
         Cursor icCursor = getDaoSession().getDatabase().rawQuery(sql, null);
-        int pay_fee_cnt = icCursor.getColumnIndex("amount");
+        int amount = icCursor.getColumnIndex("amount");
         int cnt = icCursor.getColumnIndex("cnt");
         //今日总笔数
-        String sum="0";
+        String sum = "0";
         //今日总金额
         String amountCnt = "0";
         while (icCursor.moveToNext()) {
-            amountCnt = icCursor.getString(pay_fee_cnt);
-            sum=icCursor.getString(cnt);
+            amountCnt = icCursor.getString(amount);
+            sum = icCursor.getString(cnt);
         }
+
+        sum = TextUtils.isEmpty(sum) ? "0" : sum;
+        amountCnt = TextUtils.isEmpty(amountCnt) ? "0" : amountCnt;
+
         icCursor.close();
-        return new int[]{string2Int(sum),string2Int(amountCnt)};
+        return new int[]{string2Int(sum), string2Int(amountCnt)};
+    }
+
+
+    /**
+     * 获取扫码记录
+     *
+     * @param day .
+     * @return .
+     */
+    public static List<ScanInfoEntity> getScanRecordList(int day) {
+        ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
+        return dao.queryBuilder()
+                .where(ScanInfoEntityDao.Properties.Time.ge(DateUtil.getScanCurrentDateLastDay("yyyy-MM-dd HH:mm:ss", day))).build().list();
+    }
+
+
+    /**
+     * @param day 前几天
+     * @return 刷公交卡记录
+     */
+    public static List<ConsumeCard> getConsumeCardList(int day) {
+        ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
+        return dao.queryBuilder()
+                .where(ConsumeCardDao.Properties.TransTime.ge(DateUtil.getScanCurrentDateLastDay("yyyyMMddHHmmss", day))).build().list();
+    }
+
+    /**
+     * @param day 前几天
+     * @return 刷银联卡记录
+     */
+    public static List<UnionPayEntity> getUnionPayList(int day) {
+        UnionPayEntityDao dao = DBCore.getDaoSession().getUnionPayEntityDao();
+        return dao.queryBuilder()
+                .where(UnionPayEntityDao.Properties.Time.ge(DateUtil.getScanCurrentDateLastDay("yyyy-MM-dd HH:mm:ss", day))).build().list();
     }
 }

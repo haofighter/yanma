@@ -125,6 +125,7 @@ public class QRCode {
     //IP配置码
     public static final int CONFIG_CODE_IP = 16;
 
+    //关闭菜单页
     public static final int STOP_CNT = 17;
 
     //签到
@@ -132,5 +133,8 @@ public class QRCode {
 
     //银联
     public static final int CONFIG_CODE_UNIONPAY = 19;
+
+    //汇总
+    public static final int CNT = 19;
 
 }

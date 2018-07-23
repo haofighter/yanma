@@ -74,7 +74,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         sign_bus_no.setText(BusApp.getPosManager().getBusNo());
         bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
                 BusApp.getPosManager().getBusNo(), BusApp.getPosManager().getDriverNo()));
-
     }
 
     @Override
@@ -110,7 +109,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mList.add(new MainEntity("日志导出"));
         mList.add(new MainEntity("检测网络"));
         mList.add(new MainEntity("校准时间"));
-        mList.add(new MainEntity("检查上传状态"));
         mList.add(new MainEntity("导出7天记录"));
         mList.add(new MainEntity("导出1个月记录"));
         mList.add(new MainEntity("导出3个月记录"));

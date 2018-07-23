@@ -116,7 +116,7 @@ public class PosInit {
                 blackListRequest.set(ParamsUtil.getBlackListMap());
                 Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(blackListRequest);
                 if (execute.isSucceed()) {
-                    SLog.d("PosInit(call.java:118)微信黑名单下载成功"+execute.get().toJSONString());
+                    SLog.d("PosInit(call.java:118)微信黑名单下载成功" + execute.get().toJSONString());
                     String bLMsg = execute.get().getString("retmsg");
                     if (!TextUtils.isEmpty(bLMsg) && TextUtils.equals(bLMsg, "ok")) {
                         final JSONArray array = execute.get().getJSONArray("black_list");
@@ -145,19 +145,16 @@ public class PosInit {
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean aBoolean) {
-                        SLog.d("PosInit(call.java:147)扫码初始化:"+aBoolean);
-                        BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化失败" : "扫码初始化成功", aBoolean);
+                        SLog.d("PosInit(call.java:147)扫码初始化:" + aBoolean);
+                        BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化成功" : "扫码初始化失败", aBoolean);
                         if (listener != null) {
-                            SLog.d("PosInit(call.java:152)listener!=null");
                             listener.onCallBack(aBoolean);
-                        }else {
-                            SLog.d("PosInit(call.java:152)listener==null");
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        SLog.d("PosInit(call.java:156)扫码初始化异常:"+throwable.toString());
+                        SLog.d("PosInit(call.java:156)扫码初始化异常:" + throwable.toString());
                         BusToast.showToast(BusApp.getInstance(), "网络或服务器异常", false);
                         if (listener != null) {
                             listener.onCallBack(false);
@@ -307,7 +304,7 @@ public class PosInit {
     }
 
     //下载指定文件
-    public void downloadAppointFile(final String fileName,final String busNo) {
+    public void downloadAppointFile(final String fileName, final String busNo) {
         Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
             public void call(Subscriber<? super Boolean> subscriber) {
@@ -360,7 +357,7 @@ public class PosInit {
                         dao.insertOrReplace(onLineInfo);
 
 
-                        HexUtil.parseLine(onLineInfo,busNo);
+                        HexUtil.parseLine(onLineInfo, busNo);
 
                         BusApp.getPosManager().setLineInfoEntity();
                     }

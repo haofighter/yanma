@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.rx.RxBus;
@@ -84,7 +85,7 @@ public class LoopScanTask extends Service {
     private boolean filterCheck(String result) {
         if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) return true;
         if (TextUtils.equals(result, tem)) {
-            RxBus.getInstance().send(new QRScanMessage(null, QRCode.REFRESH_QR_CODE));
+            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_QR_CODE));
             lastTime = SystemClock.elapsedRealtime();
             return true;
         }

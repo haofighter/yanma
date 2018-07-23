@@ -93,4 +93,42 @@ public class Config {
 
     public static final int IC_RECHARGE = 25;//24.请充值
 
+
+    //菜单
+    //公交卡刷卡
+    public static final int POSITION_BUS_RECORD = 0;
+
+    //扫码记录
+    public static final int POSITION_SCAN_RECORD = POSITION_BUS_RECORD + 1;
+
+    //银联卡记录
+    public static final int POSITION_UNION_RECORD = POSITION_SCAN_RECORD + 1;
+
+    //汇总
+    public static final int POSITION_CNT = POSITION_UNION_RECORD + 1;
+
+    //上传记录
+    public static final int POSITION_PUSH_RECORD = POSITION_CNT + 1;
+
+    //数据库导出
+    public static final int POSITION_EXPORT_DB = POSITION_PUSH_RECORD + 1;
+
+    //日志导出
+    public static final int POSITION_EXPORT_LOG = POSITION_EXPORT_DB + 1;
+
+    //检测网络
+    public static final int POSITION_CHECK_NET = POSITION_EXPORT_LOG + 1;
+
+    //校准时间
+    public static final int POSITION_TIME = POSITION_CHECK_NET + 1;
+
+    //导出7天记录
+    public static final int POSITION_EXPORT_7 = POSITION_TIME + 1;
+
+    //导出1个月记录
+    public static final int POSITION_EXPORT_1_M = POSITION_EXPORT_7 + 1;
+
+    //导出3个月记录
+    public static final int POSITION_EXPORT_3_M = POSITION_EXPORT_1_M + 1;
+
 }

@@ -2,6 +2,8 @@ package com.szxb.buspay.util;
 
 import android.util.Log;
 
+import com.szxb.buspay.BusApp;
+import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 
@@ -103,39 +105,37 @@ public class DateUtil {
     }
 
     /**
-     *
      * @param type 0：公交卡，1：微信、银联卡
      * @return .
      */
-    public static String[] time(int type){
-        if (type==0){
-            String startTime=DateUtil.getTime("yyyyMMddHHmmss",0,0,0,0);
-            String endTime=DateUtil.getTime("yyyyMMddHHmmss",23,59,59,999);
-            return new String[]{startTime,endTime};
-        }else {
-            String startTime=DateUtil.getTime("yyyy-MM-dd HH:mm:ss",0,0,0,0);
-            String endTime=DateUtil.getTime("yyyy-MM-dd HH:mm:ss",23,59,59,999);
-            return new String[]{startTime,endTime};
+    public static String[] time(int type) {
+        if (type == 0) {
+            String startTime = DateUtil.getTime("yyyyMMddHHmmss", 0, 0, 0, 0);
+            String endTime = DateUtil.getTime("yyyyMMddHHmmss", 23, 59, 59, 999);
+            return new String[]{startTime, endTime};
+        } else {
+            String startTime = DateUtil.getTime("yyyy-MM-dd HH:mm:ss", 0, 0, 0, 0);
+            String endTime = DateUtil.getTime("yyyy-MM-dd HH:mm:ss", 23, 59, 59, 999);
+            return new String[]{startTime, endTime};
         }
     }
 
     /**
-     *
-     * @param format 格式：公交卡：yyyyMMddHHmmss,其他yyyy-MM-dd HH:mm:ss
+     * @param format            格式：公交卡：yyyyMMddHHmmss,其他yyyy-MM-dd HH:mm:ss
      * @param hour_of_day_value 小时
-     * @param minute_value 分钟
-     * @param second_value 秒
+     * @param minute_value      分钟
+     * @param second_value      秒
      * @param millisecond_value 毫秒
      * @return 当前开始时间|结束时间
      */
-    private static String getTime(String format,int hour_of_day_value,
-                                 int minute_value,int second_value,int millisecond_value ){
-        SimpleDateFormat ft=new SimpleDateFormat(format, new Locale("zh", "CN"));
-        Calendar calendar=Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY,hour_of_day_value);
-        calendar.set(Calendar.MINUTE,minute_value);
-        calendar.set(Calendar.SECOND,second_value);
-        calendar.set(Calendar.MILLISECOND,millisecond_value);
+    public static String getTime(String format, int hour_of_day_value,
+                                 int minute_value, int second_value, int millisecond_value) {
+        SimpleDateFormat ft = new SimpleDateFormat(format, new Locale("zh", "CN"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour_of_day_value);
+        calendar.set(Calendar.MINUTE, minute_value);
+        calendar.set(Calendar.SECOND, second_value);
+        calendar.set(Calendar.MILLISECOND, millisecond_value);
         return ft.format(calendar.getTime());
     }
 
@@ -160,5 +160,46 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 校准时间
+     *
+     * @param time .
+     */
+    public static void setTime(String time) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("zh", "CN"));
+            Date date = format.parse(time);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.get(Calendar.YEAR);
+            calendar.get(Calendar.MONTH);
+            calendar.get(Calendar.DATE);
+            calendar.get(Calendar.HOUR);
+            calendar.get(Calendar.MINUTE);
+
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH) + 1;
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int min = calendar.get(Calendar.MINUTE);
+            BusApp.getInstance().getmService().setDateTime(year, month, day, hour, min);
+            setK21Time();
+            BusToast.showToast(BusApp.getInstance(), "校准成功", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            SLog.d("DateUtil(setTime.java:190)时间校准失败>>" + e.toString());
+            BusToast.showToast(BusApp.getInstance(), "校准失败\n" + e.toString(), false);
+        }
+    }
+
+
+    //扫码当前时间的前day天
+    public static String getScanCurrentDateLastDay(String format, int day) {
+        Calendar beforeTime = Calendar.getInstance();
+        beforeTime.add(Calendar.DATE, -day);//
+        Date beforeD = beforeTime.getTime();
+        SimpleDateFormat fd = new SimpleDateFormat(format, new Locale("zh", "CN"));
+        return fd.format(beforeD);
+    }
 }
 

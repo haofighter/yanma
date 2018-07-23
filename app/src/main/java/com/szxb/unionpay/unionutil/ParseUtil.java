@@ -231,14 +231,6 @@ public class ParseUtil {
 
 
     /**
-     * @param unionPayEntity 保存银联卡交易记录
-     */
-    public static void save_unionPay_record(UnionPayEntity unionPayEntity) {
-        UnionPayEntityDao dao = DBCore.getDaoSession().getUnionPayEntityDao();
-        dao.insertOrReplaceInTx(unionPayEntity);
-    }
-
-    /**
      * 保存IC卡交易参数
      *
      * @param var aid

@@ -4,6 +4,7 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
@@ -22,7 +23,6 @@ import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.UnionCard;
 
-import static com.szxb.buspay.db.entity.bean.QRCode.SIGN;
 import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_CHECK;
 import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_CHECKED;
 import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_EMP;
@@ -38,13 +38,13 @@ import static com.szxb.buspay.util.Util.filter;
 import static com.szxb.buspay.util.Util.hex2Int;
 
 /**
- * 作者：Tangren on 2018-07-19
+ * 作者：Tangren on 2018-07-23
  * 包名：com.szxb.buspay.task.card
  * 邮箱：996489865@qq.com
  * TODO:一句话描述
  */
 
-public class LoopCardThread extends Thread {
+public class LoopLwCardThread extends Thread {
 
     private boolean isBlack = false;
     private boolean isWhite = false;
@@ -88,14 +88,12 @@ public class LoopCardThread extends Thread {
 
             if (TextUtils.equals(searchCard.cardType, "02")
                     || TextUtils.equals(searchCard.cardType, "03")
-                    || TextUtils.equals(searchCard.cardType, "04")) {
+                    || TextUtils.equals(searchCard.cardType, "04")
+                    || TextUtils.equals(searchCard.cardType, "45")) {
                 //如果属于上述卡类型,如果票价小于普通卡金额做1分钟去重
                 int normalAmount = payFee(CARD_NORMAL);
                 int currentAmount = payFee(searchCard.cardType);
-                SLog.d("LoopCardThread(run.java:95)normalAmount="+normalAmount);
-                SLog.d("LoopCardThread(run.java:96)currentAmount="+currentAmount);
-
-                if (currentAmount <normalAmount) {
+                if (currentAmount < normalAmount) {
                     if (DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo)) {
                         BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", true);
                         lastTime = SystemClock.elapsedRealtime();
@@ -127,7 +125,7 @@ public class LoopCardThread extends Thread {
                         //司机卡上班
                         BusApp.getPosManager().setDriverNo(response.getTac());
                         notice(Config.IC_TO_WORK, "司机卡上班[" + response.getTac() + "]", true);
-                        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), SIGN));
+                        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
                         saveRecord(response);
                     } else {
                         BusToast.showToast(BusApp.getInstance(), "签到失败[" + response.getStatus() + "|" + response.getTransType() + "]", false);
@@ -156,15 +154,12 @@ public class LoopCardThread extends Thread {
                             //下班
                             BusApp.getPosManager().setDriverNo(String.format("%08d", 0));
                             notice(Config.IC_OFF_WORK, "司机卡下班[00]", true);
-                            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), SIGN));
+                            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
                             saveRecord(response);
 
                         } else {
                             //员工卡正常消费
                             SLog.d("LoopCardThread(run.java:100)员工卡正常消费>>>金额=" + response.getPayFee() + "..余额=" + response.getCardBalance());
-                            if (checkLine()) {
-                                return;
-                            }
 
                             if (TextUtils.equals(searchCard.cardType, "06")) {
                                 //如果司机卡是消费状态,1分钟去重
@@ -191,9 +186,6 @@ public class LoopCardThread extends Thread {
 
                 } else {
                     //其他卡
-                    if (checkLine()) {
-                        return;
-                    }
                     elseCardControl(searchCard);
                 }
             }
@@ -204,20 +196,6 @@ public class LoopCardThread extends Thread {
             e.printStackTrace();
             SLog.d("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
         }
-    }
-
-    /**
-     * 检查线路是否存在
-     *
-     * @return .
-     */
-    private boolean checkLine() {
-        if (BusApp.getPosManager().getLineInfoEntity() == null) {
-            BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
-            lastTime = SystemClock.elapsedRealtime();
-            return true;
-        }
-        return false;
     }
 
 
@@ -373,7 +351,7 @@ public class LoopCardThread extends Thread {
         SLog.d("LoopCardThread(response.java:279)发送的报文:" + HexUtil.printHexBinary(sendData));
 
         int ret = libszxb.qxcardprocess(sendData);
-        return new ConsumeCard(sendData, isSign, "zibo");
+        return new ConsumeCard(sendData, isSign,"zibo");
     }
 
     /**
@@ -387,7 +365,7 @@ public class LoopCardThread extends Thread {
             //下班成功
             BusApp.getPosManager().setDriverNo(String.format("%08d", 0));
             notice(Config.IC_OFF_WORK, "司机卡下班[00]", true);
-            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), SIGN));
+            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
             //保存下班记录
             saveRecord(response);
         } else {

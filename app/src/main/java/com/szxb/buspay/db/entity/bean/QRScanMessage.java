@@ -12,6 +12,7 @@ import com.szxb.buspay.db.entity.scan.PosRecord;
 public class QRScanMessage {
 
     private PosRecord posRecord;
+    private CntEntity cntEntity;
     private int result;
 
     public PosRecord getPosRecord() {
@@ -33,6 +34,20 @@ public class QRScanMessage {
     public QRScanMessage(PosRecord posRecord, int result) {
         this.posRecord = posRecord;
         this.result = result;
+    }
+
+
+    public QRScanMessage(CntEntity cntEntity, int result) {
+        this.cntEntity = cntEntity;
+        this.result = result;
+    }
+
+    public CntEntity getCntEntity() {
+        return cntEntity;
+    }
+
+    public void setCntEntity(CntEntity cntEntity) {
+        this.cntEntity = cntEntity;
     }
 
     @Override

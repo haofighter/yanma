@@ -3,7 +3,16 @@ package com.szxb.buspay.db.manager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.szxb.buspay.db.dao.BlackListCardDao;
+import com.szxb.buspay.db.dao.BlackListEntityDao;
+import com.szxb.buspay.db.dao.ConsumeCardDao;
 import com.szxb.buspay.db.dao.DaoMaster;
+import com.szxb.buspay.db.dao.LineInfoEntityDao;
+import com.szxb.buspay.db.dao.MacKeyEntityDao;
+import com.szxb.buspay.db.dao.PublicKeyEntityDao;
+import com.szxb.buspay.db.dao.ScanInfoEntityDao;
+import com.szxb.buspay.db.dao.UnionAidEntityDao;
+import com.szxb.buspay.db.dao.UnionPayEntityDao;
 import com.szxb.mlog.SLog;
 
 import org.greenrobot.greendao.database.Database;
@@ -37,16 +46,26 @@ public class DBHelper extends DaoMaster.OpenHelper {
     private void update(SQLiteDatabase db, int oldVersion, int newVersion) {
         SLog.d("update(DBHelper.java:57))oldVersion=" + oldVersion + "newVersion=" + newVersion);
         MigrationHelper.migrate(db, new MigrationHelper.ReCreateAllTableListener() {
-            @Override
-            public void onCreateAllTables(Database db, boolean ifNotExists) {
-                DaoMaster.createAllTables(db, ifNotExists);
-            }
+                    @Override
+                    public void onCreateAllTables(Database db, boolean ifNotExists) {
+                        DaoMaster.createAllTables(db, ifNotExists);
+                    }
 
-            @Override
-            public void onDropAllTables(Database db, boolean ifExists) {
-                DaoMaster.dropAllTables(db, ifExists);
-            }
-        });
+                    @Override
+                    public void onDropAllTables(Database db, boolean ifExists) {
+                        DaoMaster.dropAllTables(db, ifExists);
+                    }
+                },
+                BlackListCardDao.class,
+                BlackListEntityDao.class,
+                ConsumeCardDao.class,
+                LineInfoEntityDao.class,
+                MacKeyEntityDao.class,
+                PublicKeyEntityDao.class,
+                ScanInfoEntityDao.class,
+                UnionAidEntityDao.class,
+                UnionPayEntityDao.class
+        );
     }
 
 }

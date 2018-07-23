@@ -8,8 +8,8 @@ android {
         applicationId "com.szxb.buspay"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 7
-        versionName "2.5.6"
+        versionCode 1
+        versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -17,13 +17,19 @@ android {
         }
     }
     buildTypes {
+
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     greendao {
-        schemaVersion 10
+        schemaVersion 1
         daoPackage 'com.szxb.buspay.db.dao'
         targetGenDir 'src/main/java'
     }
