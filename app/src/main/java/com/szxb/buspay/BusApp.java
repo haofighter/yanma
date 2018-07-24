@@ -10,6 +10,7 @@ import android.os.IBinder;
 import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
+import com.szxb.buspay.task.service.TimeSettleTask;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.AndroidLogAdapter;
@@ -20,7 +21,6 @@ import com.szxb.mlog.PrettyFormatStrategy;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.config.UnionPayManager;
 import com.yanzhenjie.nohttp.InitializationConfig;
-import com.yanzhenjie.nohttp.Logger;
 import com.yanzhenjie.nohttp.NoHttp;
 import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
 
@@ -49,15 +49,18 @@ public class BusApp extends Application {
 
         manager = new PosManager();
         manager.loadFromPrefs();
-        SoundPoolUtil.init(this);
+
         initLog();
+
+        SoundPoolUtil.init(this);
 
         NoHttp.initialize(InitializationConfig.newBuilder(this)
                 .networkExecutor(new OkHttpNetworkExecutor())
                 .connectionTimeout(10 * 1000)
                 .build());
-        Logger.setDebug(true);
 
+        Intent timeSettleTaskIntent = new Intent(this, TimeSettleTask.class);
+        startService(timeSettleTaskIntent);
         initService();
     }
 
@@ -110,7 +113,7 @@ public class BusApp extends Application {
         SLog.addLogAdapter(new AndroidLogAdapter(format));
         FormatStrategy formatStrategy = CsvFormatStrategy.newBuilder()
                 .tag("ziBoBus:")
-                .fileName("LLLL")
+                .fileName(BusApp.getPosManager().getBusNo())
                 .build();
         SLog.addLogAdapter(new DiskLogAdapter(formatStrategy));
     }

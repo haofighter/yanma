@@ -2,7 +2,6 @@ package com.szxb.buspay.task.scan;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
@@ -33,8 +32,6 @@ public class LoopScanThread extends Thread {
     @Override
     public void run() {
         super.run();
-        Log.d("LoopScanThread",
-                "run(LoopScanThread.java:30)扫码");
         try {
             byte[] recs = new byte[1024];
             int barcode = libszxb.getBarcode(recs);
@@ -42,6 +39,9 @@ public class LoopScanThread extends Thread {
                 String result = new String(recs, 0, barcode);
                 if (PosScanManager.isTenQRcode(result)) {
                     if (filterCheck(result)) {
+                        return;
+                    }
+                    if (checkLine()) {
                         return;
                     }
                     PosScanManager.getInstance().txposScan(result);
@@ -65,6 +65,23 @@ public class LoopScanThread extends Thread {
             SLog.d("LoopScanThread(run.java:58)" + e.toString());
         }
     }
+
+
+    /**
+     * 检查线路是否存在
+     *
+     * @return .
+     */
+    private boolean checkLine() {
+        if (BusApp.getPosManager().getLineInfoEntity() == null) {
+            BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
+            lastTime = SystemClock.elapsedRealtime();
+            return true;
+        }
+        String driverNo = BusApp.getPosManager().getDriverNo();
+        return TextUtils.equals(driverNo, String.format("%08d", 0));
+    }
+
 
     private boolean filterCheck(String result) {
         if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) return true;

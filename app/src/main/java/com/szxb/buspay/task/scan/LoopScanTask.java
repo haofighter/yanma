@@ -82,6 +82,7 @@ public class LoopScanTask extends Service {
         }, 500, 200, TimeUnit.MILLISECONDS);
     }
 
+
     private boolean filterCheck(String result) {
         if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) return true;
         if (TextUtils.equals(result, tem)) {

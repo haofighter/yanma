@@ -54,6 +54,7 @@ public class QRScanMessage {
     public String toString() {
         return "QRScanMessage{" +
                 "posRecord=" + posRecord +
+                ", cntEntity=" + cntEntity +
                 ", result=" + result +
                 '}';
     }

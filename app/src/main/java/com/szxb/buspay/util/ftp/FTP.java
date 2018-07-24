@@ -88,7 +88,7 @@ public class FTP {
         boolean success = false;
         FTPClient ftp = new FTPClient();
         int reply;
-        ftp.setConnectTimeout(3000);
+        ftp.setConnectTimeout(12000);
         try {
             ftp.connect(url, port);// 连接FTP服务器
 

@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="23dp"
         android:background="@color/colorAccent"
-        android:gravity="center"
         android:text="网络连接异常"
         android:textColor="@color/colorWhite"
         android:textSize="18sp"

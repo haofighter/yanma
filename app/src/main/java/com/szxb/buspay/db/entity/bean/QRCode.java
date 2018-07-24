@@ -135,6 +135,9 @@ public class QRCode {
     public static final int CONFIG_CODE_UNIONPAY = 19;
 
     //汇总
-    public static final int CNT = 19;
+    public static final int CNT = 20;
+
+    //汇总
+    public static final int NET_STATUS = 21;
 
 }

@@ -1,6 +1,7 @@
 package com.szxb.buspay.util.rx;
 
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.mlog.SLog;
 
 import rx.Observable;
 import rx.subjects.PublishSubject;
@@ -21,6 +22,7 @@ public class RxBus {
 
     private RxBus() {
         bus = new SerializedSubject<>(PublishSubject.create());
+        SLog.d("RxBus(RxBus.java:24)RxBus是否订阅成功>>" + bus.hasObservers());
     }
 
     /**
@@ -45,7 +47,10 @@ public class RxBus {
      * @param o
      */
     public void send(QRScanMessage o) {
-        bus.onNext(o);
+        do {
+            bus.onNext(o);
+        } while (!hasObservers());
+
     }
 
     /**

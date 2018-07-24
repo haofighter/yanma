@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.bean.card.CardTypeLw;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.entity.scan.PosRecord;
@@ -23,16 +24,8 @@ import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.UnionCard;
 
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_CHECK;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_CHECKED;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_EMP;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_FREE;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_GATHER;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_MEMORY;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_NORMAL;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_OLD;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_SIGNED;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_STUDENT;
+import static com.szxb.buspay.db.entity.bean.card.CardTypeLw.CARD_CPU_DEFECT;
+import static com.szxb.buspay.db.entity.bean.card.CardTypeLw.CARD_NORMAL;
 import static com.szxb.buspay.util.Util.fen2Yuan;
 import static com.szxb.buspay.util.Util.filter;
 import static com.szxb.buspay.util.Util.hex2Int;
@@ -86,15 +79,18 @@ public class LoopLwCardThread extends Thread {
                 return;
             }
 
-            if (TextUtils.equals(searchCard.cardType, "02")
-                    || TextUtils.equals(searchCard.cardType, "03")
-                    || TextUtils.equals(searchCard.cardType, "04")
-                    || TextUtils.equals(searchCard.cardType, "45")) {
+            if (TextUtils.equals(searchCard.cardType, CardTypeLw.CARD_STUDENT)
+                    || TextUtils.equals(searchCard.cardType, CardTypeLw.CARD_OLD)
+                    || TextUtils.equals(searchCard.cardType, CardTypeLw.CARD_FREE)
+                    || TextUtils.equals(searchCard.cardType, CardTypeLw.CARD_CPU_STUDENT)
+                    || TextUtils.equals(searchCard.cardType, CardTypeLw.CARD_CPU_FREE)
+                    || TextUtils.equals(searchCard.cardType, CARD_CPU_DEFECT)) {
                 //如果属于上述卡类型,如果票价小于普通卡金额做1分钟去重
                 int normalAmount = payFee(CARD_NORMAL);
                 int currentAmount = payFee(searchCard.cardType);
+                //金额小于普通卡金额则1分钟不能连刷，04有可能为济南卡故也要排除
                 if (currentAmount < normalAmount) {
-                    if (DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo)) {
+                    if (DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo,searchCard.cardType)) {
                         BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", true);
                         lastTime = SystemClock.elapsedRealtime();
                         return;
@@ -166,7 +162,7 @@ public class LoopLwCardThread extends Thread {
                                 int normalAmount = payFee(CARD_NORMAL);
                                 int currentAmount = payFee(searchCard.cardType);
                                 if (currentAmount < normalAmount) {
-                                    if (DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo)) {
+                                    if (DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo,searchCard.cardType)) {
                                         BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", true);
                                         lastTime = SystemClock.elapsedRealtime();
                                         return;
@@ -303,20 +299,72 @@ public class LoopLwCardThread extends Thread {
         int basePrices = BusApp.getPosManager().getBasePrice();
         switch (cardType) {
             case CARD_NORMAL://普通卡
-            case CARD_MEMORY://纪念卡
+            case CardTypeLw.CARD_MEMORY://纪念卡
                 return Util.string2Int(coefficent[0]) * basePrices / 100;
-            case CARD_STUDENT://学生卡
+            case CardTypeLw.CARD_STUDENT://学生卡
+            case CardTypeLw.CARD_CPU_STUDENT://CPU学生卡
                 return Util.string2Int(coefficent[1]) * basePrices / 100;
-            case CARD_OLD://老年卡
+            case CardTypeLw.CARD_OLD://老年卡
+            case CardTypeLw.CARD_CPU_OLD://CPU老年卡
                 return Util.string2Int(coefficent[2]) * basePrices / 100;
-            case CARD_FREE://免费卡
+            case CardTypeLw.CARD_CPU_FREE://CPU免费卡
                 return Util.string2Int(coefficent[3]) * basePrices / 100;
-            case CARD_EMP://员工卡
+            case CardTypeLw.CARD_CPU_DEFECT://残疾人卡
                 return Util.string2Int(coefficent[4]) * basePrices / 100;
-            case CARD_GATHER:
-            case CARD_SIGNED:
-            case CARD_CHECKED:
-            case CARD_CHECK:
+            case CardTypeLw.CARD_EMP://员工卡
+                return Util.string2Int(coefficent[5]) * basePrices / 100;
+            case CardTypeLw.CARD_GATHER:
+            case CardTypeLw.CARD_SIGNED:
+            case CardTypeLw.CARD_CHECKED:
+            case CardTypeLw.CARD_CHECK:
+                return 0;
+            default:
+                return Util.string2Int(coefficent[0]) * basePrices / 100;
+        }
+    }
+
+    /**
+     * @param cardType       卡类型
+     * @param cardModuleType 卡物理类型
+     * @return .
+     */
+    private int payFee(String cardType, String cardModuleType) {
+        String[] coefficent = BusApp.getPosManager().getCoefficent();
+        int basePrices = BusApp.getPosManager().getBasePrice();
+
+        if (TextUtils.equals(cardType, "04")) {
+            //有可能是M1免费卡或者CPU济南卡
+            if (TextUtils.equals(cardModuleType, "08")) {
+                //M1
+                //免费卡
+                return Util.string2Int(coefficent[3]) * basePrices / 100;
+            } else {
+                //CPU
+                //济南卡
+                return Util.string2Int(coefficent[9]) * basePrices / 100;
+            }
+
+        }
+        switch (cardType) {
+            case CARD_NORMAL://普通卡
+            case CardTypeLw.CARD_MEMORY://纪念卡
+                return Util.string2Int(coefficent[0]) * basePrices / 100;
+            case CardTypeLw.CARD_STUDENT://学生卡
+            case CardTypeLw.CARD_CPU_STUDENT://CPU学生卡
+                return Util.string2Int(coefficent[1]) * basePrices / 100;
+            case CardTypeLw.CARD_OLD://老年卡
+            case CardTypeLw.CARD_CPU_OLD://CPU老年卡
+                return Util.string2Int(coefficent[2]) * basePrices / 100;
+            case CardTypeLw.CARD_CPU_FREE://CPU免费卡
+                return Util.string2Int(coefficent[3]) * basePrices / 100;
+            case CardTypeLw.CARD_CPU_DEFECT://残疾人卡
+                return Util.string2Int(coefficent[4]) * basePrices / 100;
+            case CardTypeLw.CARD_EMP://员工卡
+                return Util.string2Int(coefficent[5]) * basePrices / 100;
+            case CardTypeLw.CARD_GATHER:
+            case CardTypeLw.CARD_SIGNED:
+            case CardTypeLw.CARD_CHECKED:
+            case CardTypeLw.CARD_CHECK:
                 return 0;
             default:
                 return Util.string2Int(coefficent[0]) * basePrices / 100;
@@ -351,7 +399,7 @@ public class LoopLwCardThread extends Thread {
         SLog.d("LoopCardThread(response.java:279)发送的报文:" + HexUtil.printHexBinary(sendData));
 
         int ret = libszxb.qxcardprocess(sendData);
-        return new ConsumeCard(sendData, isSign,"zibo");
+        return new ConsumeCard(sendData, isSign, "zibo");
     }
 
     /**

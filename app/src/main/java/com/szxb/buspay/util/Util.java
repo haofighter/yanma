@@ -1,10 +1,15 @@
 package com.szxb.buspay.util;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.mlog.SLog;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 
 /**
@@ -188,5 +193,27 @@ public class Util {
             default:
                 return "UNK[" + resCode + "]";
         }
+    }
+
+
+    /**
+     * @param fileName 文件名
+     * @param context  .
+     * @return 本地配置参数
+     */
+    public static String readAssetsFile(String fileName, Context context) {
+        StringBuilder builder = new StringBuilder();
+        AssetManager manager = context.getAssets();
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(manager.open(fileName)));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            SLog.d("Util(readAssetsFile.java:212)读取本地配置文件异常>>" + e.toString());
+        }
+        return builder.toString();
     }
 }

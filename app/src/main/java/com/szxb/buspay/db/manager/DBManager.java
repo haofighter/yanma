@@ -57,7 +57,7 @@ public class DBManager {
         infoEntity.setOpenid(openID);
         infoEntity.setQrcode(qrCode);
         infoEntity.setPay_fee(pay_fee);
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("weChat",infoEntity));
+        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("weChat", infoEntity));
     }
 
     /**
@@ -216,12 +216,16 @@ public class DBManager {
     }
 
     /**
+     * @param cardNo   卡号
+     * @param cardType 卡类型
      * @return 拦截某种卡1分钟内连刷
      */
-    public static boolean filterBrush(String cardNo) {
+    public static boolean filterBrush(String cardNo, String cardType) {
         ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
         return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50)
-                .where(ConsumeCardDao.Properties.CardNo.eq(cardNo),ConsumeCardDao.Properties.TransTime.ge(DateUtil.getCurrentDateLastMi(1, "yyyyMMddHHmmss")))
+                .where(ConsumeCardDao.Properties.CardNo.eq(cardNo),
+                        ConsumeCardDao.Properties.CardType.eq(cardType),
+                        ConsumeCardDao.Properties.TransTime.ge(DateUtil.getCurrentDateLastMi(1, "yyyyMMddHHmmss")))
                 .count() > 0;
     }
 
@@ -407,5 +411,17 @@ public class DBManager {
         UnionPayEntityDao dao = DBCore.getDaoSession().getUnionPayEntityDao();
         return dao.queryBuilder()
                 .where(UnionPayEntityDao.Properties.Time.ge(DateUtil.getScanCurrentDateLastDay("yyyy-MM-dd HH:mm:ss", day))).build().list();
+    }
+
+    /**
+     * @return 得到未支付的数据每次最多10条, 降序排列取得最新的最多25条数据
+     */
+    public static List<ScanInfoEntity> getSwipeList() {
+        ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
+        Query<ScanInfoEntity> qb = dao.queryBuilder()
+                .whereOr(ScanInfoEntityDao.Properties.Status.eq(1), ScanInfoEntityDao.Properties.Status.eq(4))
+                .where(ScanInfoEntityDao.Properties.Time.le(DateUtil.getCurrentDateLastMi(1)))
+                .limit(10).orderDesc(ScanInfoEntityDao.Properties.Id).build();
+        return qb.list();
     }
 }

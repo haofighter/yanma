@@ -93,6 +93,9 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                 bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
                         BusApp.getPosManager().getBusNo(), driverNo));
                 break;
+            case QRCode.NET_STATUS:
+                net_status.setVisibility(AppUtil.checkNetStatus() ? View.GONE : View.VISIBLE);
+                break;
             default:
                 break;
         }

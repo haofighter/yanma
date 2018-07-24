@@ -62,6 +62,7 @@
 -keep class com.szxb.buspay.db.entity.bean.card.SearchCard {*;}
 -keep class com.szxb.buspay.db.entity.scan.** {*;}
 -keep class com.com.szxb.unionpay.config.**{*;}
+-keep class com.szxb.buspay.db.entity.**{*;}
 
 
 #Gson

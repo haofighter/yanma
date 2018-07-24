@@ -3,16 +3,21 @@ package com.szxb.buspay.manager;
 import android.text.TextUtils;
 
 import com.example.zhoukai.modemtooltest.ModemToolTest;
+import com.google.gson.Gson;
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.LineInfoEntityDao;
+import com.szxb.buspay.db.entity.bean.ConfigParam;
 import com.szxb.buspay.db.entity.bean.FTPEntity;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
 import com.szxb.buspay.db.sp.FetchAppConfig;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
-import com.szxb.mlog.SLog;
+
+import java.util.List;
 
 /**
  * 作者：Tangren on 2018-07-18
@@ -61,7 +66,7 @@ public class PosManager implements IPosManager, IAddRess {
     /**
      * 370300zibo  371200laiwu
      */
-    private String cityCode = "370300";//淄博
+    private String cityCode;//淄博
     /**
      * 站点ID
      */
@@ -69,7 +74,7 @@ public class PosManager implements IPosManager, IAddRess {
     /**
      * 备注
      */
-    private String orderDesc = "淄博公交";
+    private String orderDesc = "腾讯乘车码";
     /**
      * key
      */
@@ -83,7 +88,7 @@ public class PosManager implements IPosManager, IAddRess {
      * <p>
      * 09 zibo  10laiwu
      */
-    private String app_id = "10000009";
+    private String app_id = "00000000";
     /**
      * 今日交易笔数
      */
@@ -146,50 +151,45 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public void loadFromPrefs() {
-        //微信基础参数
-//        app_id = FetchAppConfig.getAppId();
-//        cityCode = FetchAppConfig.getCityCode();
-//        orderDesc = FetchAppConfig.getOrderDesc();
+        ThreadScheduledExecutorUtil.getInstance().getService().submit(new Runnable() {
+            @Override
+            public void run() {
+                //pos基础参数
+                basePrice = FetchAppConfig.getBasePrice();
+                lineName = FetchAppConfig.getLineName();
+                unitno = FetchAppConfig.unitno();
+                lastVersion = FetchAppConfig.getLastVersion();
+                currentVersion = FetchAppConfig.getBinVersion();
+                lineNo = FetchAppConfig.getLineNo();
+                bus_no = FetchAppConfig.getBusNo();
+                driverNo = FetchAppConfig.getDriverNo();
+                unitno = FetchAppConfig.unitno();
+                numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
+                chineseName = FetchAppConfig.chinese_name();
 
-        //pos基础参数
-        basePrice = FetchAppConfig.getBasePrice();
-        lineName = FetchAppConfig.getLineName();
-        unitno = FetchAppConfig.unitno();
-        lastVersion = FetchAppConfig.getLastVersion();
-        currentVersion = FetchAppConfig.getBinVersion();
-        lineNo = FetchAppConfig.getLineNo();
-        bus_no = FetchAppConfig.getBusNo();
-        driverNo = FetchAppConfig.getDriverNo();
-        unitno = FetchAppConfig.unitno();
-        numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
-        chineseName = FetchAppConfig.chinese_name();
+                //初始化SN号
+                initSn();
+                //初始化折扣
+                initDis();
 
-        //初始化SN号
-        initSn();
-        //初始化折扣
-        initDis();
+                String config = Util.readAssetsFile("config.json", BusApp.getInstance().getApplicationContext());
+                ConfigParam configParam = new Gson().fromJson(config, ConfigParam.class);
+                List<ConfigParam.ConfigBean> configList = configParam.getConfig();
 
-        //ftp基础参数
-        if (cityCode.equals("370300")) {
-            //淄博
-            app_id = "10000009";
-            cityCode = "370300";
-            orderDesc = "淄博公交";
-            ftpIP = "112.35.80.147";
-            ftpPort = 21;
-            ftpUser = "zbbusftpdan";
-            ftpPsw = "ftp1234!@#$";
-            ftpEntity = new FTPEntity(ftpIP, ftpPort, ftpUser, ftpPsw);
-        }
-//        ftpIP = FetchAppConfig.FTPIP();
-//        ftpPort = FetchAppConfig.FTPPort();
-//        ftpUser = FetchAppConfig.FTPUser();
-//        ftpPsw = FetchAppConfig.FTPPassword();
-
-
-        LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
-        lineInfoEntity = dao.queryBuilder().limit(1).unique();
-
+                if (configList.size() > 0) {
+                    ConfigParam.ConfigBean configBean = configList.get(0);
+                    app_id = configBean.getMch_id();
+                    cityCode = configBean.getCity_code();
+                    ftpIP = configBean.getIp();
+                    ftpPort = configBean.getPort();
+                    ftpUser = configBean.getUser();
+                    ftpPsw = configBean.getPsw();
+                    ftpEntity = new FTPEntity(ftpIP, ftpPort, ftpUser, ftpPsw);
+                }
+                LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
+                lineInfoEntity = dao.queryBuilder().limit(1).unique();
+            }
+        });
     }
 
     private void initDis() {
@@ -208,7 +208,6 @@ public class PosManager implements IPosManager, IAddRess {
             item = ModemToolTest.getItem(7);
         } catch (Exception e) {
             item = "default";
-            SLog.d("PosManager(initSn.java:209)SN获取失败>>" + e.toString());
         }
         if (TextUtils.isEmpty(item)) {
             posSn = "default";
@@ -431,7 +430,7 @@ public class PosManager implements IPosManager, IAddRess {
         for (int i = 0; i < len; i++) {
             coefficient[i] = coefficent.substring(index, index += 3);
         }
-        CommonSharedPreferences.put("coefficent", coefficent);
+        CommonSharedPreferences.put("coefficient", coefficent);
     }
 
     @Override

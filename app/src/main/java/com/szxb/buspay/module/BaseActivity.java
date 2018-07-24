@@ -39,6 +39,7 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
@@ -138,11 +139,15 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     private LoopKeyTask instance;
 
+    private Subscription subscribe;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(rootView());
         initView();
+
+        initRx();
 
         initData();
 
@@ -156,14 +161,12 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
         initAnimation();
 
-        initRx();
     }
 
     private void initRx() {
-        RxBus.getInstance().toObservable(QRScanMessage.class)
+        subscribe = RxBus.getInstance().toObservable(QRScanMessage.class)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .unsubscribeOn(Schedulers.io())
                 .subscribe(new Action1<QRScanMessage>() {
                     @Override
                     public void call(QRScanMessage qrScanMessage) {
@@ -423,5 +426,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         super.onDestroy();
         instance.cancel();
         onKeyCancel();
+        if (subscribe != null && !subscribe.isUnsubscribed()) {
+            SLog.d("BaseActivity(onDestroy.java:433)解除绑定>>>>");
+            subscribe.unsubscribe();
+        }
     }
 }

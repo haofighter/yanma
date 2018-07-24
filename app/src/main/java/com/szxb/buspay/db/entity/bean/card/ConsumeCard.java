@@ -244,7 +244,7 @@ public class ConsumeCard {
         arraycopy(ziboDatas, index + stationId_byte.length, fareFlag_byte, 0, fareFlag_byte.length);
         fareFlag = HexUtil.printHexBinary(fareFlag_byte);
 
-        upStatus = 0;
+        upStatus = 1;
         uniqueFlag = pasmNo + transNo + transTime;
         byte[] recordData = new byte[50];
         arraycopy(ziboDatas, 0, recordData, 0, recordData.length);
