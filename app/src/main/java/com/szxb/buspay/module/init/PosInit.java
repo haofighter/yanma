@@ -5,15 +5,21 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.dao.LineInfoEntityDao;
+import com.szxb.buspay.db.entity.bean.BlackList;
 import com.szxb.buspay.db.entity.bean.FTPEntity;
+import com.szxb.buspay.db.entity.card.BlackListCard;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
 import com.szxb.buspay.db.entity.scan.PublicKeyEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.JsonRequest;
 import com.szxb.buspay.interfaces.InitOnListener;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.HexUtil;
@@ -26,6 +32,8 @@ import com.yanzhenjie.nohttp.rest.Response;
 import com.yanzhenjie.nohttp.rest.SyncRequestExecutor;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -192,6 +200,7 @@ public class PosInit {
                         return Observable.just(true);
                     }
                     SLog.d("PosInit(call.java:194)版本文件下载失败>>线路文件存在>>本次跳过更新");
+                    BusToast.showToast(BusApp.getInstance(), "线路信息初始化成功[BE]", true);
                     return Observable.just(false);
                 }
                 byte[] PramVesion = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/" + "allline.json");
@@ -210,10 +219,10 @@ public class PosInit {
                         String routeversion = ob.getString("routeversion");
                         String fileName_ = acnt + "," + routeno + ".json";
 
-//                        SLog.d("PosInit(call.java:213)routeversion="+routeversion+",rout="+infoEntity.getVersion()+",fileName_="+fileName_+",fileName="+fileName);
-                        if (TextUtils.equals(fileName_, infoEntity.getRmk1())) {
+                        if (TextUtils.equals(fileName_, infoEntity.getFileName())) {
                             if (TextUtils.equals(routeversion, infoEntity.getVersion())) {
                                 SLog.d("PosInit(call.java:200)版本相同无需更新");
+                                BusToast.showToast(BusApp.getInstance(), "线路信息初始化成功[EQ]", true);
                                 return Observable.just(false);
                             }
                         }
@@ -248,6 +257,7 @@ public class PosInit {
                         }
 
                         if (jsonObject == null) {
+                            BusToast.showToast(BusApp.getInstance(), "线路信息初始化失败[NULL]", false);
                             return Observable.just(false);
                         }
                         String s = jsonObject.toJSONString();
@@ -266,7 +276,7 @@ public class PosInit {
                             onLineInfo.setFixed_price(object.getString("fixed_price"));
                             onLineInfo.setCoefficient(object.getString("coefficient"));
                             onLineInfo.setShortcut_price(object.getString("shortcut_price"));
-                            onLineInfo.setRmk1(fileName);
+                            onLineInfo.setFileName(fileName);
                             //先删除所有
                             dao.deleteAll();
                             dao.insertOrReplace(onLineInfo);
@@ -274,6 +284,8 @@ public class PosInit {
                             HexUtil.parseLine(onLineInfo);
 
                             BusApp.getPosManager().setLineInfoEntity();
+
+                            BusToast.showToast(BusApp.getInstance(), "线路信息更新成功[OK]", true);
                         }
                     }
                 }
@@ -287,7 +299,6 @@ public class PosInit {
                         if (listener != null) {
                             listener.onFtpCallBack();
                         }
-                        BusToast.showToast(BusApp.getInstance(), aBoolean ? "线路信息初始化完成" : "线路信息初始化失败", aBoolean);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -350,11 +361,10 @@ public class PosInit {
                         onLineInfo.setFixed_price(object.getString("fixed_price"));
                         onLineInfo.setCoefficient(object.getString("coefficient"));
                         onLineInfo.setShortcut_price(object.getString("shortcut_price"));
-                        onLineInfo.setRmk1(fileName);
+                        onLineInfo.setFileName(fileName);
                         //先删除所有
                         dao.deleteAll();
                         dao.insertOrReplace(onLineInfo);
-
 
                         HexUtil.parseLine(onLineInfo, busNo);
 
@@ -384,6 +394,100 @@ public class PosInit {
                     }
                 });
     }
+
+    private String version = "default";
+
+    public void downLoadBlack() {
+        final FTPEntity ftpEntity = BusApp.getPosManager().getFTP();
+        Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(Subscriber<? super Boolean> subscriber) {
+                boolean blackVersionisOk = new FTP()
+                        .builder(ftpEntity.getI())
+                        .setPort(ftpEntity.getP())
+                        .setLogin(ftpEntity.getU(), ftpEntity.getPsw())
+                        .setFileName("blackversion.json")
+                        .setPath(Environment.getExternalStorageDirectory() + "/")
+                        .setFTPPath("black/blackversion.json")
+                        .download();
+                subscriber.onNext(blackVersionisOk);
+            }
+        }).flatMap(new Func1<Boolean, Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call(Boolean aBoolean) {
+                if (aBoolean) {
+                    byte[] blackversion = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/blackversion.json");
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = JSONObject.parseObject(new String(blackversion, "GB2312"));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    if (jsonObject != null) {
+                        version = jsonObject.getString("blackversion");
+                        return Observable.just(HexUtil.checkBlackVersion(version));
+                    }
+                }
+                //默认不更新
+                return Observable.just(false);
+            }
+        }).flatMap(new Func1<Boolean, Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call(Boolean aBoolean) {
+                if (aBoolean) {
+                    boolean blackisOk = new FTP()
+                            .builder(ftpEntity.getI())
+                            .setPort(ftpEntity.getP())
+                            .setLogin(ftpEntity.getU(), ftpEntity.getPsw())
+                            .setFileName("blacklist.json")
+                            .setPath(Environment.getExternalStorageDirectory() + "/")
+                            .setFTPPath("black/blacklist.json")
+                            .download();
+                    if (blackisOk) {
+                        byte[] blackList = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/blacklist.json");
+                        try {
+                            BlackList black = new Gson().fromJson(new String(blackList, "GB2312"), BlackList.class);
+                            if (black != null) {
+                                BlackListCardDao dao = getDaoSession().getBlackListCardDao();
+                                dao.deleteAll();
+                                List<String> blacklist = black.getBlacklist();
+                                List<BlackListCard> bl = new ArrayList<BlackListCard>();
+                                for (String cardNo : blacklist) {
+                                    BlackListCard blackListCard = new BlackListCard();
+                                    blackListCard.setCard_id(cardNo);
+                                    bl.add(blackListCard);
+                                }
+                                BusApp.getPosManager().setLastVersion(version);
+                                ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("black_list", bl));
+                                BusToast.showToast(BusApp.getInstance(), "黑名单更新成功", true);
+                            }
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                            BusToast.showToast(BusApp.getInstance(), "黑名单更新异常\n" + e.toString(), false);
+                        }
+                    } else {
+                        BusToast.showToast(BusApp.getInstance(), "黑名单下载失败", false);
+                    }
+
+                    return Observable.just(blackisOk);
+                }
+                return Observable.just(false);
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        SLog.e("PosInit(call.java:487)更新黑名异常>>" + throwable.toString());
+                    }
+                });
+    }
+
 
     public class RetryWithDelay implements
             Func1<Observable<? extends Throwable>, Observable<?>> {

@@ -66,17 +66,24 @@ public class XBPosReportManager {
                         BusllPosManage.getPosManager().setMachId(unionPayParam.getMch());
                         BusllPosManage.getPosManager().setMacKey(unionPayParam.getKey());
                         BusllPosManage.getPosManager().setPosSn(unionPayParam.getSn());
-                        BusToast.showToast(BusApp.getInstance(), "银联参数设置成功\n重启生效", true);
+                        BusToast.showToast(BusApp.getInstance(), "银联参数设置成功\n请检查是否生效", true);
                     }
+                    break;
+                case QRCode.QR_MOREN:
+                    LINEntity linEntityMore = new Gson().fromJson(qrcode.substring(10, qrcode.length()), LINEntity.class);
+
+
                     break;
                 default:
                     BusToast.showToast(BusApp.getInstance(), "线路正在更新", true);
                     String resultLine = qrcode.substring(4, qrcode.length());
                     LINEntity linEntity = new Gson().fromJson(resultLine, LINEntity.class);
-                    String fileName = HexUtil.fileName(linEntity.getL());
-                    SLog.d("XBPosReportManager(posScan.java:70)需要下载的文件名：" + fileName);
-                    PosInit init = new PosInit();
-                    init.downloadAppointFile(fileName, linEntity.getN());
+                    if (linEntity != null) {
+                        String fileName = HexUtil.fileName(linEntity.getL());
+                        SLog.d("XBPosReportManager(posScan.java:70)需要下载的文件名：" + fileName);
+                        PosInit init = new PosInit();
+                        init.downloadAppointFile(fileName, linEntity.getN());
+                    }
                     break;
             }
         } catch (Exception e) {

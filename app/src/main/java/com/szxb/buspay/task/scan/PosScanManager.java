@@ -63,9 +63,12 @@ public class PosScanManager {
         } else if (qrcode.indexOf("szxb_ip") == 0) {
             //服务器IP设置
             codeType = QRCode.CONFIG_CODE_IP;
-        }else if (qrcode.indexOf("szxb_union") == 0) {
-            //服务器IP设置
+        } else if (qrcode.indexOf("szxb_union") == 0) {
+            //银联参数
             codeType = QRCode.CONFIG_CODE_UNIONPAY;
+        } else if (qrcode.indexOf("szxb_more") == 0) {
+            //更多功能扫码
+            codeType = QRCode.QR_MOREN;
         } else {
             //线路设置
             codeType = QRCode.CONFIG_CODE_LINE;

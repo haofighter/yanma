@@ -40,13 +40,14 @@ public class LineInfoEntity {
     private String fixed_price;//如果是固定票价线路,此项才有意义,是票价,单位分
     private String coefficient;//8种卡折扣率，依次为普通卡、学生卡、老年卡、免费卡、员工卡、优惠卡1、优惠卡2、优惠卡3、微信支付
     private String shortcut_price;//快捷票价,通过小键盘按键输入，数字1-9，直接代表金额，以分为单位。
-    private String rmk1;//文件名
+    private String fileName;//文件名
+    private String rmk1;
     private String rmk2;
     private String rmk3;
-    @Generated(hash = 1052521203)
+    @Generated(hash = 1085203862)
     public LineInfoEntity(Long id, String line, String version, String up_station, String dwon_station,
             String chinese_name, String is_fixed_price, String is_keyboard, String fixed_price,
-            String coefficient, String shortcut_price, String rmk1, String rmk2, String rmk3) {
+            String coefficient, String shortcut_price, String fileName, String rmk1, String rmk2, String rmk3) {
         this.id = id;
         this.line = line;
         this.version = version;
@@ -58,6 +59,7 @@ public class LineInfoEntity {
         this.fixed_price = fixed_price;
         this.coefficient = coefficient;
         this.shortcut_price = shortcut_price;
+        this.fileName = fileName;
         this.rmk1 = rmk1;
         this.rmk2 = rmk2;
         this.rmk3 = rmk3;
@@ -148,5 +150,11 @@ public class LineInfoEntity {
     }
     public void setRmk3(String rmk3) {
         this.rmk3 = rmk3;
+    }
+    public String getFileName() {
+        return this.fileName;
+    }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

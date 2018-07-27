@@ -137,7 +137,10 @@ public class QRCode {
     //汇总
     public static final int CNT = 20;
 
-    //汇总
+    //网络状态
     public static final int NET_STATUS = 21;
+
+    //更多功能二维码
+    public static final int QR_MOREN= 25;
 
 }

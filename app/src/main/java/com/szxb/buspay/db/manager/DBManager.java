@@ -192,11 +192,8 @@ public class DBManager {
      * @return 刷卡记录
      */
     public static List<ConsumeCard> queryCardRecord(String type) {
-        if (TextUtils.equals(type, "zibo")) {
-            ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
-            return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50).list();
-        }
-        return null;
+        ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
+        return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50).list();
     }
 
     /**
@@ -237,11 +234,12 @@ public class DBManager {
         CntEntity cntEntity = new CntEntity();
         String[] icTime = time(0);
         String[] time = time(1);
+
         int[] ic = getIcCnt(icTime[0], icTime[1]);
         int[] weChat = getWcCnt(time[0], time[1]);
         int[] union = getUnionCnt(time[0], time[1]);
-
         int[] cnt = getCnt(ic, weChat, union);
+        int[] time_cnt = timeCnt(icTime[0], icTime[1]);
 
         cntEntity.ic_card_swipe_cnt = new String[]{
                 String.valueOf(ic[0]),
@@ -263,6 +261,10 @@ public class DBManager {
                 Util.fen2Yuan(cnt[1]),
                 cnt[2] + " | " + cnt[3]};
 
+        cntEntity.time_cnt = new String[]{
+                String.valueOf(time_cnt[0]),
+                String.valueOf(time_cnt[1]),
+        };
         return cntEntity;
     }
 
@@ -287,7 +289,9 @@ public class DBManager {
         String icSql = " SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from CONSUME_CARD WHERE TRANS_TIME BETWEEN "
                 + startTime
                 + " AND "
-                + endTime;
+                + endTime
+                + " AND "
+                + "CARD_TYPE != '0A'";//扣次卡除外
 
         int[] cnt = cnt(icSql);
 
@@ -356,6 +360,21 @@ public class DBManager {
     }
 
     /**
+     * @param startTime .
+     * @param endTime   .
+     * @return 次卡统计
+     */
+    private static int[] timeCnt(String startTime, String endTime) {
+        String icSqlTime = " SELECT SUM(PAY_FEE) as amount , COUNT(*) as cnt  from CONSUME_CARD WHERE TRANS_TIME BETWEEN "
+                + startTime
+                + " AND "
+                + endTime
+                + " AND "
+                + "CARD_TYPE = '0A'";//单独统计次卡
+        return cnt(icSqlTime);
+    }
+
+    /**
      * @param sql sql
      * @return 总笔数、总金额
      */
@@ -364,19 +383,19 @@ public class DBManager {
         int amount = icCursor.getColumnIndex("amount");
         int cnt = icCursor.getColumnIndex("cnt");
         //今日总笔数
-        String sum = "0";
+        String sumCnt = "0";
         //今日总金额
         String amountCnt = "0";
         while (icCursor.moveToNext()) {
             amountCnt = icCursor.getString(amount);
-            sum = icCursor.getString(cnt);
+            sumCnt = icCursor.getString(cnt);
         }
 
-        sum = TextUtils.isEmpty(sum) ? "0" : sum;
+        sumCnt = TextUtils.isEmpty(sumCnt) ? "0" : sumCnt;
         amountCnt = TextUtils.isEmpty(amountCnt) ? "0" : amountCnt;
 
         icCursor.close();
-        return new int[]{string2Int(sum), string2Int(amountCnt)};
+        return new int[]{string2Int(sumCnt), string2Int(amountCnt)};
     }
 
 
@@ -414,7 +433,7 @@ public class DBManager {
     }
 
     /**
-     * @return 得到未支付的数据每次最多10条, 降序排列取得最新的最多25条数据
+     * @return 得到未支付的数据每次最多10条, 降序排列取得最新的最多10条数据
      */
     public static List<ScanInfoEntity> getSwipeList() {
         ScanInfoEntityDao dao = DBCore.getDaoSession().getScanInfoEntityDao();
@@ -423,5 +442,35 @@ public class DBManager {
                 .where(ScanInfoEntityDao.Properties.Time.le(DateUtil.getCurrentDateLastMi(1)))
                 .limit(10).orderDesc(ScanInfoEntityDao.Properties.Id).build();
         return qb.list();
+    }
+
+    /**
+     * @return 扫码未上传的前10条数据
+     */
+    public static List<ConsumeCard> getICList() {
+        ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
+        return dao.queryBuilder()
+                .where(ConsumeCardDao.Properties.UpStatus.eq(1))
+                .orderDesc(ConsumeCardDao.Properties.Id)
+                .limit(10).build().list();
+    }
+
+
+    /**
+     * 修改IC卡上传状态
+     *
+     * @param tradeDate      交易时间
+     * @param pasmNumber     psamNo
+     * @param cardTradeCount 用户卡脱机交易序号
+     */
+    public static void updateCardInfo(String tradeDate, String pasmNumber, String cardTradeCount) {
+        ConsumeCardDao cardRecordDao = DBCore.getDaoSession().getConsumeCardDao();
+        ConsumeCard unique = cardRecordDao.queryBuilder().where(ConsumeCardDao.Properties.TransTime.eq(tradeDate),
+                ConsumeCardDao.Properties.PasmNo.eq(pasmNumber),
+                ConsumeCardDao.Properties.TransNo2.eq(cardTradeCount)).limit(1).build().unique();
+        if (unique != null) {
+            unique.setUpStatus(0);
+            cardRecordDao.update(unique);
+        }
     }
 }

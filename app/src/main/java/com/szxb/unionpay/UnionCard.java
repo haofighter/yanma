@@ -95,8 +95,8 @@ public class UnionCard {
 
     public void run(String aid) {
         try {
-//            money = BusApp.getPosManager().getUnionPayPrice();
-            money = 1;
+            money = BusApp.getPosManager().getUnionPayPrice();
+//            money = 1;
             do {
 
                 String sAID = "00A40400" + String.format("%02X", aid.length() / 2) + aid;

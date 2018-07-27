@@ -39,6 +39,7 @@ public class ConfigParam {
         private String mch_id;
         private String city_code;
         private String url_ip;
+        private String city;
 
         public String getIp() {
             return ip;
@@ -96,6 +97,14 @@ public class ConfigParam {
             this.url_ip = url_ip;
         }
 
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.city = city;
+        }
+
         @Override
         public String toString() {
             return "ConfigBean{" +
@@ -106,6 +115,7 @@ public class ConfigParam {
                     ", mch_id='" + mch_id + '\'' +
                     ", city_code='" + city_code + '\'' +
                     ", url_ip='" + url_ip + '\'' +
+                    ", city='" + city + '\'' +
                     '}';
         }
     }

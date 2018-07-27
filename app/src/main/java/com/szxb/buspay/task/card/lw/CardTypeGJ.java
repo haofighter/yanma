@@ -1,4 +1,4 @@
-package com.szxb.buspay.db.entity.bean.card;
+package com.szxb.buspay.task.card.lw;
 
 /**
  * 作者：Tangren on 2018-07-23
@@ -7,7 +7,7 @@ package com.szxb.buspay.db.entity.bean.card;
  * TODO:莱芜卡类型
  */
 
-public class CardTypeLw {
+public class CardTypeGJ {
 
     //普通卡
     public static final String CARD_NORMAL = "01";

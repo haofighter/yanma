@@ -1,7 +1,13 @@
 package com.szxb.buspay;
 
+import android.graphics.Color;
 import android.os.Message;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,7 +17,10 @@ import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.interfaces.OnReceiverMessageListener;
 import com.szxb.buspay.module.BaseActivity;
 import com.szxb.buspay.module.WeakHandler;
-import com.szxb.buspay.task.card.LoopCardThread;
+import com.szxb.buspay.task.card.lw.LoopCardThread_CY;
+import com.szxb.buspay.task.card.taian.LoopCardThread_TA;
+import com.szxb.buspay.task.card.zhaoyuan.LoopCardThread_ZY;
+import com.szxb.buspay.task.card.zibo.LoopCardThread;
 import com.szxb.buspay.task.scan.LoopScanThread;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.AppUtil;
@@ -19,6 +28,7 @@ import com.szxb.buspay.util.DateUtil;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.szxb.buspay.util.AppUtil.sp2px;
 import static com.szxb.buspay.util.Util.fen2Yuan;
 
 public class MainActivity extends BaseActivity implements OnReceiverMessageListener {
@@ -55,8 +65,14 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         initDate();
         initDatas();
         ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new LoopScanThread(), 1000, 200, TimeUnit.MILLISECONDS);
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new LoopCardThread(), 1000, 200, TimeUnit.MILLISECONDS);
-
+        String appId = BusApp.getPosManager().getAppId();
+        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(
+                TextUtils.equals(appId, "10000009") ? new LoopCardThread() ://淄博
+                        TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY() ://莱芜长运
+                                TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA() ://泰安
+                                        TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
+                                                new LoopCardThread()
+                , 1000, 200, TimeUnit.MILLISECONDS);
     }
 
     private void initDatas() {
@@ -64,10 +80,9 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         if (TextUtils.equals(driverNo, String.format("%08d", 0))) {
             main_sign.setVisibility(View.VISIBLE);
         }
-        if (BusApp.getPosManager().getLineInfoEntity() != null) {
-            prices.setText("票价:" + fen2Yuan(BusApp.getPosManager().getBasePrice()) + "元");
-            station_name.setText(BusApp.getPosManager().getChinese_name());
-        }
+
+        setPrices();
+        station_name.setText(BusApp.getPosManager().getChinese_name());
         sign_time.setText(DateUtil.getCurrentDate("yyyy-MM-dd"));
         version_name.setText("[" + AppUtil.getVersionName(getApplicationContext()) + "]");
         sign_version.setText("[" + AppUtil.getVersionName(getApplicationContext()) + "]");
@@ -76,11 +91,26 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                 BusApp.getPosManager().getBusNo(), BusApp.getPosManager().getDriverNo()));
     }
 
+    /**
+     * 设置票价
+     */
+    private void setPrices() {
+        String text = "票价:";
+        String pricesStr = String.format("%1$s", fen2Yuan(BusApp.getPosManager().getBasePrice()));
+        String text2 = "元";
+        SpannableString ss = new SpannableString(text + pricesStr + text2);
+        ss.setSpan(new AbsoluteSizeSpan(sp2px(getApplicationContext(), 35)), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new ForegroundColorSpan(Color.parseColor("#EE4000")), text.length(), text.length() + pricesStr.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        ss.setSpan(new AbsoluteSizeSpan(sp2px(getApplicationContext(), 70)), text.length(), text.length() + pricesStr.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new AbsoluteSizeSpan(sp2px(getApplicationContext(), 35)), text.length() + pricesStr.length(), text.length() + pricesStr.length() + text2.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        prices.setText(ss);
+    }
+
     @Override
     protected void message(QRScanMessage message) {
         switch (message.getResult()) {
             case QRCode.REFRESH_VIEW:
-                prices.setText("票价:" + fen2Yuan(BusApp.getPosManager().getBasePrice()) + "元");
+                setPrices();
                 station_name.setText(BusApp.getPosManager().getChinese_name());
                 bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
                         BusApp.getPosManager().getBusNo(), BusApp.getPosManager().getDriverNo()));
@@ -107,7 +137,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mList.add(new MainEntity("查看扫码记录"));
         mList.add(new MainEntity("查看银联卡记录"));
         mList.add(new MainEntity("查询当天汇总"));
-        mList.add(new MainEntity("上传记录"));
+        mList.add(new MainEntity("手动更新参数"));
         mList.add(new MainEntity("数据库导出"));
         mList.add(new MainEntity("日志导出"));
         mList.add(new MainEntity("检测网络"));
@@ -115,6 +145,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mList.add(new MainEntity("导出7天记录"));
         mList.add(new MainEntity("导出1个月记录"));
         mList.add(new MainEntity("导出3个月记录"));
+        mList.add(new MainEntity("查看日志"));
     }
 
 

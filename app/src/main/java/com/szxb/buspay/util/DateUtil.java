@@ -201,5 +201,57 @@ public class DateUtil {
         SimpleDateFormat fd = new SimpleDateFormat(format, new Locale("zh", "CN"));
         return fd.format(beforeD);
     }
+
+    /**
+     * 文件是否过期
+     *
+     * @param lastDate 存储的时间
+     * @return 是否删除
+     */
+    public static boolean isDelFile(Date lastDate) {
+        String currentDate = getCurrentDate("yyyy-MM-dd");
+        boolean lowTime = !currentDate.equals("1970-01-01");
+        boolean heiTime = !currentDate.equals("2018-01-01");
+        return differentDays(lastDate, Calendar.getInstance().getTime()) > 7 && lowTime && heiTime;
+    }
+
+
+    /**
+     * 计算两个日期之间相差的天数
+     *
+     * @param lastDate    上次存储的日期
+     * @param currentDate 现在的日期
+     * @return 相差的天数
+     */
+    private static int differentDays(Date lastDate, Date currentDate) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(lastDate);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(currentDate);
+        int day1 = cal1.get(Calendar.DAY_OF_YEAR);
+        int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+
+        int year1 = cal1.get(Calendar.YEAR);
+        int year2 = cal2.get(Calendar.YEAR);
+        if (year1 != year2)   //同一年
+        {
+            int timeDistance = 0;
+            for (int i = year1; i < year2; i++) {
+                if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
+                {
+                    timeDistance += 366;
+                } else    //不是闰年
+                {
+                    timeDistance += 365;
+                }
+            }
+
+            return timeDistance + (day2 - day1);
+        } else    //不同年
+        {
+            return day2 - day1;
+        }
+    }
 }
 

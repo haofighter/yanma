@@ -1,4 +1,4 @@
-package com.szxb.buspay.db.entity.bean.card;
+package com.szxb.buspay.task.card.taian;
 
 /**
  * 作者：Tangren on 2018-07-19
@@ -7,7 +7,7 @@ package com.szxb.buspay.db.entity.bean.card;
  * TODO:淄博卡类型
  */
 
-public class CardTypeZiBo {
+public class CardTypeTaian {
 
     //普通卡
     public static final String CARD_NORMAL = "01";
@@ -21,13 +21,28 @@ public class CardTypeZiBo {
     //免费卡
     public static final String CARD_FREE = "04";
 
-    //纪念卡
-    public static final String CARD_MEMORY = "05";
+    //优惠卡1
+    public static final String CARD_DIS_1 = "05";
 
     //员工卡
     public static final String CARD_EMP = "06";
 
-    //采集卡
+    //优惠卡2
+    public static final String CARD_DIS_2 = "07";
+
+    //优惠卡3
+    public static final String CARD_DIS_3 = "08";
+
+    //优抚卡
+    public static final String CARD_DEFECT = "09";
+
+    //月票卡,次卡
+    public static final String CARD_MONTH = "0A";
+
+    //管理卡，下班卡
+    public static final String CARD_OFF = "10";
+
+    //采集卡、下班卡
     public static final String CARD_GATHER = "11";
 
     //签点卡

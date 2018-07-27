@@ -1,7 +1,5 @@
 package com.szxb.unionpay;
 
-import android.util.Log;
-
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.UnionPayEntityDao;
 import com.szxb.buspay.db.manager.DBCore;
@@ -94,7 +92,6 @@ public class UnionPay {
                         Iso8583MessageFactory factory = SingletonFactory.forQuickStart();
                         factory.setSpecialFieldHandle(62, new SpecialField62());
                         Iso8583Message message0810 = factory.parse(response.get());
-                        SLog.d("UnionPay(success.java:80)" + message0810.toFormatString());
                         if (what == UnionConfig.SIGN) {//签到
                             if (message0810.getValue(39).getValue().equals("00")) {
                                 String batchNum = message0810.getValue(60).getValue().substring(2, 8);
@@ -107,7 +104,6 @@ public class UnionPay {
                             String tradeSeq = message0810.getValue(11).getValue();
                             String batchNum = message0810.getValue(60).getValue().substring(2, 8);
                             String uniqueFlag = tradeSeq + batchNum;
-                            SLog.d("UnionPay(success.java:96)uniqueFlag=" + uniqueFlag);
                             UnionPayEntityDao dao = DBCore.getDaoSession().getUnionPayEntityDao();
                             UnionPayEntity unique = dao.queryBuilder()
                                     .where(UnionPayEntityDao.Properties.UniqueFlag
@@ -160,13 +156,13 @@ public class UnionPay {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        BusToast.showToast(BusApp.getInstance().getApplicationContext(), "刷卡失败[异常]\n" + e.toString(), false);
                     }
                 }
 
                 @Override
                 public void fail(int what, String e) {
-                    Log.d("RxSocket",
-                            "fail(RxSocket.java:110)" + e);
+                    BusToast.showToast(BusApp.getInstance().getApplicationContext(), "刷卡失败[超时]", false);
                 }
             });
         }

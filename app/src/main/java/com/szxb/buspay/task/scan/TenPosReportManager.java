@@ -86,7 +86,7 @@ public class TenPosReportManager {
                     posRecord.setQr_code(qrcode);
                     posRecord.setOrder_time(BusApp.getPosManager().getOrderTime());
                     posRecord.setTotal_fee(basePrice);//金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getMarkedPrice());
-                    posRecord.setPay_fee(1);//实际扣款金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getPayMarkPrice());
+                    posRecord.setPay_fee(BusApp.getPosManager().getWcPayPrice());//实际扣款金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getPayMarkPrice());
 
                     posRecord.setCity_code(BusApp.getPosManager().getCityCode());
                     posRecord.setOrder_desc(BusApp.getPosManager().getLineName());//线路名

@@ -17,7 +17,7 @@ public class ThreadScheduledExecutorUtil {
     private volatile static ScheduledThreadPoolExecutor executor;
 
     private ThreadScheduledExecutorUtil() {
-        executor = new ScheduledThreadPoolExecutor(6);
+        executor = new ScheduledThreadPoolExecutor(10);
     }
 
     public static ThreadScheduledExecutorUtil getInstance() {

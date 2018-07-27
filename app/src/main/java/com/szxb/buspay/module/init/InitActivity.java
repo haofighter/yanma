@@ -16,6 +16,7 @@ import com.szxb.buspay.R;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.interfaces.InitOnListener;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.core.Iso8583MessageFactory;
@@ -67,13 +68,12 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
 
         init = new PosInit();
         init.setOnCallBack(this);
-
         initBin();
         initUnionPay();
         init.init();
         LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
         if (lineInfoEntity != null) {
-            init.download(lineInfoEntity.getRmk1());
+            init.download(lineInfoEntity.getFileName());
         } else {
             lineOk = true;
         }
@@ -84,10 +84,11 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
             @Override
             public void run() {
                 String lastVersion = BusApp.getPosManager().getLastVersion();
-                String currentVersion = BusApp.getPosManager().getBinVersion();
-                if (!TextUtils.equals(lastVersion, currentVersion)) {
+                String currentVersion = AppUtil.getVersionName(getApplicationContext());
+                String binName=BusApp.getPosManager().getBinVersion();
+                if (!TextUtils.equals(lastVersion, binName)) {
                     AssetManager ass = BusApp.getInstance().getAssets();
-                    int k = libszxb.ymodemUpdate(ass, currentVersion);
+                    int k = libszxb.ymodemUpdate(ass, binName);
                     BusApp.getPosManager().setLastVersion(currentVersion);
                     binOk = true;
                     BusToast.showToast(BusApp.getInstance(), "固件更新成功", true);
@@ -103,6 +104,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     }
 
     private static int aidCnt = 0;
+
     public static void initUnionPay() {
         Observable.create(new Observable.OnSubscribe<byte[]>() {
             @Override

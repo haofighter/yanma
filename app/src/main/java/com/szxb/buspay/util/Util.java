@@ -67,6 +67,13 @@ public class Util {
         }
     }
 
+    /**
+     * @param hex hex
+     * @return .
+     */
+    public static String hex2IntStr(String hex) {
+        return String.valueOf(hex2Int(hex));
+    }
 
     public static String fen2Yuan(int prices) {
         DecimalFormat format = new DecimalFormat("0.00");
@@ -129,6 +136,22 @@ public class Util {
 
     private static boolean checkSwipe(long currentTime, long lastTime) {
         return currentTime - lastTime > 3000;
+    }
+
+    /**
+     * @param str       .
+     * @param strLength .
+     * @return 字符串右补0
+     */
+    public static String addZeroRight(String str, int strLength) {
+        int strLen = str.length();
+        if (strLen < strLength) {
+            while (strLen < strLength) {
+                str = str + "0";
+                strLen = str.length();
+            }
+        }
+        return str;
     }
 
     /**
@@ -215,5 +238,23 @@ public class Util {
             SLog.d("Util(readAssetsFile.java:212)读取本地配置文件异常>>" + e.toString());
         }
         return builder.toString();
+    }
+
+    /**
+     * @param intStr .
+     * @param len    .
+     * @return int string 转hex
+     */
+    public static String str2Hex(String intStr, int len) {
+        int i = string2Int(intStr);
+        String str = Integer.toHexString(i);
+        int strLen = str.length();
+        if (strLen < len) {
+            while (strLen < len) {
+                str = "0" + str;
+                strLen = str.length();
+            }
+        }
+        return str;
     }
 }

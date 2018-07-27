@@ -3,6 +3,7 @@ package com.szxb.buspay.db.entity.bean.card;
 import android.text.TextUtils;
 
 import com.szxb.buspay.util.HexUtil;
+import com.szxb.buspay.util.Util;
 import com.szxb.mlog.SLog;
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -52,25 +53,37 @@ public class ConsumeCard {
     private String driverNo;
     //PSAM卡号
     private String pasmNo;
-    //*****************淄博***********************/
+    //*****************淄博开始***********************/
     //行驶方向
-    private String direction;
+    private String direction="00";
     //站点号
-    private String stationId;
+    private String stationId="00";
     //补票标志
-    private String fareFlag;
-    //*****************淄博***********************/
+    private String fareFlag="00";
+
+    //*****************淄博结束***********************/
+
+    //*****************泰安开始***********************/
+    //本机线路号
+    private String localLineNo;
+    //本机车号
+    private String localBusNo;
+    //本机司机号
+    private String localDriverNo;
+    //*****************泰安结束***********************/
+
 
     //*****************莱芜***********************/
     //算法表示
-    private String algFlag;
+    private String algFlag = "00";
     //发卡机构标示
-    private String issuerFlag;
+    private String issuerFlag = "00";
     //卡子类型
-    private String cardChildType;
+    private String cardChildType = "00";
     //CPU卡应用版本
-    private String cpuVersion;
+    private String cpuVersion = "00";
     //*****************莱芜***********************/
+
 
     //唯一标示
     @Unique
@@ -107,11 +120,11 @@ public class ConsumeCard {
 
         byte[] cardBalance_byte = new byte[3];
         arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
-        cardBalance = HexUtil.printHexBinary(cardBalance_byte);
+        cardBalance = Util.hex2IntStr(HexUtil.printHexBinary(cardBalance_byte));
 
         byte[] payFee_byte = new byte[3];
         arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
-        payFee = HexUtil.printHexBinary(payFee_byte);
+        payFee = Util.hex2IntStr(HexUtil.printHexBinary(payFee_byte));
 
         byte[] transTime_byte = new byte[7];
         arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
@@ -185,11 +198,11 @@ public class ConsumeCard {
 
         byte[] cardBalance_byte = new byte[3];
         arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
-        cardBalance = HexUtil.printHexBinary(cardBalance_byte);
+        cardBalance = Util.hex2IntStr(HexUtil.printHexBinary(cardBalance_byte));
 
         byte[] payFee_byte = new byte[3];
         arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
-        payFee = HexUtil.printHexBinary(payFee_byte);
+        payFee = Util.hex2IntStr(HexUtil.printHexBinary(payFee_byte));
 
         byte[] transTime_byte = new byte[7];
         arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
@@ -274,12 +287,13 @@ public class ConsumeCard {
         SLog.d("ConsumeCard(getLw.java:271)莱芜>>" + toString());
     }
 
-    @Generated(hash = 364552961)
+    @Generated(hash = 1989635671)
     public ConsumeCard(Long id, String status, String cardType, String transType, String transNo, String cardNo,
-                       String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo,
-                       String busNo, String driverNo, String pasmNo, String direction, String stationId, String fareFlag,
-                       String algFlag, String issuerFlag, String cardChildType, String cpuVersion, String uniqueFlag,
-                       Integer upStatus, String singleRecord, String reserve_1, String reserve_2, String reserve_3) {
+            String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo, String busNo,
+            String driverNo, String pasmNo, String direction, String stationId, String fareFlag, String localLineNo,
+            String localBusNo, String localDriverNo, String algFlag, String issuerFlag, String cardChildType,
+            String cpuVersion, String uniqueFlag, Integer upStatus, String singleRecord, String reserve_1, String reserve_2,
+            String reserve_3) {
         this.id = id;
         this.status = status;
         this.cardType = cardType;
@@ -298,6 +312,9 @@ public class ConsumeCard {
         this.direction = direction;
         this.stationId = stationId;
         this.fareFlag = fareFlag;
+        this.localLineNo = localLineNo;
+        this.localBusNo = localBusNo;
+        this.localDriverNo = localDriverNo;
         this.algFlag = algFlag;
         this.issuerFlag = issuerFlag;
         this.cardChildType = cardChildType;
@@ -570,5 +587,29 @@ public class ConsumeCard {
                 ", reserve_2='" + reserve_2 + '\'' +
                 ", reserve_3='" + reserve_3 + '\'' +
                 '}';
+    }
+
+    public String getLocalLineNo() {
+        return this.localLineNo;
+    }
+
+    public void setLocalLineNo(String localLineNo) {
+        this.localLineNo = localLineNo;
+    }
+
+    public String getLocalBusNo() {
+        return this.localBusNo;
+    }
+
+    public void setLocalBusNo(String localBusNo) {
+        this.localBusNo = localBusNo;
+    }
+
+    public String getLocalDriverNo() {
+        return this.localDriverNo;
+    }
+
+    public void setLocalDriverNo(String localDriverNo) {
+        this.localDriverNo = localDriverNo;
     }
 }

@@ -4,11 +4,14 @@ import android.os.Environment;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.entity.bean.CntEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
+import com.szxb.buspay.db.entity.card.BlackListCard;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
+import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
@@ -17,6 +20,7 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.List;
 
 import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
 
@@ -30,6 +34,7 @@ import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
 public class WorkThread extends Thread {
 
     private Object record;
+    private List<BlackListCard> list;
 
     public WorkThread(String name) {
         super(name);
@@ -39,6 +44,12 @@ public class WorkThread extends Thread {
         super(name);
         this.record = record;
     }
+
+    public WorkThread(String name, List<BlackListCard> list) {
+        super(name);
+        this.list = list;
+    }
+
 
     @Override
     public void run() {
@@ -59,6 +70,12 @@ public class WorkThread extends Thread {
             UnionPayEntity unionPayEntity = (UnionPayEntity) record;
             getDaoSession().getUnionPayEntityDao().insertOrReplaceInTx(unionPayEntity);
 
+        } else if (TextUtils.equals(name, "black_list")) {
+            //更新黑名单
+            BlackListCardDao dao = DBCore.getDaoSession().getBlackListCardDao();
+            dao.deleteAll();
+            List<BlackListCard> bl = list;
+            dao.insertOrReplaceInTx(bl);
         } else if (TextUtils.equals(name, "cnt")) {
             //汇总
             CntEntity cntEntity = DBManager.getCnt();

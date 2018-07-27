@@ -1,11 +1,11 @@
-package com.szxb.buspay.task.card;
+package com.szxb.buspay.task.card.lw;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
-import com.szxb.buspay.db.entity.bean.card.CardTypeZiBo;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.entity.scan.PosRecord;
@@ -23,20 +23,20 @@ import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.UnionCard;
 
-import static com.szxb.buspay.db.entity.bean.QRCode.SIGN;
-import static com.szxb.buspay.db.entity.bean.card.CardTypeZiBo.CARD_NORMAL;
+import static com.szxb.buspay.task.card.lw.CardTypeGJ.CARD_NORMAL;
 import static com.szxb.buspay.util.Util.fen2Yuan;
 import static com.szxb.buspay.util.Util.filter;
 import static com.szxb.buspay.util.Util.hex2Int;
+import static com.szxb.buspay.util.Util.string2Int;
 
 /**
- * 作者：Tangren on 2018-07-19
+ * 作者：Tangren on 2018-07-23
  * 包名：com.szxb.buspay.task.card
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:莱芜公交
  */
 
-public class LoopCardThread extends Thread {
+public class LoopCardThread_GJ extends Thread {
 
     private boolean isBlack = false;
     private boolean isWhite = false;
@@ -44,6 +44,7 @@ public class LoopCardThread extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
+
 
     @Override
     public void run() {
@@ -93,6 +94,7 @@ public class LoopCardThread extends Thread {
                 }
             }
 
+
             //防止重复刷卡
             //去重刷,同一个卡号3S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
@@ -101,6 +103,7 @@ public class LoopCardThread extends Thread {
             }
 
             SLog.d("LoopCardThread(run.java:82)寻卡数据>>>" + searchCard);
+
 
             //1.判断是否已签到
             //2.未签到
@@ -114,10 +117,10 @@ public class LoopCardThread extends Thread {
                     if (TextUtils.equals(response.getStatus(), "00") &&
                             TextUtils.equals(response.getTransType(), "12")) {
                         //司机卡上班
-                        BusApp.getPosManager().setDriverNo(response.getTac());
+                        BusApp.getPosManager().setDriverNo(response.getTac(), response.getCardNo());
                         notice(Config.IC_TO_WORK, "司机卡上班[" + response.getTac() + "]", true);
                         saveRecord(response);
-                        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), SIGN));
+                        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
                     } else {
                         BusToast.showToast(BusApp.getInstance(), "签到失败[" + response.getStatus() + "|" + response.getTransType() + "]", false);
                     }
@@ -130,11 +133,28 @@ public class LoopCardThread extends Thread {
                 if (checkLine()) {
                     return;
                 }
-
+                //06员工卡要做特殊处理,此时员工卡要么是下班要么是正常消费
+                //此员工卡卡号等于当前司机卡号时>>下班，否则正常消费
+                if (TextUtils.equals(searchCard.cardType, "06")) {
+                    String empNo = BusApp.getPosManager().getEmpNo();
+                    if (!TextUtils.equals(searchCard.cityCode + searchCard.cardNo, empNo)) {
+                        int normalAmount = payFee(CARD_NORMAL);
+                        int currentAmount = payFee(searchCard.cardType);
+                        if (currentAmount < normalAmount
+                            &&
+                                DBManager.filterBrush(searchCard.cityCode + searchCard.cardNo, searchCard.cardType)) {
+                            BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
+                            lastTime = SystemClock.elapsedRealtime();
+                            return;
+                        }
+                    }
+                }
                 //已签到
                 elseCardControl(searchCard);
             }
 
+            cardNoTemp = searchCard.cardNo;
+            lastTime = SystemClock.elapsedRealtime();
             cardNoTemp = searchCard.cardNo;
             lastTime = SystemClock.elapsedRealtime();
         } catch (Exception e) {
@@ -156,7 +176,6 @@ public class LoopCardThread extends Thread {
         }
         return false;
     }
-
 
     /**
      * @param searchCard 其他卡操作
@@ -245,15 +264,18 @@ public class LoopCardThread extends Thread {
             } else if (status.equalsIgnoreCase("F3")) {
                 //卡内余额不足
                 notice(Config.IC_PUSH_MONEY, "卡内余额不足[F3]", false);
+                this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F4")) {
                 //此卡为黑名单卡(已经锁了)
                 notice(Config.IC_PUSH_MONEY, "黑名单卡[F4]", false);
             } else if (status.equalsIgnoreCase("F5")) {
                 //不是本系统卡
                 notice(Config.IC_PUSH_MONEY, "不是本系统卡[F5]", false);
+                this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F6")) {
                 //月票卡不能乘坐本线路
                 notice(Config.IC_PUSH_MONEY, "月票卡不能乘坐本线路[F6]", false);
+                this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("FE")
                     || status.equalsIgnoreCase("FF")) {
                 //消费异常(重新刷卡)
@@ -276,16 +298,6 @@ public class LoopCardThread extends Thread {
     }
 
     /**
-     * @param response 下班
-     */
-    private void offWork(ConsumeCard response) {
-        BusApp.getPosManager().setDriverNo(String.format("%08d", 0));
-        notice(Config.IC_OFF_WORK, "司机卡下班[00]", true);
-        saveRecord(response);
-        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), SIGN));
-    }
-
-    /**
      * @param cardType 卡类型
      * @return .
      */
@@ -293,24 +305,76 @@ public class LoopCardThread extends Thread {
         String[] coefficent = BusApp.getPosManager().getCoefficent();
         int basePrices = BusApp.getPosManager().getBasePrice();
         switch (cardType) {
-            case CardTypeZiBo.CARD_NORMAL://普通卡 01
-            case CardTypeZiBo.CARD_MEMORY://纪念卡
-                return Util.string2Int(coefficent[0]) * basePrices / 100;
-            case CardTypeZiBo.CARD_STUDENT://学生卡
-                return Util.string2Int(coefficent[1]) * basePrices / 100;
-            case CardTypeZiBo.CARD_OLD://老年卡
-                return Util.string2Int(coefficent[2]) * basePrices / 100;
-            case CardTypeZiBo.CARD_FREE://免费卡
-                return Util.string2Int(coefficent[3]) * basePrices / 100;
-            case CardTypeZiBo.CARD_EMP://员工卡
-                return Util.string2Int(coefficent[4]) * basePrices / 100;
-            case CardTypeZiBo.CARD_GATHER:
-            case CardTypeZiBo.CARD_SIGNED:
-            case CardTypeZiBo.CARD_CHECKED:
-            case CardTypeZiBo.CARD_CHECK:
+            case CARD_NORMAL://普通卡
+            case CardTypeGJ.CARD_MEMORY://纪念卡
+                return string2Int(coefficent[0]) * basePrices / 100;
+            case CardTypeGJ.CARD_STUDENT://学生卡
+            case CardTypeGJ.CARD_CPU_STUDENT://CPU学生卡
+                return string2Int(coefficent[1]) * basePrices / 100;
+            case CardTypeGJ.CARD_OLD://老年卡
+            case CardTypeGJ.CARD_CPU_OLD://CPU老年卡
+                return string2Int(coefficent[2]) * basePrices / 100;
+            case CardTypeGJ.CARD_CPU_FREE://CPU免费卡
+                return string2Int(coefficent[3]) * basePrices / 100;
+            case CardTypeGJ.CARD_CPU_DEFECT://残疾人卡
+                return string2Int(coefficent[4]) * basePrices / 100;
+            case CardTypeGJ.CARD_EMP://员工卡
+                return string2Int(coefficent[5]) * basePrices / 100;
+            case CardTypeGJ.CARD_GATHER:
+            case CardTypeGJ.CARD_SIGNED:
+            case CardTypeGJ.CARD_CHECKED:
+            case CardTypeGJ.CARD_CHECK:
                 return 0;
             default:
-                return Util.string2Int(coefficent[0]) * basePrices / 100;
+                return string2Int(coefficent[0]) * basePrices / 100;
+        }
+    }
+
+    /**
+     * @param cardType       卡类型
+     * @param cardModuleType 卡物理类型
+     * @return .
+     */
+    private int payFee(String cardType, String cardModuleType) {
+        String[] coefficent = BusApp.getPosManager().getCoefficent();
+        int basePrices = BusApp.getPosManager().getBasePrice();
+
+        if (TextUtils.equals(cardType, "04")) {
+            //有可能是M1免费卡或者CPU济南卡
+            if (TextUtils.equals(cardModuleType, "08")) {
+                //M1
+                //免费卡
+                return string2Int(coefficent[3]) * basePrices / 100;
+            } else {
+                //CPU
+                //济南卡
+                return string2Int(coefficent[9]) * basePrices / 100;
+            }
+
+        }
+        switch (cardType) {
+            case CARD_NORMAL://普通卡
+            case CardTypeGJ.CARD_MEMORY://纪念卡
+                return string2Int(coefficent[0]) * basePrices / 100;
+            case CardTypeGJ.CARD_STUDENT://学生卡
+            case CardTypeGJ.CARD_CPU_STUDENT://CPU学生卡
+                return string2Int(coefficent[1]) * basePrices / 100;
+            case CardTypeGJ.CARD_OLD://老年卡
+            case CardTypeGJ.CARD_CPU_OLD://CPU老年卡
+                return string2Int(coefficent[2]) * basePrices / 100;
+            case CardTypeGJ.CARD_CPU_FREE://CPU免费卡
+                return string2Int(coefficent[3]) * basePrices / 100;
+            case CardTypeGJ.CARD_CPU_DEFECT://残疾人卡
+                return string2Int(coefficent[4]) * basePrices / 100;
+            case CardTypeGJ.CARD_EMP://员工卡
+                return string2Int(coefficent[5]) * basePrices / 100;
+            case CardTypeGJ.CARD_GATHER:
+            case CardTypeGJ.CARD_SIGNED:
+            case CardTypeGJ.CARD_CHECKED:
+            case CardTypeGJ.CARD_CHECK:
+                return 0;
+            default:
+                return string2Int(coefficent[0]) * basePrices / 100;
         }
     }
 
@@ -336,15 +400,24 @@ public class LoopCardThread extends Thread {
         byte[] driverNo = HexUtil.str2Bcd(BusApp.getPosManager().getDriverNo());
         byte[] direction = new byte[]{0x00};
         byte[] stationId = new byte[]{0x01};
-        byte[] normal = HexUtil.int2Bytes(payFee(CardTypeZiBo.CARD_NORMAL), 3);
         byte[] sendData = HexUtil.mergeByte(amount, baseAmount, black, white, busNo, lineNo,
-                workStatus_, driverNo, direction, stationId, normal, data);
+                workStatus_, driverNo, direction, stationId, data);
 
-        SLog.d("LoopCardThread(response.java:366)消费金额=" + pay_fee + ",基础金额=" + total_fee + ",普通卡金额=" + payFee(CardTypeZiBo.CARD_NORMAL));
         SLog.d("LoopCardThread(response.java:279)发送的报文:" + HexUtil.printHexBinary(sendData));
 
         int ret = libszxb.qxcardprocess(sendData);
         return new ConsumeCard(sendData, isSign, "zibo");
+    }
+
+
+    /**
+     * @param response 下班
+     */
+    private void offWork(ConsumeCard response) {
+        BusApp.getPosManager().setDriverNo(String.format("%08d", 0), String.format("%08d", 0));
+        notice(Config.IC_OFF_WORK, "司机卡下班[00]", true);
+        saveRecord(response);
+        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
     }
 
 
@@ -355,8 +428,8 @@ public class LoopCardThread extends Thread {
      */
     private void checkTheBalance(ConsumeCard response, int music) {
         notice(music, "本次扣款:"
-                + fen2Yuan(hex2Int(response.getPayFee())) + "元\n余额:"
-                + fen2Yuan(hex2Int(response.getCardBalance())) + "元", true);
+                + fen2Yuan(string2Int(response.getPayFee())) + "元\n余额:"
+                + fen2Yuan(string2Int(response.getCardBalance())) + "元", true);
 
         saveRecord(response);
     }

@@ -10,7 +10,7 @@ import com.szxb.buspay.db.entity.card.LineInfoEntity;
  */
 
 public interface IPosManager {
-    void loadFromPrefs();
+    void loadFromPrefs(int city,String binName);
 
     String getLineName();
 
@@ -70,9 +70,11 @@ public interface IPosManager {
 
     String getUnitno();
 
-    void setDriverNo(String no);
+    void setDriverNo(String no, String empCardNo);
 
     String getDriverNo();
+
+    String getEmpNo();
 
     String getPosSN();
 
@@ -86,8 +88,12 @@ public interface IPosManager {
 
     String getBinVersion();
 
-    String[]getCoefficent();
+    String[] getCoefficent();
 
     void setCoefficent(String coefficent);
+
+    void setBlackVersion(String version);
+
+    String getBlackVersion();
 
 }

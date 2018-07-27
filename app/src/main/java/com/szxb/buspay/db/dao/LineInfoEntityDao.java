@@ -35,9 +35,10 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
         public final static Property Fixed_price = new Property(8, String.class, "fixed_price", false, "FIXED_PRICE");
         public final static Property Coefficient = new Property(9, String.class, "coefficient", false, "COEFFICIENT");
         public final static Property Shortcut_price = new Property(10, String.class, "shortcut_price", false, "SHORTCUT_PRICE");
-        public final static Property Rmk1 = new Property(11, String.class, "rmk1", false, "RMK1");
-        public final static Property Rmk2 = new Property(12, String.class, "rmk2", false, "RMK2");
-        public final static Property Rmk3 = new Property(13, String.class, "rmk3", false, "RMK3");
+        public final static Property FileName = new Property(11, String.class, "fileName", false, "FILE_NAME");
+        public final static Property Rmk1 = new Property(12, String.class, "rmk1", false, "RMK1");
+        public final static Property Rmk2 = new Property(13, String.class, "rmk2", false, "RMK2");
+        public final static Property Rmk3 = new Property(14, String.class, "rmk3", false, "RMK3");
     }
 
 
@@ -64,9 +65,10 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
                 "\"FIXED_PRICE\" TEXT," + // 8: fixed_price
                 "\"COEFFICIENT\" TEXT," + // 9: coefficient
                 "\"SHORTCUT_PRICE\" TEXT," + // 10: shortcut_price
-                "\"RMK1\" TEXT," + // 11: rmk1
-                "\"RMK2\" TEXT," + // 12: rmk2
-                "\"RMK3\" TEXT);"); // 13: rmk3
+                "\"FILE_NAME\" TEXT," + // 11: fileName
+                "\"RMK1\" TEXT," + // 12: rmk1
+                "\"RMK2\" TEXT," + // 13: rmk2
+                "\"RMK3\" TEXT);"); // 14: rmk3
     }
 
     /** Drops the underlying database table. */
@@ -134,19 +136,24 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
             stmt.bindString(11, shortcut_price);
         }
  
+        String fileName = entity.getFileName();
+        if (fileName != null) {
+            stmt.bindString(12, fileName);
+        }
+ 
         String rmk1 = entity.getRmk1();
         if (rmk1 != null) {
-            stmt.bindString(12, rmk1);
+            stmt.bindString(13, rmk1);
         }
  
         String rmk2 = entity.getRmk2();
         if (rmk2 != null) {
-            stmt.bindString(13, rmk2);
+            stmt.bindString(14, rmk2);
         }
  
         String rmk3 = entity.getRmk3();
         if (rmk3 != null) {
-            stmt.bindString(14, rmk3);
+            stmt.bindString(15, rmk3);
         }
     }
 
@@ -209,19 +216,24 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
             stmt.bindString(11, shortcut_price);
         }
  
+        String fileName = entity.getFileName();
+        if (fileName != null) {
+            stmt.bindString(12, fileName);
+        }
+ 
         String rmk1 = entity.getRmk1();
         if (rmk1 != null) {
-            stmt.bindString(12, rmk1);
+            stmt.bindString(13, rmk1);
         }
  
         String rmk2 = entity.getRmk2();
         if (rmk2 != null) {
-            stmt.bindString(13, rmk2);
+            stmt.bindString(14, rmk2);
         }
  
         String rmk3 = entity.getRmk3();
         if (rmk3 != null) {
-            stmt.bindString(14, rmk3);
+            stmt.bindString(15, rmk3);
         }
     }
 
@@ -244,9 +256,10 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // fixed_price
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // coefficient
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // shortcut_price
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // rmk1
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // rmk2
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // rmk3
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // fileName
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // rmk1
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // rmk2
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14) // rmk3
         );
         return entity;
     }
@@ -264,9 +277,10 @@ public class LineInfoEntityDao extends AbstractDao<LineInfoEntity, Long> {
         entity.setFixed_price(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setCoefficient(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setShortcut_price(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setRmk1(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setRmk2(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setRmk3(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setFileName(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setRmk1(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setRmk2(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setRmk3(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
      }
     
     @Override

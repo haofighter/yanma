@@ -10,6 +10,7 @@ import android.os.IBinder;
 import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
+import com.szxb.buspay.task.TaskDelFile;
 import com.szxb.buspay.task.service.TimeSettleTask;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.java8583.module.manager.BusllPosManage;
@@ -37,6 +38,22 @@ public class BusApp extends Application {
     //服务操作
     private IToolInterface mService;
 
+    /**
+     * 0：淄博
+     * 1：泰安
+     * 2：莱芜长运
+     * 3：招远
+     */
+    private static int city = 3;
+
+    /**
+     * taian.bin 泰安
+     * zibo.bin 淄博
+     * laiwu_cy.bin 莱芜长运
+     * zhaoyuan.bin 招远
+     */
+    private static String binName = "zhaoyuan.bin";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -48,7 +65,7 @@ public class BusApp extends Application {
         BusllPosManage.init(unionPayManager);
 
         manager = new PosManager();
-        manager.loadFromPrefs();
+        manager.loadFromPrefs(city, binName);
 
         initLog();
 
@@ -99,7 +116,7 @@ public class BusApp extends Application {
     public static PosManager getPosManager() {
         if (manager == null) {
             manager = new PosManager();
-            manager.loadFromPrefs();
+            manager.loadFromPrefs(city, binName);
         }
         return manager;
     }
@@ -116,6 +133,8 @@ public class BusApp extends Application {
                 .fileName(BusApp.getPosManager().getBusNo())
                 .build();
         SLog.addLogAdapter(new DiskLogAdapter(formatStrategy));
+
+        new TaskDelFile().del();
     }
 
 }

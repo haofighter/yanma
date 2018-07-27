@@ -20,18 +20,18 @@
             android:layout_height="wrap_content"
             android:maxLength="10"
             android:text="请先设置线路信息"
-            android:textColor="#F7F7F7"
-            android:textSize="60sp" />
+            android:textColor="#3A5FCD"
+            android:textSize="45sp" />
 
         <TextView
             android:id="@+id/prices"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:textStyle="italic"
             android:text="票价:0.00元"
-            android:textColor="#F7F7F7"
-            android:textSize="40sp"
-            android:textStyle="bold" />
+            android:textColor="@color/colorBlack"
+            android:textSize="50sp"/>
 
     </LinearLayout>
 

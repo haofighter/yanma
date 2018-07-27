@@ -8,20 +8,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.R;
 import com.szxb.buspay.db.entity.bean.CntEntity;
 import com.szxb.buspay.db.entity.bean.MainEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
+import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.interfaces.OnKeyListener;
+import com.szxb.buspay.module.init.PosInit;
 import com.szxb.buspay.task.CalibrateTime;
 import com.szxb.buspay.task.key.LoopKeyTask;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
@@ -49,14 +53,13 @@ import static com.szxb.buspay.util.Config.POSITION_BUS_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_CHECK_NET;
 import static com.szxb.buspay.util.Config.POSITION_CNT;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_1_M;
-import static com.szxb.buspay.util.Config.POSITION_EXPORT_3_M;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_7;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_DB;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_LOG;
-import static com.szxb.buspay.util.Config.POSITION_PUSH_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_SCAN_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_TIME;
 import static com.szxb.buspay.util.Config.POSITION_UNION_RECORD;
+import static com.szxb.buspay.util.Config.POSITION_UPDATE_PARAMS;
 import static com.szxb.buspay.util.Util.fen2Yuan;
 import static com.szxb.buspay.util.Util.hex2Int;
 import static com.szxb.buspay.util.Util.string2Int;
@@ -85,6 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     protected TextView scan_cnt, scan_amount_cnt, scan_up_status;
     protected TextView union_cnt, union_amount_cnt, union_un_status;
     protected TextView sum_cnt, sum_amount_cnt, sum_up_status;
+    protected TextView time_cnt, time_amount_cnt;
 
     private void initCntView() {
         ic_card_swipe_cnt = (TextView) findViewById(R.id.ic_card_swipe_cnt);
@@ -102,6 +106,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         sum_cnt = (TextView) findViewById(R.id.sum_cnt);
         sum_amount_cnt = (TextView) findViewById(R.id.sum_amount_cnt);
         sum_up_status = (TextView) findViewById(R.id.sum_up_status);
+
+        time_cnt = (TextView) findViewById(R.id.time_cnt);
+        time_amount_cnt = (TextView) findViewById(R.id.time_amount_cnt);
     }
 
     //签到view
@@ -143,6 +150,14 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT > 21) {
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            getWindow().getDecorView().setSystemUiVisibility(option);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        }
         super.onCreate(savedInstanceState);
         setContentView(rootView());
         initView();
@@ -227,8 +242,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         if (!childViewShow) {
             //如果不是交易查询界面
             if (recyclerView.getVisibility() == View.GONE) {
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.startAnimation(mShowAnimation);
+                setViewStatus(recyclerView,true);
             } else {
                 mAdapter.downKey();
             }
@@ -244,8 +258,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         }
         if (!childViewShow) {
             if (recyclerView.getVisibility() == View.GONE) {
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.startAnimation(mShowAnimation);
+                setViewStatus(recyclerView,true);
             } else {
                 mAdapter.upKey();
             }
@@ -256,7 +269,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     @Override
     public void onKeyOk() {
-        SLog.d("BaseActivity(onKeyOk.java:145)childViewShow=" + childViewShow);
         if (childViewShow || main_sign.getVisibility() == View.VISIBLE) {
             return;
         }
@@ -265,7 +277,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         if (position == POSITION_BUS_RECORD) {
             onKeyCancel();
             childViewShow = true;
-            main_record.setVisibility(View.VISIBLE);
+            setViewStatus(main_record,true);
             record_type.setText("刷卡记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("卡号", "余额", "金额", "交易时间"));
@@ -277,8 +289,14 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                     mainEntity.setStatus(consumeCard.getUpStatus());
                     mainEntity.setTime(consumeCard.getTransTime());
                     mainEntity.setCard_id(consumeCard.getCardNo());
-                    mainEntity.setCard_money(fen2Yuan(hex2Int(consumeCard.getCardBalance())));
-                    mainEntity.setPay_money(fen2Yuan(hex2Int(consumeCard.getPayFee())));
+                    if (TextUtils.equals(consumeCard.getCardType(), "0A")) {
+                        //次数卡
+                        mainEntity.setCard_money(hex2Int(consumeCard.getCardBalance()) + "");
+                        mainEntity.setPay_money(hex2Int(consumeCard.getPayFee()) + "");
+                    } else {
+                        mainEntity.setCard_money(fen2Yuan(string2Int(consumeCard.getCardBalance())));
+                        mainEntity.setPay_money(fen2Yuan(string2Int(consumeCard.getPayFee())));
+                    }
                     mRecordList.add(mainEntity);
                 }
             }
@@ -287,7 +305,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_SCAN_RECORD) {//扫码记录
             onKeyCancel();
             childViewShow = true;
-            main_record.setVisibility(View.VISIBLE);
+            setViewStatus(main_record,true);
             record_type.setText("扫码记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("用户ID", "交易状态", "金额", "交易时间"));
@@ -307,7 +325,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_UNION_RECORD) {//银联卡记录
             onKeyCancel();
             childViewShow = true;
-            main_record.setVisibility(View.VISIBLE);
+            setViewStatus(main_record,true);
             record_type.setText("银联卡记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("卡号", "交易状态", "金额", "交易时间"));
@@ -328,11 +346,18 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_CNT) {//当天汇总
             onKeyCancel();
             childViewShow = true;
-            main_cnt.setVisibility(View.VISIBLE);
+            setViewStatus(main_cnt,true);
             record_type_cnt.setText("当天汇总");
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("cnt"));
-        } else if (position == POSITION_PUSH_RECORD) {//上传记录
-
+        } else if (position == POSITION_UPDATE_PARAMS) {//手动更新参数
+            BusToast.showToast(BusApp.getInstance(), "开始更新请稍后", true);
+            LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
+            PosInit init = new PosInit();
+            init.init();
+            if (lineInfoEntity != null) {
+                init.download(lineInfoEntity.getFileName());
+            }
+            onKeyCancel();
         } else if (position == POSITION_EXPORT_DB) {//数据库导出
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_db"));
         } else if (position == POSITION_EXPORT_LOG) {//日志导出
@@ -349,8 +374,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             export(7);
         } else if (position == POSITION_EXPORT_1_M) {//导出1个月记录
             export(30);
-        } else if (position == POSITION_EXPORT_3_M) {//导出3个月记录
-            export(90);
         }
     }
 
@@ -369,19 +392,16 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     @Override
     public void onKeyCancel() {
         if (recyclerView.getVisibility() == View.VISIBLE) {
-            recyclerView.setVisibility(View.GONE);
-            recyclerView.startAnimation(mHiddenAnimation);
+            setViewStatus(recyclerView,false);
         }
 
         if (main_record.getVisibility() == View.VISIBLE) {
-            main_record.setVisibility(View.GONE);
-            main_record.startAnimation(mHiddenAnimation);
+            setViewStatus(main_record,false);
             childViewShow = false;
         }
 
         if (main_cnt.getVisibility() == View.VISIBLE) {
-            main_cnt.setVisibility(View.GONE);
-            main_cnt.startAnimation(mHiddenAnimation);
+            setViewStatus(main_cnt,false);
             childViewShow = false;
         }
     }
@@ -402,22 +422,26 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         sum_cnt.setText(cntEntity.cnt[0]);
         sum_amount_cnt.setText(cntEntity.cnt[1]);
         sum_up_status.setText(cntEntity.cnt[2]);
+
+        time_cnt.setText(cntEntity.time_cnt[0]);
+        time_amount_cnt.setText(cntEntity.time_cnt[1]);
     }
 
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().getDecorView()
-                    .setSystemUiVisibility(
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-            getWindow().setNavigationBarColor(Color.TRANSPARENT);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
+    /**
+     *
+     * @param view view
+     * @param isShow 是否显示
+     */
+    private void setViewStatus(View view, boolean isShow) {
+        if (isShow) {
+            //显示
+            view.setVisibility(View.VISIBLE);
+            view.startAnimation(mShowAnimation);
+        } else {
+            //隐藏
+            view.setVisibility(View.GONE);
+            view.startAnimation(mHiddenAnimation);
         }
     }
 
@@ -427,7 +451,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         instance.cancel();
         onKeyCancel();
         if (subscribe != null && !subscribe.isUnsubscribed()) {
-            SLog.d("BaseActivity(onDestroy.java:433)解除绑定>>>>");
             subscribe.unsubscribe();
         }
     }

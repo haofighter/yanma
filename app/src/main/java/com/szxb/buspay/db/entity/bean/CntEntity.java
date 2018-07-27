@@ -16,4 +16,6 @@ public class CntEntity {
     public String[] union_cnt = new String[]{"0", "0", "0 | 0"};
 
     public String[] cnt = new String[]{"0", "0", "0 | 0"};
+
+    public String[] time_cnt = new String[]{"0", "0"};
 }

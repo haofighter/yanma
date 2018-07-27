@@ -19,6 +19,8 @@ import com.szxb.buspay.util.Util;
 
 import java.util.List;
 
+import static com.szxb.buspay.util.Util.string2Int;
+
 /**
  * 作者：Tangren on 2018-07-18
  * 包名：com.szxb.buspay.manager
@@ -54,7 +56,7 @@ public class PosManager implements IPosManager, IAddRess {
      */
     private int basePrice;
     /**
-     * 实际扣款金额
+     * 微信实际扣款金额
      */
     private int paymarkedPrice;
 
@@ -66,7 +68,7 @@ public class PosManager implements IPosManager, IAddRess {
     /**
      * 370300zibo  371200laiwu
      */
-    private String cityCode;//淄博
+    private String cityCode;
     /**
      * 站点ID
      */
@@ -109,6 +111,10 @@ public class PosManager implements IPosManager, IAddRess {
      * 司机号
      */
     private String driverNo;
+    /**
+     * 司机号卡号
+     */
+    private String empNo;
 
     private String ftpIP;
     private int ftpPort;
@@ -126,31 +132,39 @@ public class PosManager implements IPosManager, IAddRess {
     //上个bin版本
     private String lastVersion;
 
-    //当前bin版本
-    private String currentVersion;
+    //当前bin
+    private String binName;
+
+    //上个黑名单版本
+    private String lastBalackVersion;
 
     /**
-     * ################淄博      栖霞、招远      莱芜
-     * coefficient[0]:普通卡      普通卡        普通卡
-     * coefficient[1]:学生卡      学生卡        学生卡
-     * coefficient[2]:老年卡      老年卡        老年卡
-     * coefficient[3]:免费        免费卡        免费卡
-     * coefficient[4]:员工        优惠1         残疾人卡
-     * coefficient[5]:优惠1       员工卡        员工卡
-     * coefficient[6]:优惠2       优惠2         优惠2
-     * coefficient[7]:优惠3       优惠3         优惠3
-     * coefficient[8]:微信        微信          银联
-     * coefficient[9]:银联        银联          济南卡
+     * ################淄博      栖霞、招远           莱芜                泰安、沂源
+     * coefficient[0]:普通卡      普通卡              普通卡                 普通卡
+     * coefficient[1]:学生卡      学生卡              学生卡                 学生卡
+     * coefficient[2]:老年卡      老年卡              老年卡                 老年卡
+     * coefficient[3]:免费        免费卡              免费卡                 免费卡
+     * coefficient[4]:员工        优惠1               残疾人卡               优惠1
+     * coefficient[5]:优惠1       员工卡              员工卡                 员工卡
+     * coefficient[6]:优惠2       优惠2               优惠2                  优惠2
+     * coefficient[7]:优惠3       优惠3               优惠3                  优惠3
+     * coefficient[8]:微信        微信                银联                    银联
+     * coefficient[9]:银联        银联                济南卡                  济南卡
+     * coefficient[10]########################################################优抚卡
+     * coefficient[11]#######################################################月票卡
      */
     private String[] coefficient;
 
+    //备注（线路信息）
     private String chineseName;
+
+    private boolean isUpdateBin;
 
     //递增流水号
     private int numSeq = 0;
 
     @Override
-    public void loadFromPrefs() {
+    public void loadFromPrefs(final int city, final String bin) {
         ThreadScheduledExecutorUtil.getInstance().getService().submit(new Runnable() {
             @Override
             public void run() {
@@ -159,13 +173,15 @@ public class PosManager implements IPosManager, IAddRess {
                 lineName = FetchAppConfig.getLineName();
                 unitno = FetchAppConfig.unitno();
                 lastVersion = FetchAppConfig.getLastVersion();
-                currentVersion = FetchAppConfig.getBinVersion();
+                binName = bin;
                 lineNo = FetchAppConfig.getLineNo();
                 bus_no = FetchAppConfig.getBusNo();
                 driverNo = FetchAppConfig.getDriverNo();
+                empNo = FetchAppConfig.getEmpNo();
                 unitno = FetchAppConfig.unitno();
                 numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
                 chineseName = FetchAppConfig.chinese_name();
+                lastBalackVersion = FetchAppConfig.getLastBlackVersion();
 
                 //初始化SN号
                 initSn();
@@ -175,9 +191,8 @@ public class PosManager implements IPosManager, IAddRess {
                 String config = Util.readAssetsFile("config.json", BusApp.getInstance().getApplicationContext());
                 ConfigParam configParam = new Gson().fromJson(config, ConfigParam.class);
                 List<ConfigParam.ConfigBean> configList = configParam.getConfig();
-
-                if (configList.size() > 0) {
-                    ConfigParam.ConfigBean configBean = configList.get(0);
+                if (configList.size() > 3) {
+                    ConfigParam.ConfigBean configBean = configList.get(city);
                     app_id = configBean.getMch_id();
                     cityCode = configBean.getCity_code();
                     ftpIP = configBean.getIp();
@@ -200,6 +215,8 @@ public class PosManager implements IPosManager, IAddRess {
         for (int i = 0; i < len; i++) {
             coefficient[i] = dis.substring(index, index += 3);
         }
+        paymarkedPrice = string2Int(coefficient[8]) * basePrice / 100;
+        unionPaymarkedPrice = string2Int(coefficient[9]) * basePrice / 100;
     }
 
     private void initSn() {
@@ -251,22 +268,22 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public int getWcPayPrice() {
-        return 0;
+        return paymarkedPrice;
     }
 
     @Override
     public void setWcPrice(int var1) {
-
+        this.paymarkedPrice = var1;
     }
 
     @Override
     public void setUnionPayPrice(int price) {
-
+        this.unionPaymarkedPrice = price;
     }
 
     @Override
     public int getUnionPayPrice() {
-        return 0;
+        return unionPaymarkedPrice;
     }
 
     @Override
@@ -298,7 +315,7 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public String geCityCode() {
-        return null;
+        return cityCode;
     }
 
     @Override
@@ -375,14 +392,21 @@ public class PosManager implements IPosManager, IAddRess {
     }
 
     @Override
-    public void setDriverNo(String no) {
+    public void setDriverNo(String no, String empNo) {
         this.driverNo = no;
+        this.empNo = empNo;
         CommonSharedPreferences.put("driver_no", no);
+        CommonSharedPreferences.put("emp_no", empNo);
     }
 
     @Override
     public String getDriverNo() {
         return driverNo;
+    }
+
+    @Override
+    public String getEmpNo() {
+        return empNo;
     }
 
     @Override
@@ -414,7 +438,7 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public String getBinVersion() {
-        return currentVersion;
+        return binName;
     }
 
     @Override
@@ -424,13 +448,27 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public void setCoefficent(String coefficent) {
+        coefficent = Util.addZeroRight(coefficent, 36);
         int len = coefficent.length() / 3;
         coefficient = new String[len];
         int index = 0;
         for (int i = 0; i < len; i++) {
             coefficient[i] = coefficent.substring(index, index += 3);
         }
+        setWcPrice(string2Int(coefficient[8]) * basePrice / 100);
+        setUnionPayPrice(string2Int(coefficient[9]) * basePrice / 100);
         CommonSharedPreferences.put("coefficient", coefficent);
+    }
+
+    @Override
+    public void setBlackVersion(String version) {
+        this.lastVersion = version;
+        CommonSharedPreferences.put("last_black_version", version);
+    }
+
+    @Override
+    public String getBlackVersion() {
+        return lastVersion;
     }
 
     @Override

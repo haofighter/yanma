@@ -50,6 +50,9 @@ public class SoundPoolUtil {
             R.raw.ic_yearly,//23请年检
             R.raw.qr_error,//24.二维码有误
             R.raw.ic_recharge,//25.请充值
+            R.raw.ic_defect,//26.优抚卡
+            R.raw.ic_manager,//27.管理卡
+            R.raw.ic_month,//26.月票卡
     };
 
     /**

@@ -1,6 +1,7 @@
 package com.szxb.buspay.util;
 
 import android.os.Environment;
+import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.MainActivity;
@@ -129,6 +130,7 @@ public class HexUtil {
 
     /**
      * byte[]bcd 转str
+     *
      * @param bytes .
      * @return .
      */
@@ -165,6 +167,7 @@ public class HexUtil {
         }
         return b;
     }
+
     public static void parseLine(LineInfoEntity onLineInfo) {
         parseLine(onLineInfo, null);
     }
@@ -185,5 +188,14 @@ public class HexUtil {
         if (AppUtil.isForeground(MainActivity.class.getName())) {
             RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_VIEW));
         }
+    }
+
+    /**
+     * @param version ftp黑名单版本
+     * @return 是否需要更新 true 更新，否则不更新
+     */
+    public static boolean checkBlackVersion(String version) {
+        String lastBlackVersion = BusApp.getPosManager().getBlackVersion();
+        return !TextUtils.equals(lastBlackVersion, version);
     }
 }

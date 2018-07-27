@@ -4,9 +4,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
-/**
- * Created by Administrator on 2017/8/25.
- */
+
 @Entity
 public class BlackListCard {
     @Id(autoincrement = true)

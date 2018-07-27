@@ -33,7 +33,6 @@
                 android:layout_width="1dp"
                 android:layout_height="45dp"
                 android:gravity="center"
-
                 android:padding="8dp"
                 android:text="类型"
                 android:textColor="@color/colorWhite"
@@ -185,6 +184,43 @@
                 android:textSize="18sp" />
         </TableRow>
 
+
+        <TableRow
+            android:divider="@drawable/line"
+            android:showDividers="beginning|middle|end">
+
+            <TextView
+                android:layout_width="1dp"
+                android:layout_height="45dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="月票卡"
+                android:textSize="18sp"
+                android:textStyle="bold"  />
+
+            <TextView
+                android:id="@+id/time_cnt"
+                android:layout_width="1dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="0"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/time_amount_cnt"
+                android:layout_width="1dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="0"
+                android:textSize="18sp" />
+            <TextView
+                android:layout_width="1dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="0 | 0"
+                android:textSize="18sp" />
+        </TableRow>
+
         <TableRow
             android:divider="@drawable/line"
             android:showDividers="beginning|middle|end">
@@ -224,5 +260,13 @@
         </TableRow>
     </TableLayout>
 
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:lineSpacingExtra="5dp"
+        android:text="特别说明:\n月票卡不包含在汇总里(金额表示扣款次数)"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp" />
 </LinearLayout>
