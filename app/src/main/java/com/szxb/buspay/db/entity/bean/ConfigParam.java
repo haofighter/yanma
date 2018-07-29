@@ -23,13 +23,17 @@ public class ConfigParam {
 
     public static class ConfigBean {
         /**
-         * ip : 112.35.80.147
-         * port : 21
-         * user : zbbusftpdan
-         * psw : ftp1234!@#$
-         * mch_id : 10000009
-         * city_code : 370300
-         * url_ip : 111.230.85.238
+         * ip : ftp地址
+         * port : ftp 端口号
+         * user : ftp用户名
+         * psw : ftp密码
+         * mch_id : 微信商户号
+         * city_code : 城市代码
+         * url_ip : http ip
+         * is_supp_scan_pay : true    是否支持扫码支付
+         * is_supp_ic_pay : true      是否支持ic卡支付
+         * is_supp_union_pay : false  是否支持银联卡支付
+         * city : 淄博[0]
          */
 
         private String ip;
@@ -39,6 +43,9 @@ public class ConfigParam {
         private String mch_id;
         private String city_code;
         private String url_ip;
+        private boolean is_supp_scan_pay;
+        private boolean is_supp_ic_pay;
+        private boolean is_supp_union_pay;
         private String city;
 
         public String getIp() {
@@ -97,6 +104,30 @@ public class ConfigParam {
             this.url_ip = url_ip;
         }
 
+        public boolean isIs_supp_scan_pay() {
+            return is_supp_scan_pay;
+        }
+
+        public void setIs_supp_scan_pay(boolean is_supp_scan_pay) {
+            this.is_supp_scan_pay = is_supp_scan_pay;
+        }
+
+        public boolean isIs_supp_ic_pay() {
+            return is_supp_ic_pay;
+        }
+
+        public void setIs_supp_ic_pay(boolean is_supp_ic_pay) {
+            this.is_supp_ic_pay = is_supp_ic_pay;
+        }
+
+        public boolean isIs_supp_union_pay() {
+            return is_supp_union_pay;
+        }
+
+        public void setIs_supp_union_pay(boolean is_supp_union_pay) {
+            this.is_supp_union_pay = is_supp_union_pay;
+        }
+
         public String getCity() {
             return city;
         }
@@ -104,26 +135,5 @@ public class ConfigParam {
         public void setCity(String city) {
             this.city = city;
         }
-
-        @Override
-        public String toString() {
-            return "ConfigBean{" +
-                    "ip='" + ip + '\'' +
-                    ", port=" + port +
-                    ", user='" + user + '\'' +
-                    ", psw='" + psw + '\'' +
-                    ", mch_id='" + mch_id + '\'' +
-                    ", city_code='" + city_code + '\'' +
-                    ", url_ip='" + url_ip + '\'' +
-                    ", city='" + city + '\'' +
-                    '}';
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "ConfigParam{" +
-                "config=" + config +
-                '}';
     }
 }

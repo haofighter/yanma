@@ -118,14 +118,14 @@ public class HexUtil {
         if (str.length() % 2 != 0) {
             str = "0" + str;
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baOs = new ByteArrayOutputStream();
         char[] cs = str.toCharArray();
         for (int i = 0; i < cs.length; i += 2) {
             int high = cs[i] - 48;
             int low = cs[i + 1] - 48;
-            baos.write(high << 4 | low);
+            baOs.write(high << 4 | low);
         }
-        return baos.toByteArray();
+        return baOs.toByteArray();
     }
 
     /**
@@ -136,7 +136,7 @@ public class HexUtil {
      */
     public static String bcd2Str(byte[] bytes) {
         if (bytes.length == 0) {
-            return "";
+            return "00";
         }
         StringBuilder sb = new StringBuilder();
         for (byte aByte : bytes) {
@@ -156,14 +156,14 @@ public class HexUtil {
     public static byte[] hex2byte(String hex)
             throws IllegalArgumentException {
         if (hex.length() % 2 != 0) {
-            throw new IllegalArgumentException();
+            hex = hex + "0";
         }
         char[] arr = hex.toCharArray();
         byte[] b = new byte[hex.length() / 2];
         for (int i = 0, j = 0, l = hex.length(); i < l; i++, j++) {
             String swap = "" + arr[i++] + arr[i];
-            int byteint = Integer.parseInt(swap, 16) & 0xFF;
-            b[j] = Integer.valueOf(byteint).byteValue();
+            int byteInt = Integer.parseInt(swap, 16) & 0xFF;
+            b[j] = Integer.valueOf(byteInt).byteValue();
         }
         return b;
     }

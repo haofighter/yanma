@@ -94,6 +94,10 @@ public class UnionCard {
     private int ret = 0;
 
     public void run(String aid) {
+        if (!BusApp.getPosManager().isSuppUnionPay()) {
+            return;
+        }
+
         try {
             money = BusApp.getPosManager().getUnionPayPrice();
 //            money = 1;

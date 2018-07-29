@@ -154,8 +154,8 @@ public class PosInit {
                     @Override
                     public void call(Boolean aBoolean) {
                         SLog.d("PosInit(call.java:147)扫码初始化:" + aBoolean);
-                        BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化成功" : "扫码初始化失败", aBoolean);
                         if (listener != null) {
+                            BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化成功" : "扫码初始化失败", aBoolean);
                             listener.onCallBack(aBoolean);
                         }
                     }

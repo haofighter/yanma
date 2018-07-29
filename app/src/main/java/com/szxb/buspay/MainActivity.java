@@ -65,14 +65,17 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         initDate();
         initDatas();
         ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new LoopScanThread(), 1000, 200, TimeUnit.MILLISECONDS);
-        String appId = BusApp.getPosManager().getAppId();
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(
-                TextUtils.equals(appId, "10000009") ? new LoopCardThread() ://淄博
-                        TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY() ://莱芜长运
-                                TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA() ://泰安
-                                        TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
-                                                new LoopCardThread()
-                , 1000, 200, TimeUnit.MILLISECONDS);
+        boolean isSuppIC = BusApp.getPosManager().isSuppIcPay();
+        if (isSuppIC) {
+            String appId = BusApp.getPosManager().getAppId();
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(
+                    TextUtils.equals(appId, "10000009") ? new LoopCardThread() ://淄博
+                            TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY() ://莱芜长运
+                                    TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA() ://泰安
+                                            TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
+                                                    new LoopCardThread()
+                    , 1000, 200, TimeUnit.MILLISECONDS);
+        }
     }
 
     private void initDatas() {

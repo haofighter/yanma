@@ -5,11 +5,9 @@ import android.text.TextUtils;
 import com.example.zhoukai.modemtooltest.ModemToolTest;
 import com.google.gson.Gson;
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.db.dao.LineInfoEntityDao;
 import com.szxb.buspay.db.entity.bean.ConfigParam;
 import com.szxb.buspay.db.entity.bean.FTPEntity;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
-import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
 import com.szxb.buspay.db.sp.FetchAppConfig;
@@ -28,7 +26,7 @@ import static com.szxb.buspay.util.Util.string2Int;
  * TODO:一句话描述
  */
 
-public class PosManager implements IPosManager, IAddRess {
+public class PosManager implements IPosManager, IAddRess, ISwitch {
 
     /**
      * 路线名
@@ -158,7 +156,15 @@ public class PosManager implements IPosManager, IAddRess {
     //备注（线路信息）
     private String chineseName;
 
-    private boolean isUpdateBin;
+    //是否支持微信支付
+    private boolean isSuppScanPay = false;
+
+    //是否支持银联卡支付
+    private boolean isSuppUnionPay = false;
+
+    //是否支付刷公交卡
+    private boolean isSuppIcPay = false;
+
 
     //递增流水号
     private int numSeq = 0;
@@ -169,42 +175,54 @@ public class PosManager implements IPosManager, IAddRess {
             @Override
             public void run() {
                 //pos基础参数
-                basePrice = FetchAppConfig.getBasePrice();
-                lineName = FetchAppConfig.getLineName();
-                unitno = FetchAppConfig.unitno();
-                lastVersion = FetchAppConfig.getLastVersion();
-                binName = bin;
-                lineNo = FetchAppConfig.getLineNo();
-                bus_no = FetchAppConfig.getBusNo();
-                driverNo = FetchAppConfig.getDriverNo();
-                empNo = FetchAppConfig.getEmpNo();
-                unitno = FetchAppConfig.unitno();
-                numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
-                chineseName = FetchAppConfig.chinese_name();
-                lastBalackVersion = FetchAppConfig.getLastBlackVersion();
+                initBase(bin);
 
                 //初始化SN号
                 initSn();
+
                 //初始化折扣
                 initDis();
 
-                String config = Util.readAssetsFile("config.json", BusApp.getInstance().getApplicationContext());
-                ConfigParam configParam = new Gson().fromJson(config, ConfigParam.class);
-                List<ConfigParam.ConfigBean> configList = configParam.getConfig();
-                if (configList.size() > 3) {
-                    ConfigParam.ConfigBean configBean = configList.get(city);
-                    app_id = configBean.getMch_id();
-                    cityCode = configBean.getCity_code();
-                    ftpIP = configBean.getIp();
-                    ftpPort = configBean.getPort();
-                    ftpUser = configBean.getUser();
-                    ftpPsw = configBean.getPsw();
-                    ftpEntity = new FTPEntity(ftpIP, ftpPort, ftpUser, ftpPsw);
-                }
-                LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
-                lineInfoEntity = dao.queryBuilder().limit(1).unique();
+                //读取配置参数
+                config(city);
+
+                //读取线路信息
+                lineInfoEntity = DBManager.readLine();
             }
         });
+    }
+
+    private void initBase(String bin) {
+        basePrice = FetchAppConfig.getBasePrice();
+        lineName = FetchAppConfig.getLineName();
+        unitno = FetchAppConfig.unitno();
+        lastVersion = FetchAppConfig.getLastVersion();
+        binName = bin;
+        lineNo = FetchAppConfig.getLineNo();
+        bus_no = FetchAppConfig.getBusNo();
+        driverNo = FetchAppConfig.getDriverNo();
+        empNo = FetchAppConfig.getEmpNo();
+        unitno = FetchAppConfig.unitno();
+        numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
+        chineseName = FetchAppConfig.chinese_name();
+        lastBalackVersion = FetchAppConfig.getLastBlackVersion();
+    }
+
+    private void config(int city) {
+        String config = Util.readAssetsFile("config.json", BusApp.getInstance().getApplicationContext());
+        ConfigParam configParam = new Gson().fromJson(config, ConfigParam.class);
+        List<ConfigParam.ConfigBean> configList = configParam.getConfig();
+        ConfigParam.ConfigBean configBean = configList.get(city);
+        isSuppIcPay = configBean.isIs_supp_ic_pay();
+        isSuppScanPay = configBean.isIs_supp_scan_pay();
+        isSuppUnionPay = configBean.isIs_supp_union_pay();
+        app_id = configBean.getMch_id();
+        cityCode = configBean.getCity_code();
+        ftpIP = configBean.getIp();
+        ftpPort = configBean.getPort();
+        ftpUser = configBean.getUser();
+        ftpPsw = configBean.getPsw();
+        ftpEntity = new FTPEntity(ftpIP, ftpPort, ftpUser, ftpPsw);
     }
 
     private void initDis() {
@@ -421,8 +439,7 @@ public class PosManager implements IPosManager, IAddRess {
 
     @Override
     public void setLineInfoEntity() {
-        LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
-        lineInfoEntity = dao.queryBuilder().limit(1).unique();
+        lineInfoEntity=DBManager.readLine();
     }
 
     @Override
@@ -474,7 +491,7 @@ public class PosManager implements IPosManager, IAddRess {
     @Override
     public void setFtpIp(String ip) {
         this.ftpIP = ip;
-        CommonSharedPreferences.put("FTPIP", ip);
+        CommonSharedPreferences.put("ftp_ip", ip);
     }
 
     @Override
@@ -485,7 +502,7 @@ public class PosManager implements IPosManager, IAddRess {
     @Override
     public void setPort(int port) {
         this.ftpPort = port;
-        CommonSharedPreferences.put("FTPPort", port);
+        CommonSharedPreferences.put("ftp_port", port);
     }
 
     @Override
@@ -496,7 +513,7 @@ public class PosManager implements IPosManager, IAddRess {
     @Override
     public void setFtpPsw(String psw) {
         this.ftpPsw = psw;
-        CommonSharedPreferences.put("Password", psw);
+        CommonSharedPreferences.put("ftp_psw", psw);
     }
 
     @Override
@@ -507,7 +524,7 @@ public class PosManager implements IPosManager, IAddRess {
     @Override
     public void setFtpUser(String user) {
         this.ftpUser = user;
-        CommonSharedPreferences.put("FTPUser", user);
+        CommonSharedPreferences.put("ftp_user", user);
     }
 
     @Override
@@ -531,11 +548,26 @@ public class PosManager implements IPosManager, IAddRess {
         CommonSharedPreferences.put("ftp_ip", ftp.getI());
         CommonSharedPreferences.put("ftp_user", ftp.getU());
         CommonSharedPreferences.put("ftp_psw", ftp.getPsw());
-        CommonSharedPreferences.put("port", ftp.getP());
+        CommonSharedPreferences.put("ftp_port", ftp.getP());
     }
 
     @Override
     public FTPEntity getFTP() {
         return ftpEntity;
+    }
+
+    @Override
+    public boolean isSuppScanPay() {
+        return isSuppScanPay;
+    }
+
+    @Override
+    public boolean isSuppIcPay() {
+        return isSuppIcPay;
+    }
+
+    @Override
+    public boolean isSuppUnionPay() {
+        return isSuppUnionPay;
     }
 }

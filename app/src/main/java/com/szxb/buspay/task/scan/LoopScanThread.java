@@ -38,12 +38,18 @@ public class LoopScanThread extends Thread {
             if (barcode > 0) {
                 String result = new String(recs, 0, barcode);
                 if (PosScanManager.isTenQRcode(result)) {
+                    if (BusApp.getPosManager().isSuppScanPay()) {
+                        //本线路不支持扫码
+                        BusToast.showToast(BusApp.getInstance(), "本线路暂不支持扫码乘车", false);
+                        return;
+                    }
                     if (filterCheck(result)) {
                         return;
                     }
                     if (checkLine()) {
                         return;
                     }
+
                     PosScanManager.getInstance().txposScan(result);
                 } else if (PosScanManager.isMyQRcode(result)) {
                     if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) {

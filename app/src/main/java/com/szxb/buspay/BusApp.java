@@ -43,8 +43,10 @@ public class BusApp extends Application {
      * 1：泰安
      * 2：莱芜长运
      * 3：招远
+     * 4：荣成
+     * 5：潍坊
      */
-    private static int city = 3;
+    private static int city = 1;
 
     /**
      * taian.bin 泰安
@@ -52,7 +54,7 @@ public class BusApp extends Application {
      * laiwu_cy.bin 莱芜长运
      * zhaoyuan.bin 招远
      */
-    private static String binName = "zhaoyuan.bin";
+    private static String binName = "taian.bin";
 
     @Override
     public void onCreate() {
@@ -73,7 +75,7 @@ public class BusApp extends Application {
 
         NoHttp.initialize(InitializationConfig.newBuilder(this)
                 .networkExecutor(new OkHttpNetworkExecutor())
-                .connectionTimeout(10 * 1000)
+                .connectionTimeout(15 * 1000)
                 .build());
 
         Intent timeSettleTaskIntent = new Intent(this, TimeSettleTask.class);

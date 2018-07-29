@@ -12,7 +12,6 @@ import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
-import com.szxb.mlog.SLog;
 import com.tencent.wlxsdk.WlxSdk;
 
 
@@ -72,20 +71,11 @@ public class TenPosReportManager {
 
                     String record = wxSdk.get_record();
 
-                    int basePrice = BusApp.getPosManager().getBasePrice();
-                    String[] coefficent = BusApp.getPosManager().getCoefficent();
-                    int dis = 100;
-                    if (coefficent.length >= 9) {
-                        dis = Util.string2Int(coefficent[8]);
-                    }
-                    int pay_fee = dis * basePrice / 100;
-                    SLog.d("TenPosReportManager(posScan.java:81)乘车码折后金额:" + pay_fee);
-
                     PosRecord posRecord = new PosRecord();
                     posRecord.setOpen_id(open_id);
                     posRecord.setQr_code(qrcode);
                     posRecord.setOrder_time(BusApp.getPosManager().getOrderTime());
-                    posRecord.setTotal_fee(basePrice);//金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getMarkedPrice());
+                    posRecord.setTotal_fee(BusApp.getPosManager().getBasePrice());//金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getMarkedPrice());
                     posRecord.setPay_fee(BusApp.getPosManager().getWcPayPrice());//实际扣款金额，上线修改为posRecord.setTotal_fee(App.getPosManager().getPayMarkPrice());
 
                     posRecord.setCity_code(BusApp.getPosManager().getCityCode());
@@ -103,7 +93,7 @@ public class TenPosReportManager {
                     PosRequest.getInstance().request(new QRScanMessage(posRecord, verify));
                 } else {
                     SoundPoolUtil.play(Config.VERIFY_FAIL);
-                    BusToast.showToast(BusApp.getInstance(), "验码失败[SDK初始化失败]", false);
+                    BusToast.showToast(BusApp.getInstance(), "验码失败\n[SDK初始化失败]", false);
                 }
 
             }

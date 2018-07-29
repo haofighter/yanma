@@ -473,4 +473,13 @@ public class DBManager {
             cardRecordDao.update(unique);
         }
     }
+
+
+    /**
+     * @return 线路信息
+     */
+    public static LineInfoEntity readLine() {
+        LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
+        return dao.queryBuilder().limit(1).unique();
+    }
 }

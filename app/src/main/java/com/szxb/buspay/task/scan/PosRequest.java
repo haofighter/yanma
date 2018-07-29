@@ -9,6 +9,7 @@ import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.CallServer;
 import com.szxb.buspay.http.HttpListener;
 import com.szxb.buspay.http.JsonRequest;
+import com.szxb.buspay.module.init.PosInit;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
@@ -53,7 +54,7 @@ public class PosRequest {
                 BusToast.showToast(BusApp.getInstance(), "扫码成功", true);
                 message.getPosRecord().setMch_trx_id(BusApp.getPosManager().getmchTrxId());
                 Map<String, Object> map = ParamsUtil.requestMap(message.getPosRecord());
-                requestTX(1111, Config.XBPAY, map);
+                requestTX(1000, Config.XBPAY, map);
                 break;
             case QRCode.QR_ERROR://非腾讯或者小兵二维码
             case QRCode.EC_CARD_CERT_SIGN_ALG_NOT_SUPPORT://卡证书签名算法不支持
@@ -91,6 +92,10 @@ public class PosRequest {
             default:
                 SoundPoolUtil.play(Config.VERIFY_FAIL);
                 BusToast.showToast(BusApp.getInstance(), "验码失败[" + message.getResult() + "]", false);
+                if (message.getResult()==-1){
+                    PosInit posInit=new PosInit();
+                    posInit.init();
+                }
                 break;
         }
     }

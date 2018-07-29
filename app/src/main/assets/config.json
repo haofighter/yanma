@@ -8,7 +8,10 @@
       "mch_id": "10000009",
       "city_code": "370300",
       "url_ip": "111.230.85.238",
-      "city": "淄博"
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":true,
+      "is_supp_union_pay":false,
+      "city": "淄博[0]"
     },
     {
       "ip": "192.144.184.104",
@@ -18,7 +21,10 @@
       "mch_id": "10000098",
       "city_code": "370900",
       "url_ip": "111.230.85.238",
-      "city": "泰安"
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":true,
+      "is_supp_union_pay":false,
+      "city": "泰安[1]"
     },
     {
       "ip": "222.134.206.204",
@@ -28,7 +34,10 @@
       "mch_id": "10000010",
       "city_code": "371200",
       "url_ip": "111.230.85.238",
-      "city": "莱芜长运"
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":true,
+      "is_supp_union_pay":false,
+      "city": "莱芜长运[2]"
     },
     {
       "ip": "222.135.141.247",
@@ -38,7 +47,36 @@
       "mch_id": "10000011",
       "city_code": "370600",
       "url_ip": "111.230.85.238",
-      "city": "招远"
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":true,
+      "is_supp_union_pay":false,
+      "city": "招远[3]"
+    },
+    {
+      "ip": "192.144.184.104",
+      "port": 26,
+      "user": "ftp_rc_sing",
+      "psw": "ftp1234!@#$",
+      "mch_id": "10000021",
+      "city_code": "371082",
+      "url_ip": "111.230.85.238",
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":false,
+      "is_supp_union_pay":false,
+      "city": "荣成[4]"
+    },
+    {
+      "ip": "222.134.206.204",
+      "port": 30,
+      "user": "ydtcommserver\\ftp",
+      "psw": "ftp1234!@#$",
+      "mch_id": "10000092",
+      "city_code": "370700",
+      "url_ip": "111.230.85.238",
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":false,
+      "is_supp_union_pay":false,
+      "city": "潍坊[5]"
     }
   ]
 }
