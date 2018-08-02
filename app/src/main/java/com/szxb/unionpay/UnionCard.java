@@ -107,6 +107,7 @@ public class UnionCard {
                 String[] retStr = libszxb.RFID_APDU(sAID);
 
                 if (retStr == null || retStr[0] == null) {
+                    SLog.d("UnionCard(run.java:110)RFID_APDU>>NULL>>aid=" + aid);
                     ret = NULL;
                     break;
                 }
@@ -122,6 +123,8 @@ public class UnionCard {
 
                 listTLV = TLV.decodingPDOL(mapTLV.get("9f38"));
                 mapTLV = TLV.decodingTLV(listTLV);
+
+                SLog.d("UnionCard(run.java:127)9f38="+mapTLV.get("9f38"));
 
                 int len = 0;
                 StringBuilder pDOLBuilder = new StringBuilder();
@@ -188,11 +191,13 @@ public class UnionCard {
                 retStr = libszxb.RFID_APDU(GPO);
                 if (null == retStr) {
                     ret = NULL;
+                    SLog.d("UnionCard(run.java:192)RFID_APDU>>NULL");
                     break;
                 }
 
                 if (!retStr[0].equalsIgnoreCase("9000")) {
                     ret = INVALID;
+                    SLog.d("UnionCard(run.java:198)>>>无效");
                     break;
                 }
 
@@ -320,7 +325,7 @@ public class UnionCard {
      * @return .
      */
     private boolean checkQR2(long currentTime, long lastTime) {
-        return currentTime - lastTime > 5000;
+        return currentTime - lastTime > 3000;
     }
 
     /**

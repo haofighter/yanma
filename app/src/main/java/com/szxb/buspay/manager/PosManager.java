@@ -134,7 +134,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     private String binName;
 
     //上个黑名单版本
-    private String lastBalackVersion;
+    private String lastBlackVersion;
 
     /**
      * ################淄博      栖霞、招远           莱芜                泰安、沂源
@@ -205,7 +205,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         unitno = FetchAppConfig.unitno();
         numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
         chineseName = FetchAppConfig.chinese_name();
-        lastBalackVersion = FetchAppConfig.getLastBlackVersion();
+        lastBlackVersion = FetchAppConfig.getLastBlackVersion();
     }
 
     private void config(int city) {
@@ -479,13 +479,13 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
 
     @Override
     public void setBlackVersion(String version) {
-        this.lastVersion = version;
+        this.lastBlackVersion = version;
         CommonSharedPreferences.put("last_black_version", version);
     }
 
     @Override
     public String getBlackVersion() {
-        return lastVersion;
+        return lastBlackVersion;
     }
 
     @Override

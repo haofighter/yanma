@@ -36,7 +36,7 @@ public class UnionPayEntity {
     private String payFee;
 
     //扣款返回码
-    private String resCode;
+    private String resCode="408";
 
     //交易时间
     private String time;

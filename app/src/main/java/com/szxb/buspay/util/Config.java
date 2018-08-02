@@ -45,59 +45,59 @@ public class Config {
 
     public static final int SCAN_SUCCESS = 1;//1.扫码成功
 
-    public static final int EC_RE_QR_CODE = SCAN_SUCCESS+1;//2.请刷新二维码
+    public static final int EC_RE_QR_CODE = SCAN_SUCCESS + 1;//2.请刷新二维码
 
-    public static final int EC_CODE_TIME = EC_RE_QR_CODE+1;//3.二维码过期
+    public static final int EC_CODE_TIME = EC_RE_QR_CODE + 1;//3.二维码过期
 
-    public static final int EC_CARD_CERT_TIME =EC_CODE_TIME+1;//4.请联网刷
+    public static final int EC_CARD_CERT_TIME = EC_CODE_TIME + 1;//4.请联网刷
 
-    public static final int EC_FEE = EC_CARD_CERT_TIME+1;//5.超出最大金额
+    public static final int EC_FEE = EC_CARD_CERT_TIME + 1;//5.超出最大金额
 
-    public static final int VERIFY_FAIL = EC_FEE+1;//6.验码失败
+    public static final int VERIFY_FAIL = EC_FEE + 1;//6.验码失败
 
-    public static final int EC_BALANCE = VERIFY_FAIL+1;//7.余额不足
+    public static final int EC_BALANCE = VERIFY_FAIL + 1;//7.余额不足
 
-    public static final int IC_BASE = EC_BALANCE+1;//8.铛
+    public static final int IC_BASE = EC_BALANCE + 1;//8.铛
 
-    public static final int IC_BASE2 = IC_BASE+1;//9.铛铛
+    public static final int IC_BASE2 = IC_BASE + 1;//9.铛铛
 
-    public static final int IC_DIS = IC_BASE2+1;//10.优惠卡
+    public static final int IC_DIS = IC_BASE2 + 1;//10.优惠卡
 
-    public static final int IC_EMP =IC_DIS+1;//11.员工卡
+    public static final int IC_EMP = IC_DIS + 1;//11.员工卡
 
-    public static final int IC_BLOOD =IC_EMP+1;//12.无偿献血卡
+    public static final int IC_BLOOD = IC_EMP + 1;//12.无偿献血卡
 
-    public static final int IC_FREE = IC_BLOOD+1;//13.免费卡
+    public static final int IC_FREE = IC_BLOOD + 1;//13.免费卡
 
-    public static final int IC_HONOR = IC_FREE+1;//14.荣军卡
+    public static final int IC_HONOR = IC_FREE + 1;//14.荣军卡
 
-    public static final int IC_OLD =IC_HONOR+1;//15.老年卡
+    public static final int IC_OLD = IC_HONOR + 1;//15.老年卡
 
-    public static final int IC_STUDENT = IC_OLD+1;//16.学生卡
+    public static final int IC_STUDENT = IC_OLD + 1;//16.学生卡
 
-    public static final int IC_INVALID = IC_STUDENT+1;//17.卡失效
+    public static final int IC_INVALID = IC_STUDENT + 1;//17.卡失效
 
-    public static final int IC_LOVE = IC_INVALID+1;//18.爱心卡
+    public static final int IC_LOVE = IC_INVALID + 1;//18.爱心卡
 
-    public static final int IC_TO_WORK = IC_LOVE+1;//19.上班
+    public static final int IC_TO_WORK = IC_LOVE + 1;//19.上班
 
-    public static final int IC_OFF_WORK = IC_TO_WORK+1;//20.下班
+    public static final int IC_OFF_WORK = IC_TO_WORK + 1;//20.下班
 
-    public static final int IC_PUSH_MONEY = IC_OFF_WORK+1;//21请投币
+    public static final int IC_PUSH_MONEY = IC_OFF_WORK + 1;//21请投币
 
-    public static final int IC_RE = IC_PUSH_MONEY+1;//22重新刷卡
+    public static final int IC_RE = IC_PUSH_MONEY + 1;//22重新刷卡
 
-    public static final int IC_YEARLY = IC_RE+1;//23请年检
+    public static final int IC_YEARLY = IC_RE + 1;//23请年检
 
-    public static final int QR_ERROR =IC_YEARLY+1;//24.二维码有误
+    public static final int QR_ERROR = IC_YEARLY + 1;//24.二维码有误
 
-    public static final int IC_RECHARGE = QR_ERROR+1;//25.请充值
+    public static final int IC_RECHARGE = QR_ERROR + 1;//25.请充值
 
-    public static final int IC_DEFECT =IC_RECHARGE+1;//26.优抚卡
+    public static final int IC_DEFECT = IC_RECHARGE + 1;//26.优抚卡
 
-    public static final int IC_MANAGER =IC_DEFECT+1;//27.管理卡
+    public static final int IC_MANAGER = IC_DEFECT + 1;//27.管理卡
 
-    public static final int IC_MONTH = IC_MANAGER+1;//28.月票卡
+    public static final int IC_MONTH = IC_MANAGER + 1;//28.月票卡
 
 
     //菜单
@@ -113,8 +113,8 @@ public class Config {
     //汇总
     public static final int POSITION_CNT = POSITION_UNION_RECORD + 1;
 
-    //上传记录
-    public static final int POSITION_UPDATE_PARAMS= POSITION_CNT + 1;
+    //更新参数
+    public static final int POSITION_UPDATE_PARAMS = POSITION_CNT + 1;
 
     //数据库导出
     public static final int POSITION_EXPORT_DB = POSITION_UPDATE_PARAMS + 1;
@@ -137,7 +137,7 @@ public class Config {
     //导出3个月记录
     public static final int POSITION_EXPORT_3_M = POSITION_EXPORT_1_M + 1;
 
-    //导出3个月记录
-    public static final int POSITION_READ_LOG = POSITION_EXPORT_3_M + 1;
+    //查看参数信息
+    public static final int POSITION_READ_PARAM = POSITION_EXPORT_3_M + 1;
 
 }

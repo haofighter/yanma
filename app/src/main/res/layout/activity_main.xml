@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bzb"
     tools:context="com.szxb.buspay.MainActivity">
 
     <include
@@ -17,6 +16,7 @@
         android:layout_height="23dp"
         android:background="@color/colorAccent"
         android:text="网络连接异常"
+        android:gravity="center"
         android:textColor="@color/colorWhite"
         android:textSize="18sp"
         android:visibility="gone" />
@@ -42,5 +42,10 @@
     <include
         android:id="@+id/main_cnt"
         layout="@layout/main_cnt"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/main_info"
+        layout="@layout/main_info"
         android:visibility="gone" />
 </RelativeLayout>

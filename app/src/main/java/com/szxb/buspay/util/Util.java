@@ -125,7 +125,7 @@ public class Util {
     public static boolean check(String temCardNo, String cardNo, long lastTime) {
 
         return (!TextUtils.equals(temCardNo, cardNo) //不是相同的卡
-                || checkSwipe(SystemClock.elapsedRealtime(), lastTime)//或者间隔超过5S
+                || checkSwipe(SystemClock.elapsedRealtime(), lastTime)//或者间隔超过3S
         )
                 && filter(SystemClock.elapsedRealtime(), lastTime);//两次刷卡间隔大于1S(防止语音叠加)
     }
@@ -135,7 +135,7 @@ public class Util {
     }
 
     private static boolean checkSwipe(long currentTime, long lastTime) {
-        return currentTime - lastTime > 3000;
+        return currentTime - lastTime > 1500;
     }
 
     /**
@@ -177,6 +177,9 @@ public class Util {
      * @return 银联卡上传状态
      */
     public static String unionPayStatus(String resCode) {
+        if (TextUtils.isEmpty(resCode)) {
+            return "超时";
+        }
         switch (resCode) {
             case "00":
                 return "已扣款";
@@ -213,6 +216,8 @@ public class Util {
                 return "待确认";
             case "94":
                 return "流水重复";
+            case "408":
+                return "超时";
             default:
                 return "UNK[" + resCode + "]";
         }

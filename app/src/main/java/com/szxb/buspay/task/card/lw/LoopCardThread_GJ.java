@@ -406,7 +406,7 @@ public class LoopCardThread_GJ extends Thread {
         SLog.d("LoopCardThread(response.java:279)发送的报文:" + HexUtil.printHexBinary(sendData));
 
         int ret = libszxb.qxcardprocess(sendData);
-        return new ConsumeCard(sendData, isSign, "zibo");
+        return new ConsumeCard(sendData, isSign, "zibo",searchCard.cardModuleType);
     }
 
 

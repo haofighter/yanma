@@ -2,7 +2,9 @@ package com.szxb.buspay.task.thread;
 
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.alibaba.fastjson.JSONObject;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.entity.bean.CntEntity;
@@ -13,14 +15,21 @@ import com.szxb.buspay.db.entity.card.BlackListCard;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
+import com.szxb.buspay.http.JsonRequest;
+import com.szxb.buspay.util.AppUtil;
+import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.unionpay.entity.UnionPayEntity;
+import com.yanzhenjie.nohttp.rest.Response;
+import com.yanzhenjie.nohttp.rest.SyncRequestExecutor;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
 
@@ -28,7 +37,7 @@ import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
  * 作者：Tangren on 2018-07-20
  * 包名：com.szxb.buspay.task.thread
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:任务线程
  */
 
 public class WorkThread extends Thread {
@@ -91,8 +100,32 @@ public class WorkThread extends Thread {
             String posDirectory = "data/data/" + BusApp.getInstance().getPackageName() + "/databases";
             String sdDirectory = "/databases";
             exportFile(posDirectory, sdDirectory);
+        } else if (TextUtils.equals(name, "pos_status_push")) {
+            pushStatus();
         }
 
+    }
+
+    /**
+     * 机具上报
+     */
+    private void pushStatus() {
+        String url = "http://134.175.56.14/bipeqt/interaction/terminalStream";
+        Map<String, Object> params = new HashMap<>();
+        params.put("mchid", BusApp.getPosManager().getAppId());
+        params.put("devno", BusApp.getPosManager().getPosSN());
+        params.put("version", AppUtil.getVersionName(BusApp.getInstance()));
+        params.put("custnum", BusApp.getPosManager().getBusNo());
+        params.put("postdate", DateUtil.getCurrentDate());
+        params.put("lineno", BusApp.getPosManager().getLineNo());
+        params.put("type", "1");
+        JsonRequest request = new JsonRequest(url);
+        request.add(params);
+        Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
+        if (execute.isSucceed()) {
+            Log.d("PosRequest",
+                    "run(PosRequest.java:44)" + execute.get().toJSONString());
+        }
     }
 
     /**

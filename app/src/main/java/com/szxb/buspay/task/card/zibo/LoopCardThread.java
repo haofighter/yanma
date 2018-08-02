@@ -85,7 +85,7 @@ public class LoopCardThread extends Thread {
             //防止重复刷卡
             //去重刷,同一个卡号3S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
-                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
+//                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }
 
@@ -163,7 +163,8 @@ public class LoopCardThread extends Thread {
             UnionCard.getInstance().run(searchCard.cityCode + searchCard.cardNo);
         } else {
             int pay_fee = payFee(searchCard.cardType);
-            ConsumeCard response = CommonBase.response(pay_fee, isBlack, isWhite, true, false);
+            int normal_pay = payFee("01");
+            ConsumeCard response = CommonBase.response(pay_fee, normal_pay, isBlack, isWhite, true, false,searchCard.cardModuleType);
 
             String status = response.getStatus();
             String balance = response.getCardBalance();

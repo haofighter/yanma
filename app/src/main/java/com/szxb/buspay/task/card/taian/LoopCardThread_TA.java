@@ -78,6 +78,10 @@ public class LoopCardThread_TA extends Thread {
             if (TextUtils.equals(searchCard.cardType, "02")
                     || TextUtils.equals(searchCard.cardType, "03")
                     || TextUtils.equals(searchCard.cardType, "04")
+                    || TextUtils.equals(searchCard.cardType, "05")
+                    || TextUtils.equals(searchCard.cardType, "07")
+                    || TextUtils.equals(searchCard.cardType, "08")
+                    || TextUtils.equals(searchCard.cardType, "09")
                     || TextUtils.equals(searchCard.cardType, "0A")) {
                 //如果属于上述卡类型,如果票价小于普通卡金额做1分钟去重
                 if (filterOneMinute()) {
@@ -88,7 +92,7 @@ public class LoopCardThread_TA extends Thread {
             //防止重复刷卡
             //去重刷,同一个卡号3S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
-                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
+//                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }
 
@@ -169,14 +173,14 @@ public class LoopCardThread_TA extends Thread {
             UnionCard.getInstance().run(searchCard.cityCode + searchCard.cardNo);
         } else {
             int pay_fee = payFee(searchCard.cardType);
-            ConsumeCard response = CommonBase.response(pay_fee, isBlack, isWhite, true, false);
+            int normal_pay = payFee("01");
+            ConsumeCard response = CommonBase.response(pay_fee, normal_pay,isBlack, isWhite, true, false,searchCard.cardModuleType);
             String status = response.getStatus();
             String balance = response.getCardBalance();
             String cardType = response.getCardType();
             if (TextUtils.equals(status, "00")) {
                 switch (cardType) {
                     case "01"://普通卡和CPU福利卡
-                    case "05"://纪念卡
                         checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE : Config.IC_RECHARGE);
                         break;
                     case "02"://学生卡
@@ -195,6 +199,9 @@ public class LoopCardThread_TA extends Thread {
                             zeroDis(response);
                             checkTheBalance(response, Config.IC_HONOR);
                         }
+                        break;
+                    case "05"://优惠卡
+                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_DIS : Config.IC_RECHARGE);
                         break;
                     case "06"://员工卡
                         if (TextUtils.equals(response.getTransType(), "13")) {

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.szxb.buspay.http.JsonRequest;
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 
 import java.util.concurrent.TimeUnit;
@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeSettleTask extends Service {
 
-    private JsonRequest request;
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,9 +29,17 @@ public class TimeSettleTask extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 1, 60, TimeUnit.SECONDS);
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 1, 140, TimeUnit.SECONDS);
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 1, 160, TimeUnit.SECONDS);
+        if (BusApp.getPosManager().isSuppScanPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 1, 60, TimeUnit.SECONDS);
+        }
+
+        if (BusApp.getPosManager().isSuppIcPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 1, 140, TimeUnit.SECONDS);
+        }
+
+        if (BusApp.getPosManager().isSuppUnionPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 1, 160, TimeUnit.SECONDS);
+        }
     }
 
 

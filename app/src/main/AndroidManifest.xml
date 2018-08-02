@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.szxb.buspay">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_LOGS" />
@@ -13,9 +13,9 @@
     <application
         android:name=".BusApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".module.init.InitActivity">
@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity" />
 
         <receiver android:name=".task.BootBroadcastReceiver">
             <intent-filter>
@@ -34,7 +34,32 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".task.service.TimeSettleTask"/>
+        <receiver android:name=".task.ResponseLauncherReceiver">
+            <intent-filter>
+                <action android:name="com.szxb.launcher.receiverbus" />
+            </intent-filter>
+        </receiver>
+
+
+        <receiver android:name=".task.NetChangeReceiver">
+            <intent-filter>
+                <action android:name="android.NET.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.Net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".task.service.TimeSettleTask" />
+
+        <meta-data
+            android:name="com.taobao.android.hotfix.IDSECRET"
+            android:value="24999049-1" />
+        <meta-data
+            android:name="com.taobao.android.hotfix.APPSECRET"
+            android:value="461566ed77d5b6b4203082a23f29ad8d" />
+        <meta-data
+            android:name="com.taobao.android.hotfix.RSASECRET"
+            android:value="MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC8Zn2EPKu6GTqFTXfYKGYET9ynppzwBWBY5T45+zulHRvc2oZ8ARtpqVayshRfg96uZ5N8qY4vWpL0bkaBkr6xGT/oyvqfxgjRXKTaR+IfZjK2Rg3HzY45Xn7bXcHMn6NgDIM/1SatcICSGfRrNjTd5xGKpny8uMOrPpqxu6wwd5lM3SdYwgLcPd7yHEBfcERUSO9syIu7mvZw5tC62ooA2PXHz0FvndTDxPxMIlLl91QIugqS2J3mLjdkOz/RZgNnO0bPoNKwvtIqoPlYrt/6zDxg+5+eTBPtM6ucd9hZbTKOiJIFmdMe3b9DyN/sDw5DkNcxIPZLDY3nz5Caq1yjAgMBAAECggEAXYDIXq7108DdqHcQObmjGBTCwHoSfZVNghEUVxZ3PbU6tNvHzxeFkWU34Cw9rEH4bLp/GmnUZXAgayun1nsMJT0Q2OqUhGN20OGX97WhZlAEby5JfJZqNdLORvU7T+ES5oKPSUjyjzW8ucYj5mnaxx79N8D1O3y/r+e8QuWPyeVXtBZW8cYCk1VuzVyNb0V+eglFfrVuEnsoDBpojxerUKetEPGQAlUSbCkhv9Sn9vOmkj5G0bfw/dczxTc90XWVWkV6ejVN+PFIKXdQ3oJMDT5EqNvwc4pfUfVLECWRlXcwawVdbldb4pgkpihrrLl+H7vfU6BTZKI2fk9oiijvUQKBgQDbs0phKMXbtpnpYCHwUCMyFFwBe5PAUN/7fbzZpFLA9LjBMPXbz1enc3giQyXEGnYN8xx6mF6xvFiIIIRZjJqC5pLwUdjOje6MIW7oZe6d7xRM2fYTC5b2Ixap3WCg4q5UfKopZ3+QCJbp5owUdiXDeTruVQdVs8hFM1gTe7BUBwKBgQDbh0wikmxalDDz3SnAJ5Ue+OsvlVlG1Dv9zgre+fFHruX3CTxm5uWJF1oTNysPHue4upO/S/JulNebrdmJsFwQMJtUZnRZl+MbbyfhBHty1N+auG3C+pvoaIdIojtkZaD1wjxJM0q+S08KZOUiD1kMYeR0PJzKiKZuHieAMadjhQKBgQCVwSByGdjEazN+YIjBxd43xKjyWcnczUPfqVWRBPFjlWxaQ4VSz4JwIcVBlYOoqGDQIWbIKhRiEoBGSePtJmorz/9Y0HF4WkbAPgnbX5/HB7BOskOJt9yu6jwIjV3QTLOH43IZxvKsuy4jQYM6b05Ob9Q7oLnfMSzR/q2KmkUXAQKBgBnbMq1zv41fnPBsISm/v8GZIeJF3fEIuFQpe4BNwgxmXjGdhd683VYrSPGwcsLiKfrJBvPmFxTNNSPh8xhTjFRf1Tu4oYWX7SjjC7hmFcAtsHSBunPXnpteDGkSqpolmjK4AO/COdB2AEZCIfbEBgH+WbETHoiAVdHsfUyNDKEdAoGAdlwQyD4dp0WKu9lNVSkltl1l/XZddknWr8Q3F44N234gL/7HBYFPzmAJc82UIeIljz8Xc7DHTVcXb6dorGSdHs8qN4zcczWgPYKFLxaBg2vO9SlFxYg/y/cNRt+Ov+CbQ/HcrtYn7Up7hv+1H7SvUsqSWHBRAwEP8GfrG9BMn8w=" />
 
     </application>
 

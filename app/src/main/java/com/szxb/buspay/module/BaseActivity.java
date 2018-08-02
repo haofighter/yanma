@@ -37,6 +37,7 @@ import com.szxb.buspay.util.adapter.HomeParentAdapter;
 import com.szxb.buspay.util.adapter.RecordAdapter;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
 
@@ -56,6 +57,7 @@ import static com.szxb.buspay.util.Config.POSITION_EXPORT_1_M;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_7;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_DB;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_LOG;
+import static com.szxb.buspay.util.Config.POSITION_READ_PARAM;
 import static com.szxb.buspay.util.Config.POSITION_SCAN_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_TIME;
 import static com.szxb.buspay.util.Config.POSITION_UNION_RECORD;
@@ -76,6 +78,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     //菜单view
     protected RecyclerView recyclerView;
 
+    private TextView net_status;
+
     //记录view
     protected RecyclerView recycler_view_record;
     protected View main_record;
@@ -89,6 +93,13 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     protected TextView union_cnt, union_amount_cnt, union_un_status;
     protected TextView sum_cnt, sum_amount_cnt, sum_up_status;
     protected TextView time_cnt, time_amount_cnt;
+
+    //参数信息
+    protected View main_info;
+    protected TextView main_info_type;
+    protected TextView city_code, ten_mach_id, union_mch_id;
+    protected TextView line_name, driver_no, union_pos_sn;
+    protected TextView pos_sn, black_version, black_cnt;
 
     private void initCntView() {
         ic_card_swipe_cnt = (TextView) findViewById(R.id.ic_card_swipe_cnt);
@@ -111,6 +122,23 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         time_amount_cnt = (TextView) findViewById(R.id.time_amount_cnt);
     }
 
+    private void initMainInfoView() {
+        main_info = findViewById(R.id.main_info);
+        main_info_type = (TextView) findViewById(R.id.main_info_type);
+
+        city_code = (TextView) findViewById(R.id.city_code);
+        ten_mach_id = (TextView) findViewById(R.id.ten_mach_id);
+        union_mch_id = (TextView) findViewById(R.id.union_mch_id);
+
+        line_name = (TextView) findViewById(R.id.line_name);
+        driver_no = (TextView) findViewById(R.id.driver_no);
+        union_pos_sn = (TextView) findViewById(R.id.union_pos_sn);
+
+        pos_sn = (TextView) findViewById(R.id.pos_sn);
+        black_version = (TextView) findViewById(R.id.black_version);
+        black_cnt = (TextView) findViewById(R.id.black_cnt);
+    }
+
     //签到view
     protected View main_sign;
 
@@ -129,6 +157,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     private List<MainEntity> mRecordList = new ArrayList<>();
 
     protected void initView() {
+        net_status = (TextView) findViewById(R.id.net_status);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recycler_view_record = (RecyclerView) findViewById(R.id.recycler_view_record);
         main_record = findViewById(R.id.main_record);
@@ -138,6 +167,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         main_sign = findViewById(R.id.main_sign);
 
         initCntView();
+        initMainInfoView();
     }
 
     protected abstract void initData();
@@ -192,6 +222,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                         } else if (qrScanMessage.getResult() == QRCode.CNT) {
                             //汇总
                             showCnt(qrScanMessage.getCntEntity());
+                        } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
+                            //网络状态发送改变
+                            hasNetWork(AppUtil.checkNetStatus());
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -202,6 +235,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 });
 
     }
+
 
     protected abstract void initList();
 
@@ -242,7 +276,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         if (!childViewShow) {
             //如果不是交易查询界面
             if (recyclerView.getVisibility() == View.GONE) {
-                setViewStatus(recyclerView,true);
+                setViewStatus(recyclerView, true);
             } else {
                 mAdapter.downKey();
             }
@@ -258,7 +292,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         }
         if (!childViewShow) {
             if (recyclerView.getVisibility() == View.GONE) {
-                setViewStatus(recyclerView,true);
+                setViewStatus(recyclerView, true);
             } else {
                 mAdapter.upKey();
             }
@@ -277,7 +311,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         if (position == POSITION_BUS_RECORD) {
             onKeyCancel();
             childViewShow = true;
-            setViewStatus(main_record,true);
+            setViewStatus(main_record, true);
             record_type.setText("刷卡记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("卡号", "余额", "金额", "交易时间"));
@@ -305,7 +339,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_SCAN_RECORD) {//扫码记录
             onKeyCancel();
             childViewShow = true;
-            setViewStatus(main_record,true);
+            setViewStatus(main_record, true);
             record_type.setText("扫码记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("用户ID", "交易状态", "金额", "交易时间"));
@@ -325,7 +359,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_UNION_RECORD) {//银联卡记录
             onKeyCancel();
             childViewShow = true;
-            setViewStatus(main_record,true);
+            setViewStatus(main_record, true);
             record_type.setText("银联卡记录");
             mRecordList.clear();
             mRecordList.add(new MainEntity("卡号", "交易状态", "金额", "交易时间"));
@@ -346,7 +380,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_CNT) {//当天汇总
             onKeyCancel();
             childViewShow = true;
-            setViewStatus(main_cnt,true);
+            setViewStatus(main_cnt, true);
             record_type_cnt.setText("当天汇总");
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("cnt"));
         } else if (position == POSITION_UPDATE_PARAMS) {//手动更新参数
@@ -374,6 +408,22 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             export(7);
         } else if (position == POSITION_EXPORT_1_M) {//导出1个月记录
             export(30);
+        } else if (position == POSITION_READ_PARAM) {//参数信息
+            onKeyCancel();
+            childViewShow = true;
+            setViewStatus(main_info, true);
+            main_info_type.setText("参数查询");
+
+            city_code.setText(String.format("城市代码\n%1$s", BusApp.getPosManager().getCityCode()));
+            ten_mach_id.setText(String.format("腾讯商户号\n%1$s", BusApp.getPosManager().getAppId()));
+            union_mch_id.setText(String.format("银联商户号\n%1$s", BusllPosManage.getPosManager().getMchId()));
+            line_name.setText(String.format("线路名\n%1$s", BusApp.getPosManager().getChinese_name()));
+            driver_no.setText(String.format("司机号\n%1$s", BusApp.getPosManager().getDriverNo()));
+            union_pos_sn.setText(String.format("银联POS编号\n%1$s", BusllPosManage.getPosManager().getPosSn()));
+            pos_sn.setText(String.format("车载编号\n%1$s", BusApp.getPosManager().getBusNo()));
+            black_version.setText(String.format("黑名单版本\n%1$s", BusApp.getPosManager().getBlackVersion()));
+            long[] longs = DBManager.queryBlackListCnt();
+            black_cnt.setText(String.format("黑名单数量\n%1$d|%2$d", longs[0], longs[1]));
         }
     }
 
@@ -392,16 +442,21 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     @Override
     public void onKeyCancel() {
         if (recyclerView.getVisibility() == View.VISIBLE) {
-            setViewStatus(recyclerView,false);
+            setViewStatus(recyclerView, false);
         }
 
         if (main_record.getVisibility() == View.VISIBLE) {
-            setViewStatus(main_record,false);
+            setViewStatus(main_record, false);
             childViewShow = false;
         }
 
         if (main_cnt.getVisibility() == View.VISIBLE) {
-            setViewStatus(main_cnt,false);
+            setViewStatus(main_cnt, false);
+            childViewShow = false;
+        }
+
+        if (main_info.getVisibility() == View.VISIBLE) {
+            setViewStatus(main_info, false);
             childViewShow = false;
         }
     }
@@ -429,8 +484,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
 
     /**
-     *
-     * @param view view
+     * @param view   view
      * @param isShow 是否显示
      */
     private void setViewStatus(View view, boolean isShow) {
@@ -446,6 +500,16 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        hasNetWork(AppUtil.checkNetStatus());
+    }
+
+    private void hasNetWork(boolean b) {
+        net_status.setVisibility(b ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         instance.cancel();
@@ -454,4 +518,5 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             subscribe.unsubscribe();
         }
     }
+
 }

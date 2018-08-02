@@ -2,6 +2,7 @@ package com.szxb.buspay.module.init;
 
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -410,6 +411,7 @@ public class PosInit {
                         .setPath(Environment.getExternalStorageDirectory() + "/")
                         .setFTPPath("black/blackversion.json")
                         .download();
+                SLog.d("PosInit(call.java:414)黑名单版本是否下载成功>>" + blackVersionisOk);
                 subscriber.onNext(blackVersionisOk);
             }
         }).flatMap(new Func1<Boolean, Observable<Boolean>>() {
@@ -420,11 +422,15 @@ public class PosInit {
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = JSONObject.parseObject(new String(blackversion, "GB2312"));
+                        SLog.d("PosInit(call.java:425)读取黑名单版本文件>>" + jsonObject);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
+                        SLog.d("PosInit(call.java:428不支持的编码格式>>)" + e.toString());
                     }
                     if (jsonObject != null) {
                         version = jsonObject.getString("blackversion");
+                        SLog.d("PosInit(call.java:432)当前版本="+version);
+                        SLog.d("PosInit(call.java:433)上一个版本:"+BusApp.getPosManager().getBlackVersion());
                         return Observable.just(HexUtil.checkBlackVersion(version));
                     }
                 }
@@ -443,11 +449,13 @@ public class PosInit {
                             .setPath(Environment.getExternalStorageDirectory() + "/")
                             .setFTPPath("black/blacklist.json")
                             .download();
+                    SLog.d("PosInit(call.java:450)下载黑名单文件是否成功>>" + blackisOk);
                     if (blackisOk) {
                         byte[] blackList = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/blacklist.json");
                         try {
                             BlackList black = new Gson().fromJson(new String(blackList, "GB2312"), BlackList.class);
                             if (black != null) {
+                                SLog.d("PosInit(call.java:456)黑名单文件内容>>"+black.getBlacklist().toString());
                                 BlackListCardDao dao = getDaoSession().getBlackListCardDao();
                                 dao.deleteAll();
                                 List<String> blacklist = black.getBlacklist();
@@ -456,8 +464,10 @@ public class PosInit {
                                     BlackListCard blackListCard = new BlackListCard();
                                     blackListCard.setCard_id(cardNo);
                                     bl.add(blackListCard);
+                                    Log.d("PosInit",
+                                            "call(PosInit.java:463)" + cardNo);
                                 }
-                                BusApp.getPosManager().setLastVersion(version);
+                                BusApp.getPosManager().setBlackVersion(version);
                                 ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("black_list", bl));
                                 BusToast.showToast(BusApp.getInstance(), "黑名单更新成功", true);
                             }
@@ -468,7 +478,6 @@ public class PosInit {
                     } else {
                         BusToast.showToast(BusApp.getInstance(), "黑名单下载失败", false);
                     }
-
                     return Observable.just(blackisOk);
                 }
                 return Observable.just(false);

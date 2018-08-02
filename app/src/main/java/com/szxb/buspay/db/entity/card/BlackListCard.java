@@ -3,6 +3,7 @@ package com.szxb.buspay.db.entity.card;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Index;
 
 
 @Entity
@@ -10,6 +11,7 @@ public class BlackListCard {
     @Id(autoincrement = true)
     private Long id;
 
+    @Index(unique = true)
     private String card_id;
 
     private String reserve_1;

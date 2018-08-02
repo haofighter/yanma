@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.MainActivity;
@@ -49,7 +48,6 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
 
     private PosInit init;
     private ImageView img;
-    private TextView tip;
     private boolean lineOk = false;
     private boolean wcOk = false;
     private boolean binOk = false;
@@ -60,7 +58,6 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
         img = (ImageView) findViewById(R.id.progress);
-        tip = (TextView) findViewById(R.id.tip);
 
         animationDrawable = (AnimationDrawable) img.getBackground();
         animationDrawable.start();
@@ -70,6 +67,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
         initBin();
         initUnionPay();
         init.init();
+        init.downLoadBlack();
         LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
         if (lineInfoEntity != null) {
             init.download(lineInfoEntity.getFileName());
@@ -83,7 +81,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
             @Override
             public void run() {
                 String lastVersion = BusApp.getPosManager().getLastVersion();
-                String binName=BusApp.getPosManager().getBinVersion();
+                String binName = BusApp.getPosManager().getBinVersion();
                 if (!TextUtils.equals(lastVersion, binName)) {
                     AssetManager ass = BusApp.getInstance().getAssets();
                     int k = libszxb.ymodemUpdate(ass, binName);
@@ -104,6 +102,10 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     private static int aidCnt = 0;
 
     public static void initUnionPay() {
+        boolean isSuppUnionPay = BusApp.getPosManager().isSuppUnionPay();
+        if (!isSuppUnionPay) {
+            return;
+        }
         Observable.create(new Observable.OnSubscribe<byte[]>() {
             @Override
             public void call(Subscriber<? super byte[]> subscriber) {

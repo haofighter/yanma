@@ -47,18 +47,22 @@ public class RecordThread extends Thread {
     @Override
     public void run() {
         super.run();
-        if (!AppUtil.checkNetStatus()) {
-            //如果无网络,停止本次上传
-            return;
+        try{
+            if (!AppUtil.checkNetStatus()) {
+                //如果无网络,停止本次上传
+                return;
+            }
+            if (TextUtils.equals(getName(), "scan")) {
+                scanRecordTask();
+            } else if (TextUtils.equals(getName(), "ic")) {
+                icRecordTask();
+            } else if (TextUtils.equals(getName(), "union")) {
+                unionRecordTask();
+            }
+        }catch (Exception e){
+            SLog.d("RecordThread(run.java:53)"+getName()+"任务异常>>>"+e.toString());
         }
 
-        if (TextUtils.equals(getName(), "scan")) {
-            scanRecordTask();
-        } else if (TextUtils.equals(getName(), "ic")) {
-            icRecordTask();
-        } else if (TextUtils.equals(getName(), "union")) {
-            unionRecordTask();
-        }
     }
 
     /**
@@ -73,32 +77,62 @@ public class RecordThread extends Thread {
         Map<String, Object> map = new HashMap<>();
         for (ConsumeCard cardRecord : icList) {
             JSONObject object = new JSONObject();
+            //卡类型
             object.put("cardType", cardRecord.getCardType());
+            //交易类型
             object.put("tradeType", cardRecord.getTransType());
+            //设备交易序号
             object.put("psamTradeCount", cardRecord.getDriverNo());
+            //卡号
             object.put("cardNo", cardRecord.getCardNo());
+            //卡金额
             object.put("cardAmt", Util.str2Hex(cardRecord.getCardBalance(), 6));
+            //交易金额
             object.put("fareAmt", Util.str2Hex(cardRecord.getPayFee(), 6));
+            //交易时间
             object.put("tradeDate", cardRecord.getTransTime());
+            //
             object.put("tradeTime", cardRecord.getTransTime());
+            //用户卡脱机交易序号
             object.put("cardTradeCount", cardRecord.getTransNo2());
+            //TAC
             object.put("tACCode", cardRecord.getTac());
+            //
             object.put("companyNo", BusApp.getPosManager().getUnitno());
+            //
             object.put("lineNo", cardRecord.getLineNo());
+            //
             object.put("busNo", cardRecord.getBusNo());
+            //
             object.put("driverNo", cardRecord.getDriverNo());
+            //
             object.put("pasmNumber", cardRecord.getPasmNo());
+            //
             object.put("direction", cardRecord.getDirection());
+            //
             object.put("currenStation", cardRecord.getStationId());
+            //
             object.put("ticketMore", cardRecord.getFareFlag());
+            //
             object.put("currentLineNo", cardRecord.getLineNo());
+            //
             object.put("currentBusNo", cardRecord.getBusNo());
+            //
             object.put("currentDriverNo", cardRecord.getDriverNo());
+            //
             object.put("backup", "0000000000");
 
+            //
             object.put("termid", BusApp.getPosManager().getDriverNo());
             object.put("termseq", Util.Random(10));
-            object.put("mchid", "10000009");
+            object.put("mchid", BusApp.getPosManager().getAppId());
+
+
+            object.put("halfprice", "0");
+            object.put("keytype", TextUtils.equals(cardRecord.getCardModuleType(), "08") ? "0" : "31");
+            object.put("citycode", cardRecord.getCardNo().substring(0, 4));
+            object.put("internalcode", cardRecord.getCardNo().substring(4, 8));
+            object.put("branchcode", BusApp.getPosManager().getUnitno());
 
             array.add(object);
         }

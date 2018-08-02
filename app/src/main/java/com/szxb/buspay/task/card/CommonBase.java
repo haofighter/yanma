@@ -40,7 +40,7 @@ public class CommonBase {
         //未签到
         if (TextUtils.equals(searchCard.cardType, "06")) {
             //只允许普通员工签到
-            ConsumeCard response = CommonBase.response(0, false, false, false, true);
+            ConsumeCard response = CommonBase.response(0, 0, false, false, false, true,searchCard.cardModuleType);
             SLog.d("CommonBase(empSign.java:44)签到>>" + response);
             if (TextUtils.equals(response.getStatus(), "00") &&
                     TextUtils.equals(response.getTransType(), "12")) {
@@ -62,14 +62,17 @@ public class CommonBase {
     /**
      * 消费报文
      *
-     * @param pay_fee 实际扣款
-     * @param isBlack 是否是黑名单：0x01黑名单锁卡
-     * @param isWhite 是否是白名单,预留
+     * @param pay_fee    实际扣款
+     * @param normal_pay 普通卡金额
+     * @param isBlack    是否是黑名单：0x01黑名单锁卡
+     *
+     * @param isWhite    是否是白名单,预留
      * @return 消费响应
      */
-    public static ConsumeCard response(int pay_fee, boolean isBlack, boolean isWhite, boolean workStatus, boolean isSign) {
+    public static ConsumeCard response(int pay_fee, int normal_pay, boolean isBlack, boolean isWhite,
+                                       boolean workStatus, boolean isSign,String cardModuleType) {
         int total_fee = BusApp.getPosManager().getBasePrice();
-        byte[] data = new byte[128];
+        byte[] data = new byte[64];
         byte[] amount = HexUtil.int2Bytes(pay_fee, 3);
         byte[] baseAmount = HexUtil.int2Bytes(total_fee, 3);
         byte[] black = new byte[]{(byte) (isBlack ? 0x01 : 0x00)};
@@ -80,12 +83,13 @@ public class CommonBase {
         byte[] driverNo = HexUtil.str2Bcd(BusApp.getPosManager().getDriverNo());
         byte[] direction = new byte[]{0x00};
         byte[] stationId = new byte[]{0x01};
+        byte[] normalAmount = HexUtil.int2Bytes(normal_pay, 3);
         byte[] sendData = HexUtil.mergeByte(amount, baseAmount, black, white, busNo, lineNo,
-                workStatus_, driverNo, direction, stationId, data);
+                workStatus_, driverNo, direction, stationId, normalAmount, data);
 
         SLog.d("CommonBase(response.java:86)发送的报文:" + HexUtil.printHexBinary(sendData));
         int ret = libszxb.qxcardprocess(sendData);
-        return new ConsumeCard(sendData, isSign, "zibo");
+        return new ConsumeCard(sendData, isSign, "zibo",cardModuleType);
     }
 
     /**

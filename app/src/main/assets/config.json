@@ -10,7 +10,7 @@
       "url_ip": "111.230.85.238",
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
-      "is_supp_union_pay":false,
+      "is_supp_union_pay":true,
       "city": "淄博[0]"
     },
     {
@@ -49,7 +49,7 @@
       "url_ip": "111.230.85.238",
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
-      "is_supp_union_pay":false,
+      "is_supp_union_pay":true,
       "city": "招远[3]"
     },
     {

@@ -20,4 +20,6 @@ public class BlackList {
     public void setBlacklist(List<String> blacklist) {
         this.blacklist = blacklist;
     }
+
+
 }

@@ -51,6 +51,9 @@ public class BlackListCardDao extends AbstractDao<BlackListCard, Long> {
                 "\"RESERVE_2\" TEXT," + // 3: reserve_2
                 "\"RESERVE_3\" TEXT," + // 4: reserve_3
                 "\"RESERVE_4\" TEXT);"); // 5: reserve_4
+        // Add Indexes
+        db.execSQL("CREATE UNIQUE INDEX " + constraint + "IDX_BLACK_LIST_CARD_CARD_ID ON BLACK_LIST_CARD" +
+                " (\"CARD_ID\" ASC);");
     }
 
     /** Drops the underlying database table. */

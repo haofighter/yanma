@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.dao.BlackListEntityDao;
 import com.szxb.buspay.db.dao.ConsumeCardDao;
 import com.szxb.buspay.db.dao.LineInfoEntityDao;
@@ -193,7 +194,7 @@ public class DBManager {
      */
     public static List<ConsumeCard> queryCardRecord(String type) {
         ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
-        return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50).list();
+        return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50).build().list();
     }
 
     /**
@@ -201,7 +202,7 @@ public class DBManager {
      */
     public static List<ScanInfoEntity> queryScanRecord() {
         ScanInfoEntityDao dao = getDaoSession().getScanInfoEntityDao();
-        return dao.queryBuilder().orderDesc(ScanInfoEntityDao.Properties.Id).limit(50).list();
+        return dao.queryBuilder().orderDesc(ScanInfoEntityDao.Properties.Id).limit(50).build().list();
     }
 
     /**
@@ -209,7 +210,7 @@ public class DBManager {
      */
     public static List<UnionPayEntity> queryUnionPayRecord() {
         UnionPayEntityDao dao = getDaoSession().getUnionPayEntityDao();
-        return dao.queryBuilder().orderDesc(UnionPayEntityDao.Properties.Id).limit(50).list();
+        return dao.queryBuilder().orderDesc(UnionPayEntityDao.Properties.Id).limit(50).build().list();
     }
 
     /**
@@ -481,5 +482,17 @@ public class DBManager {
     public static LineInfoEntity readLine() {
         LineInfoEntityDao dao = DBCore.getDaoSession().getLineInfoEntityDao();
         return dao.queryBuilder().limit(1).unique();
+    }
+
+    /**
+     * @return 黑名单数量
+     */
+    public static long[] queryBlackListCnt() {
+        long[] cnt = new long[2];
+        BlackListEntityDao scanDao = DBCore.getDaoSession().getBlackListEntityDao();
+        cnt[0] = scanDao.queryBuilder().count();
+        BlackListCardDao dao = DBCore.getDaoSession().getBlackListCardDao();
+        cnt[1] = dao.queryBuilder().count();
+        return cnt;
     }
 }

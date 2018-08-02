@@ -2,6 +2,7 @@ package com.szxb.buspay.db.entity.bean.card;
 
 import android.text.TextUtils;
 
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.mlog.SLog;
@@ -28,6 +29,8 @@ public class ConsumeCard {
     private String status;
     //卡类型
     private String cardType;
+    //卡模块类型CPU/M1
+    private String cardModuleType;
     //交易类型
     private String transType;
     //设备交易序号
@@ -55,11 +58,11 @@ public class ConsumeCard {
     private String pasmNo;
     //*****************淄博开始***********************/
     //行驶方向
-    private String direction="00";
+    private String direction = "00";
     //站点号
-    private String stationId="00";
+    private String stationId = "00";
     //补票标志
-    private String fareFlag="00";
+    private String fareFlag = "00";
 
     //*****************淄博结束***********************/
 
@@ -174,7 +177,7 @@ public class ConsumeCard {
         SLog.d("ConsumeCard(ConsumeCard.java:119)" + toString());
     }
 
-    public ConsumeCard(byte[] receDatas, boolean isSignOrBack, String city) {
+    public ConsumeCard(byte[] receDatas, boolean isSignOrBack, String city, String cardModuleType) {
         int index = 0;
         byte[] status_byte = new byte[1];
         arraycopy(receDatas, index, status_byte, 0, status_byte.length);
@@ -232,6 +235,7 @@ public class ConsumeCard {
         arraycopy(receDatas, index += driverNo_byte.length, pasmNo_byte, 0, pasmNo_byte.length);
         pasmNo = HexUtil.bcd2Str(pasmNo_byte);
 
+        this.cardModuleType = cardModuleType;
         if (TextUtils.equals(city, "zibo")) {
             getZibo(receDatas, index + pasmNo_byte.length);
         } else if (TextUtils.equals(city, "laiwu")) {
@@ -263,7 +267,7 @@ public class ConsumeCard {
         arraycopy(ziboDatas, 0, recordData, 0, recordData.length);
         singleRecord = HexUtil.printHexBinary(recordData);
 
-        SLog.d("ConsumeCard(ConsumeCard.java:119)淄博>>" + toString());
+        SLog.d("ConsumeCard(ConsumeCard.java:119)" + BusApp.getPosManager().getAppId() + ">>" + toString());
     }
 
 
@@ -284,19 +288,19 @@ public class ConsumeCard {
         arraycopy(lwDatas, index + cardChildType_bytes.length, cpuVersion_bytes, 0, cpuVersion_bytes.length);
         cpuVersion = HexUtil.printHexBinary(cpuVersion_bytes);
 
-        SLog.d("ConsumeCard(getLw.java:271)莱芜>>" + toString());
+        SLog.d("ConsumeCard(getLw.java:271)" + BusApp.getPosManager().getAppId() + ">>" + toString());
     }
 
-    @Generated(hash = 1989635671)
-    public ConsumeCard(Long id, String status, String cardType, String transType, String transNo, String cardNo,
-            String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo, String busNo,
-            String driverNo, String pasmNo, String direction, String stationId, String fareFlag, String localLineNo,
-            String localBusNo, String localDriverNo, String algFlag, String issuerFlag, String cardChildType,
-            String cpuVersion, String uniqueFlag, Integer upStatus, String singleRecord, String reserve_1, String reserve_2,
-            String reserve_3) {
+    @Generated(hash = 878111215)
+    public ConsumeCard(Long id, String status, String cardType, String cardModuleType, String transType, String transNo, String cardNo,
+                       String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo, String busNo, String driverNo,
+                       String pasmNo, String direction, String stationId, String fareFlag, String localLineNo, String localBusNo, String localDriverNo,
+                       String algFlag, String issuerFlag, String cardChildType, String cpuVersion, String uniqueFlag, Integer upStatus,
+                       String singleRecord, String reserve_1, String reserve_2, String reserve_3) {
         this.id = id;
         this.status = status;
         this.cardType = cardType;
+        this.cardModuleType = cardModuleType;
         this.transType = transType;
         this.transNo = transNo;
         this.cardNo = cardNo;
@@ -611,5 +615,13 @@ public class ConsumeCard {
 
     public void setLocalDriverNo(String localDriverNo) {
         this.localDriverNo = localDriverNo;
+    }
+
+    public String getCardModuleType() {
+        return this.cardModuleType;
+    }
+
+    public void setCardModuleType(String cardModuleType) {
+        this.cardModuleType = cardModuleType;
     }
 }

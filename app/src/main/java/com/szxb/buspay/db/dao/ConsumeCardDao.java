@@ -27,34 +27,35 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Status = new Property(1, String.class, "status", false, "STATUS");
         public final static Property CardType = new Property(2, String.class, "cardType", false, "CARD_TYPE");
-        public final static Property TransType = new Property(3, String.class, "transType", false, "TRANS_TYPE");
-        public final static Property TransNo = new Property(4, String.class, "transNo", false, "TRANS_NO");
-        public final static Property CardNo = new Property(5, String.class, "cardNo", false, "CARD_NO");
-        public final static Property CardBalance = new Property(6, String.class, "cardBalance", false, "CARD_BALANCE");
-        public final static Property PayFee = new Property(7, String.class, "payFee", false, "PAY_FEE");
-        public final static Property TransTime = new Property(8, String.class, "transTime", false, "TRANS_TIME");
-        public final static Property TransNo2 = new Property(9, String.class, "transNo2", false, "TRANS_NO2");
-        public final static Property Tac = new Property(10, String.class, "tac", false, "TAC");
-        public final static Property LineNo = new Property(11, String.class, "lineNo", false, "LINE_NO");
-        public final static Property BusNo = new Property(12, String.class, "busNo", false, "BUS_NO");
-        public final static Property DriverNo = new Property(13, String.class, "driverNo", false, "DRIVER_NO");
-        public final static Property PasmNo = new Property(14, String.class, "pasmNo", false, "PASM_NO");
-        public final static Property Direction = new Property(15, String.class, "direction", false, "DIRECTION");
-        public final static Property StationId = new Property(16, String.class, "stationId", false, "STATION_ID");
-        public final static Property FareFlag = new Property(17, String.class, "fareFlag", false, "FARE_FLAG");
-        public final static Property LocalLineNo = new Property(18, String.class, "localLineNo", false, "LOCAL_LINE_NO");
-        public final static Property LocalBusNo = new Property(19, String.class, "localBusNo", false, "LOCAL_BUS_NO");
-        public final static Property LocalDriverNo = new Property(20, String.class, "localDriverNo", false, "LOCAL_DRIVER_NO");
-        public final static Property AlgFlag = new Property(21, String.class, "algFlag", false, "ALG_FLAG");
-        public final static Property IssuerFlag = new Property(22, String.class, "issuerFlag", false, "ISSUER_FLAG");
-        public final static Property CardChildType = new Property(23, String.class, "cardChildType", false, "CARD_CHILD_TYPE");
-        public final static Property CpuVersion = new Property(24, String.class, "cpuVersion", false, "CPU_VERSION");
-        public final static Property UniqueFlag = new Property(25, String.class, "uniqueFlag", false, "UNIQUE_FLAG");
-        public final static Property UpStatus = new Property(26, Integer.class, "upStatus", false, "UP_STATUS");
-        public final static Property SingleRecord = new Property(27, String.class, "singleRecord", false, "SINGLE_RECORD");
-        public final static Property Reserve_1 = new Property(28, String.class, "reserve_1", false, "RESERVE_1");
-        public final static Property Reserve_2 = new Property(29, String.class, "reserve_2", false, "RESERVE_2");
-        public final static Property Reserve_3 = new Property(30, String.class, "reserve_3", false, "RESERVE_3");
+        public final static Property CardModuleType = new Property(3, String.class, "cardModuleType", false, "CARD_MODULE_TYPE");
+        public final static Property TransType = new Property(4, String.class, "transType", false, "TRANS_TYPE");
+        public final static Property TransNo = new Property(5, String.class, "transNo", false, "TRANS_NO");
+        public final static Property CardNo = new Property(6, String.class, "cardNo", false, "CARD_NO");
+        public final static Property CardBalance = new Property(7, String.class, "cardBalance", false, "CARD_BALANCE");
+        public final static Property PayFee = new Property(8, String.class, "payFee", false, "PAY_FEE");
+        public final static Property TransTime = new Property(9, String.class, "transTime", false, "TRANS_TIME");
+        public final static Property TransNo2 = new Property(10, String.class, "transNo2", false, "TRANS_NO2");
+        public final static Property Tac = new Property(11, String.class, "tac", false, "TAC");
+        public final static Property LineNo = new Property(12, String.class, "lineNo", false, "LINE_NO");
+        public final static Property BusNo = new Property(13, String.class, "busNo", false, "BUS_NO");
+        public final static Property DriverNo = new Property(14, String.class, "driverNo", false, "DRIVER_NO");
+        public final static Property PasmNo = new Property(15, String.class, "pasmNo", false, "PASM_NO");
+        public final static Property Direction = new Property(16, String.class, "direction", false, "DIRECTION");
+        public final static Property StationId = new Property(17, String.class, "stationId", false, "STATION_ID");
+        public final static Property FareFlag = new Property(18, String.class, "fareFlag", false, "FARE_FLAG");
+        public final static Property LocalLineNo = new Property(19, String.class, "localLineNo", false, "LOCAL_LINE_NO");
+        public final static Property LocalBusNo = new Property(20, String.class, "localBusNo", false, "LOCAL_BUS_NO");
+        public final static Property LocalDriverNo = new Property(21, String.class, "localDriverNo", false, "LOCAL_DRIVER_NO");
+        public final static Property AlgFlag = new Property(22, String.class, "algFlag", false, "ALG_FLAG");
+        public final static Property IssuerFlag = new Property(23, String.class, "issuerFlag", false, "ISSUER_FLAG");
+        public final static Property CardChildType = new Property(24, String.class, "cardChildType", false, "CARD_CHILD_TYPE");
+        public final static Property CpuVersion = new Property(25, String.class, "cpuVersion", false, "CPU_VERSION");
+        public final static Property UniqueFlag = new Property(26, String.class, "uniqueFlag", false, "UNIQUE_FLAG");
+        public final static Property UpStatus = new Property(27, Integer.class, "upStatus", false, "UP_STATUS");
+        public final static Property SingleRecord = new Property(28, String.class, "singleRecord", false, "SINGLE_RECORD");
+        public final static Property Reserve_1 = new Property(29, String.class, "reserve_1", false, "RESERVE_1");
+        public final static Property Reserve_2 = new Property(30, String.class, "reserve_2", false, "RESERVE_2");
+        public final static Property Reserve_3 = new Property(31, String.class, "reserve_3", false, "RESERVE_3");
     }
 
 
@@ -73,34 +74,35 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"STATUS\" TEXT," + // 1: status
                 "\"CARD_TYPE\" TEXT," + // 2: cardType
-                "\"TRANS_TYPE\" TEXT," + // 3: transType
-                "\"TRANS_NO\" TEXT," + // 4: transNo
-                "\"CARD_NO\" TEXT," + // 5: cardNo
-                "\"CARD_BALANCE\" TEXT," + // 6: cardBalance
-                "\"PAY_FEE\" TEXT," + // 7: payFee
-                "\"TRANS_TIME\" TEXT," + // 8: transTime
-                "\"TRANS_NO2\" TEXT," + // 9: transNo2
-                "\"TAC\" TEXT," + // 10: tac
-                "\"LINE_NO\" TEXT," + // 11: lineNo
-                "\"BUS_NO\" TEXT," + // 12: busNo
-                "\"DRIVER_NO\" TEXT," + // 13: driverNo
-                "\"PASM_NO\" TEXT," + // 14: pasmNo
-                "\"DIRECTION\" TEXT," + // 15: direction
-                "\"STATION_ID\" TEXT," + // 16: stationId
-                "\"FARE_FLAG\" TEXT," + // 17: fareFlag
-                "\"LOCAL_LINE_NO\" TEXT," + // 18: localLineNo
-                "\"LOCAL_BUS_NO\" TEXT," + // 19: localBusNo
-                "\"LOCAL_DRIVER_NO\" TEXT," + // 20: localDriverNo
-                "\"ALG_FLAG\" TEXT," + // 21: algFlag
-                "\"ISSUER_FLAG\" TEXT," + // 22: issuerFlag
-                "\"CARD_CHILD_TYPE\" TEXT," + // 23: cardChildType
-                "\"CPU_VERSION\" TEXT," + // 24: cpuVersion
-                "\"UNIQUE_FLAG\" TEXT UNIQUE ," + // 25: uniqueFlag
-                "\"UP_STATUS\" INTEGER," + // 26: upStatus
-                "\"SINGLE_RECORD\" TEXT," + // 27: singleRecord
-                "\"RESERVE_1\" TEXT," + // 28: reserve_1
-                "\"RESERVE_2\" TEXT," + // 29: reserve_2
-                "\"RESERVE_3\" TEXT);"); // 30: reserve_3
+                "\"CARD_MODULE_TYPE\" TEXT," + // 3: cardModuleType
+                "\"TRANS_TYPE\" TEXT," + // 4: transType
+                "\"TRANS_NO\" TEXT," + // 5: transNo
+                "\"CARD_NO\" TEXT," + // 6: cardNo
+                "\"CARD_BALANCE\" TEXT," + // 7: cardBalance
+                "\"PAY_FEE\" TEXT," + // 8: payFee
+                "\"TRANS_TIME\" TEXT," + // 9: transTime
+                "\"TRANS_NO2\" TEXT," + // 10: transNo2
+                "\"TAC\" TEXT," + // 11: tac
+                "\"LINE_NO\" TEXT," + // 12: lineNo
+                "\"BUS_NO\" TEXT," + // 13: busNo
+                "\"DRIVER_NO\" TEXT," + // 14: driverNo
+                "\"PASM_NO\" TEXT," + // 15: pasmNo
+                "\"DIRECTION\" TEXT," + // 16: direction
+                "\"STATION_ID\" TEXT," + // 17: stationId
+                "\"FARE_FLAG\" TEXT," + // 18: fareFlag
+                "\"LOCAL_LINE_NO\" TEXT," + // 19: localLineNo
+                "\"LOCAL_BUS_NO\" TEXT," + // 20: localBusNo
+                "\"LOCAL_DRIVER_NO\" TEXT," + // 21: localDriverNo
+                "\"ALG_FLAG\" TEXT," + // 22: algFlag
+                "\"ISSUER_FLAG\" TEXT," + // 23: issuerFlag
+                "\"CARD_CHILD_TYPE\" TEXT," + // 24: cardChildType
+                "\"CPU_VERSION\" TEXT," + // 25: cpuVersion
+                "\"UNIQUE_FLAG\" TEXT UNIQUE ," + // 26: uniqueFlag
+                "\"UP_STATUS\" INTEGER," + // 27: upStatus
+                "\"SINGLE_RECORD\" TEXT," + // 28: singleRecord
+                "\"RESERVE_1\" TEXT," + // 29: reserve_1
+                "\"RESERVE_2\" TEXT," + // 30: reserve_2
+                "\"RESERVE_3\" TEXT);"); // 31: reserve_3
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_CONSUME_CARD_CARD_NO ON CONSUME_CARD" +
                 " (\"CARD_NO\" ASC);");
@@ -131,144 +133,149 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(3, cardType);
         }
  
+        String cardModuleType = entity.getCardModuleType();
+        if (cardModuleType != null) {
+            stmt.bindString(4, cardModuleType);
+        }
+ 
         String transType = entity.getTransType();
         if (transType != null) {
-            stmt.bindString(4, transType);
+            stmt.bindString(5, transType);
         }
  
         String transNo = entity.getTransNo();
         if (transNo != null) {
-            stmt.bindString(5, transNo);
+            stmt.bindString(6, transNo);
         }
  
         String cardNo = entity.getCardNo();
         if (cardNo != null) {
-            stmt.bindString(6, cardNo);
+            stmt.bindString(7, cardNo);
         }
  
         String cardBalance = entity.getCardBalance();
         if (cardBalance != null) {
-            stmt.bindString(7, cardBalance);
+            stmt.bindString(8, cardBalance);
         }
  
         String payFee = entity.getPayFee();
         if (payFee != null) {
-            stmt.bindString(8, payFee);
+            stmt.bindString(9, payFee);
         }
  
         String transTime = entity.getTransTime();
         if (transTime != null) {
-            stmt.bindString(9, transTime);
+            stmt.bindString(10, transTime);
         }
  
         String transNo2 = entity.getTransNo2();
         if (transNo2 != null) {
-            stmt.bindString(10, transNo2);
+            stmt.bindString(11, transNo2);
         }
  
         String tac = entity.getTac();
         if (tac != null) {
-            stmt.bindString(11, tac);
+            stmt.bindString(12, tac);
         }
  
         String lineNo = entity.getLineNo();
         if (lineNo != null) {
-            stmt.bindString(12, lineNo);
+            stmt.bindString(13, lineNo);
         }
  
         String busNo = entity.getBusNo();
         if (busNo != null) {
-            stmt.bindString(13, busNo);
+            stmt.bindString(14, busNo);
         }
  
         String driverNo = entity.getDriverNo();
         if (driverNo != null) {
-            stmt.bindString(14, driverNo);
+            stmt.bindString(15, driverNo);
         }
  
         String pasmNo = entity.getPasmNo();
         if (pasmNo != null) {
-            stmt.bindString(15, pasmNo);
+            stmt.bindString(16, pasmNo);
         }
  
         String direction = entity.getDirection();
         if (direction != null) {
-            stmt.bindString(16, direction);
+            stmt.bindString(17, direction);
         }
  
         String stationId = entity.getStationId();
         if (stationId != null) {
-            stmt.bindString(17, stationId);
+            stmt.bindString(18, stationId);
         }
  
         String fareFlag = entity.getFareFlag();
         if (fareFlag != null) {
-            stmt.bindString(18, fareFlag);
+            stmt.bindString(19, fareFlag);
         }
  
         String localLineNo = entity.getLocalLineNo();
         if (localLineNo != null) {
-            stmt.bindString(19, localLineNo);
+            stmt.bindString(20, localLineNo);
         }
  
         String localBusNo = entity.getLocalBusNo();
         if (localBusNo != null) {
-            stmt.bindString(20, localBusNo);
+            stmt.bindString(21, localBusNo);
         }
  
         String localDriverNo = entity.getLocalDriverNo();
         if (localDriverNo != null) {
-            stmt.bindString(21, localDriverNo);
+            stmt.bindString(22, localDriverNo);
         }
  
         String algFlag = entity.getAlgFlag();
         if (algFlag != null) {
-            stmt.bindString(22, algFlag);
+            stmt.bindString(23, algFlag);
         }
  
         String issuerFlag = entity.getIssuerFlag();
         if (issuerFlag != null) {
-            stmt.bindString(23, issuerFlag);
+            stmt.bindString(24, issuerFlag);
         }
  
         String cardChildType = entity.getCardChildType();
         if (cardChildType != null) {
-            stmt.bindString(24, cardChildType);
+            stmt.bindString(25, cardChildType);
         }
  
         String cpuVersion = entity.getCpuVersion();
         if (cpuVersion != null) {
-            stmt.bindString(25, cpuVersion);
+            stmt.bindString(26, cpuVersion);
         }
  
         String uniqueFlag = entity.getUniqueFlag();
         if (uniqueFlag != null) {
-            stmt.bindString(26, uniqueFlag);
+            stmt.bindString(27, uniqueFlag);
         }
  
         Integer upStatus = entity.getUpStatus();
         if (upStatus != null) {
-            stmt.bindLong(27, upStatus);
+            stmt.bindLong(28, upStatus);
         }
  
         String singleRecord = entity.getSingleRecord();
         if (singleRecord != null) {
-            stmt.bindString(28, singleRecord);
+            stmt.bindString(29, singleRecord);
         }
  
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(29, reserve_1);
+            stmt.bindString(30, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(30, reserve_2);
+            stmt.bindString(31, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(31, reserve_3);
+            stmt.bindString(32, reserve_3);
         }
     }
 
@@ -291,144 +298,149 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(3, cardType);
         }
  
+        String cardModuleType = entity.getCardModuleType();
+        if (cardModuleType != null) {
+            stmt.bindString(4, cardModuleType);
+        }
+ 
         String transType = entity.getTransType();
         if (transType != null) {
-            stmt.bindString(4, transType);
+            stmt.bindString(5, transType);
         }
  
         String transNo = entity.getTransNo();
         if (transNo != null) {
-            stmt.bindString(5, transNo);
+            stmt.bindString(6, transNo);
         }
  
         String cardNo = entity.getCardNo();
         if (cardNo != null) {
-            stmt.bindString(6, cardNo);
+            stmt.bindString(7, cardNo);
         }
  
         String cardBalance = entity.getCardBalance();
         if (cardBalance != null) {
-            stmt.bindString(7, cardBalance);
+            stmt.bindString(8, cardBalance);
         }
  
         String payFee = entity.getPayFee();
         if (payFee != null) {
-            stmt.bindString(8, payFee);
+            stmt.bindString(9, payFee);
         }
  
         String transTime = entity.getTransTime();
         if (transTime != null) {
-            stmt.bindString(9, transTime);
+            stmt.bindString(10, transTime);
         }
  
         String transNo2 = entity.getTransNo2();
         if (transNo2 != null) {
-            stmt.bindString(10, transNo2);
+            stmt.bindString(11, transNo2);
         }
  
         String tac = entity.getTac();
         if (tac != null) {
-            stmt.bindString(11, tac);
+            stmt.bindString(12, tac);
         }
  
         String lineNo = entity.getLineNo();
         if (lineNo != null) {
-            stmt.bindString(12, lineNo);
+            stmt.bindString(13, lineNo);
         }
  
         String busNo = entity.getBusNo();
         if (busNo != null) {
-            stmt.bindString(13, busNo);
+            stmt.bindString(14, busNo);
         }
  
         String driverNo = entity.getDriverNo();
         if (driverNo != null) {
-            stmt.bindString(14, driverNo);
+            stmt.bindString(15, driverNo);
         }
  
         String pasmNo = entity.getPasmNo();
         if (pasmNo != null) {
-            stmt.bindString(15, pasmNo);
+            stmt.bindString(16, pasmNo);
         }
  
         String direction = entity.getDirection();
         if (direction != null) {
-            stmt.bindString(16, direction);
+            stmt.bindString(17, direction);
         }
  
         String stationId = entity.getStationId();
         if (stationId != null) {
-            stmt.bindString(17, stationId);
+            stmt.bindString(18, stationId);
         }
  
         String fareFlag = entity.getFareFlag();
         if (fareFlag != null) {
-            stmt.bindString(18, fareFlag);
+            stmt.bindString(19, fareFlag);
         }
  
         String localLineNo = entity.getLocalLineNo();
         if (localLineNo != null) {
-            stmt.bindString(19, localLineNo);
+            stmt.bindString(20, localLineNo);
         }
  
         String localBusNo = entity.getLocalBusNo();
         if (localBusNo != null) {
-            stmt.bindString(20, localBusNo);
+            stmt.bindString(21, localBusNo);
         }
  
         String localDriverNo = entity.getLocalDriverNo();
         if (localDriverNo != null) {
-            stmt.bindString(21, localDriverNo);
+            stmt.bindString(22, localDriverNo);
         }
  
         String algFlag = entity.getAlgFlag();
         if (algFlag != null) {
-            stmt.bindString(22, algFlag);
+            stmt.bindString(23, algFlag);
         }
  
         String issuerFlag = entity.getIssuerFlag();
         if (issuerFlag != null) {
-            stmt.bindString(23, issuerFlag);
+            stmt.bindString(24, issuerFlag);
         }
  
         String cardChildType = entity.getCardChildType();
         if (cardChildType != null) {
-            stmt.bindString(24, cardChildType);
+            stmt.bindString(25, cardChildType);
         }
  
         String cpuVersion = entity.getCpuVersion();
         if (cpuVersion != null) {
-            stmt.bindString(25, cpuVersion);
+            stmt.bindString(26, cpuVersion);
         }
  
         String uniqueFlag = entity.getUniqueFlag();
         if (uniqueFlag != null) {
-            stmt.bindString(26, uniqueFlag);
+            stmt.bindString(27, uniqueFlag);
         }
  
         Integer upStatus = entity.getUpStatus();
         if (upStatus != null) {
-            stmt.bindLong(27, upStatus);
+            stmt.bindLong(28, upStatus);
         }
  
         String singleRecord = entity.getSingleRecord();
         if (singleRecord != null) {
-            stmt.bindString(28, singleRecord);
+            stmt.bindString(29, singleRecord);
         }
  
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(29, reserve_1);
+            stmt.bindString(30, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(30, reserve_2);
+            stmt.bindString(31, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(31, reserve_3);
+            stmt.bindString(32, reserve_3);
         }
     }
 
@@ -443,34 +455,35 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // status
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // cardType
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // transType
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // transNo
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // cardNo
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // cardBalance
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // payFee
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // transTime
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // transNo2
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // tac
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // lineNo
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // busNo
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // driverNo
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // pasmNo
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // direction
-            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // stationId
-            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // fareFlag
-            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // localLineNo
-            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // localBusNo
-            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // localDriverNo
-            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // algFlag
-            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // issuerFlag
-            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // cardChildType
-            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24), // cpuVersion
-            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25), // uniqueFlag
-            cursor.isNull(offset + 26) ? null : cursor.getInt(offset + 26), // upStatus
-            cursor.isNull(offset + 27) ? null : cursor.getString(offset + 27), // singleRecord
-            cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28), // reserve_1
-            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29), // reserve_2
-            cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30) // reserve_3
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // cardModuleType
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // transType
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // transNo
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // cardNo
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // cardBalance
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // payFee
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // transTime
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // transNo2
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // tac
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // lineNo
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // busNo
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // driverNo
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // pasmNo
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // direction
+            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // stationId
+            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // fareFlag
+            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // localLineNo
+            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // localBusNo
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // localDriverNo
+            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // algFlag
+            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // issuerFlag
+            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24), // cardChildType
+            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25), // cpuVersion
+            cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26), // uniqueFlag
+            cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27), // upStatus
+            cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28), // singleRecord
+            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29), // reserve_1
+            cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30), // reserve_2
+            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31) // reserve_3
         );
         return entity;
     }
@@ -480,34 +493,35 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setStatus(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setCardType(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setTransType(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setTransNo(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCardNo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setCardBalance(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setPayFee(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setTransTime(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setTransNo2(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setTac(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setLineNo(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setBusNo(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setDriverNo(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setPasmNo(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setDirection(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
-        entity.setStationId(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
-        entity.setFareFlag(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
-        entity.setLocalLineNo(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
-        entity.setLocalBusNo(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
-        entity.setLocalDriverNo(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
-        entity.setAlgFlag(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
-        entity.setIssuerFlag(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
-        entity.setCardChildType(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
-        entity.setCpuVersion(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
-        entity.setUniqueFlag(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
-        entity.setUpStatus(cursor.isNull(offset + 26) ? null : cursor.getInt(offset + 26));
-        entity.setSingleRecord(cursor.isNull(offset + 27) ? null : cursor.getString(offset + 27));
-        entity.setReserve_1(cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28));
-        entity.setReserve_2(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
-        entity.setReserve_3(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
+        entity.setCardModuleType(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setTransType(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setTransNo(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setCardNo(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setCardBalance(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setPayFee(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setTransTime(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setTransNo2(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setTac(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setLineNo(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setBusNo(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setDriverNo(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setPasmNo(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setDirection(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setStationId(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
+        entity.setFareFlag(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
+        entity.setLocalLineNo(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
+        entity.setLocalBusNo(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
+        entity.setLocalDriverNo(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
+        entity.setAlgFlag(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
+        entity.setIssuerFlag(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
+        entity.setCardChildType(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
+        entity.setCpuVersion(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
+        entity.setUniqueFlag(cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26));
+        entity.setUpStatus(cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27));
+        entity.setSingleRecord(cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28));
+        entity.setReserve_1(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
+        entity.setReserve_2(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
+        entity.setReserve_3(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
      }
     
     @Override

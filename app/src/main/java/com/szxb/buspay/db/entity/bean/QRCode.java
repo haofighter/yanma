@@ -141,6 +141,7 @@ public class QRCode {
     public static final int NET_STATUS = 21;
 
     //更多功能二维码
-    public static final int QR_MOREN= 25;
+    public static final int QR_MOREN = 25;
 
+    public static final int RES_LAUNCHER = 26;
 }

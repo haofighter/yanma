@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
     private WeakHandler.MyHandler mHandler;
     private TextView time, station_name, prices, version_name, bus_no;
     private TextView sign_time, sign_version, sign_bus_no;
-    private TextView net_status;
 
 
     @Override
@@ -56,7 +55,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         sign_time = (TextView) findViewById(R.id.sign_time);
         sign_version = (TextView) findViewById(R.id.sign_version);
         sign_bus_no = (TextView) findViewById(R.id.sign_bus_no);
-        net_status = (TextView) findViewById(R.id.net_status);
     }
 
     @Override
@@ -68,14 +66,16 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         boolean isSuppIC = BusApp.getPosManager().isSuppIcPay();
         if (isSuppIC) {
             String appId = BusApp.getPosManager().getAppId();
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(
-                    TextUtils.equals(appId, "10000009") ? new LoopCardThread() ://淄博
-                            TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY() ://莱芜长运
-                                    TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA() ://泰安
-                                            TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
-                                                    new LoopCardThread()
-                    , 1000, 200, TimeUnit.MILLISECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService()
+                    .scheduleAtFixedRate(
+                            TextUtils.equals(appId, "10000009") ? new LoopCardThread() ://淄博
+                                    TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY() ://莱芜长运
+                                            TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA() ://泰安
+                                                    TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
+                                                            new LoopCardThread()
+                            , 1000, 200, TimeUnit.MILLISECONDS);
         }
+
     }
 
     private void initDatas() {
@@ -126,8 +126,9 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                 bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
                         BusApp.getPosManager().getBusNo(), driverNo));
                 break;
-            case QRCode.NET_STATUS:
-                net_status.setVisibility(AppUtil.checkNetStatus() ? View.GONE : View.VISIBLE);
+            case QRCode.RES_LAUNCHER:
+                version_name.setTextColor(getApplicationContext().getResources().getColor(R.color.colorAccent));
+                version_name.setText(String.format("%1$s!", version_name.getText().toString()));
                 break;
             default:
                 break;
@@ -148,7 +149,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mList.add(new MainEntity("导出7天记录"));
         mList.add(new MainEntity("导出1个月记录"));
         mList.add(new MainEntity("导出3个月记录"));
-        mList.add(new MainEntity("查看日志"));
+        mList.add(new MainEntity("查看基础信息"));
     }
 
 

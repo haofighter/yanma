@@ -12,6 +12,9 @@ import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
 import com.szxb.buspay.task.TaskDelFile;
 import com.szxb.buspay.task.service.TimeSettleTask;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.AndroidLogAdapter;
@@ -21,9 +24,13 @@ import com.szxb.mlog.FormatStrategy;
 import com.szxb.mlog.PrettyFormatStrategy;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.config.UnionPayManager;
+import com.taobao.sophix.SophixManager;
+import com.taobao.sophix.listener.PatchLoadStatusListener;
 import com.yanzhenjie.nohttp.InitializationConfig;
 import com.yanzhenjie.nohttp.NoHttp;
 import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 作者：Tangren on 2018-07-18
@@ -46,7 +53,7 @@ public class BusApp extends Application {
      * 4：荣成
      * 5：潍坊
      */
-    private static int city = 1;
+    private static int city = 0;
 
     /**
      * taian.bin 泰安
@@ -54,7 +61,7 @@ public class BusApp extends Application {
      * laiwu_cy.bin 莱芜长运
      * zhaoyuan.bin 招远
      */
-    private static String binName = "taian.bin";
+    private static String binName = "zibo.bin";
 
     @Override
     public void onCreate() {
@@ -81,6 +88,8 @@ public class BusApp extends Application {
         Intent timeSettleTaskIntent = new Intent(this, TimeSettleTask.class);
         startService(timeSettleTaskIntent);
         initService();
+
+        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
     }
 
     //连接服务
@@ -139,4 +148,24 @@ public class BusApp extends Application {
         new TaskDelFile().del();
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        initSophi();
+    }
+
+    private void initSophi() {
+        String appVersion = AppUtil.getVersionName(this);
+        SophixManager.getInstance().setContext(this)
+                .setAppVersion(appVersion)
+                .setAesKey(null)
+                .setEnableDebug(true)
+                .setPatchLoadStatusStub(new PatchLoadStatusListener() {
+                    @Override
+                    public void onLoad(final int mode, final int code, final String info, final int handlePatchVersion) {
+
+                    }
+                }).initialize();
+
+    }
 }

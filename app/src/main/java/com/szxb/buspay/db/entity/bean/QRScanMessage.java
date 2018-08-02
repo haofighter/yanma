@@ -15,6 +15,7 @@ public class QRScanMessage {
     private CntEntity cntEntity;
     private int result;
 
+
     public PosRecord getPosRecord() {
         return posRecord;
     }
