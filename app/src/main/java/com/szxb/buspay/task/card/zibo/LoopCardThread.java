@@ -61,6 +61,10 @@ public class LoopCardThread extends Thread {
 
             //拦截黑名单
             //do
+            if (DBManager.queryBlack(searchCard.cardNo)) {
+                //黑名单锁卡命令
+                isBlack = true;
+            }
 
             //1S防抖动
             if (!filter(SystemClock.elapsedRealtime(), lastTime)) {
@@ -164,7 +168,7 @@ public class LoopCardThread extends Thread {
         } else {
             int pay_fee = payFee(searchCard.cardType);
             int normal_pay = payFee("01");
-            ConsumeCard response = CommonBase.response(pay_fee, normal_pay, isBlack, isWhite, true, false,searchCard.cardModuleType);
+            ConsumeCard response = CommonBase.response(pay_fee, normal_pay, isBlack, isWhite, true, false, searchCard.cardModuleType);
 
             String status = response.getStatus();
             String balance = response.getCardBalance();
@@ -180,8 +184,13 @@ public class LoopCardThread extends Thread {
                         checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_STUDENT : Config.IC_RECHARGE);
                         break;
                     case "03"://老年卡
-                        zeroDis(response);
-                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_OLD : Config.IC_RECHARGE);
+                        if (TextUtils.equals(response.getTransType(), "06")) {
+                            //免费卡交易类型为06时判断余额是否小于5元
+                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_OLD : Config.IC_RECHARGE);
+                        } else {
+                            zeroDis(response);
+                            checkTheBalance(response, Config.IC_OLD);
+                        }
                         break;
                     case "04"://免费卡
                         if (TextUtils.equals(response.getTransType(), "06")) {

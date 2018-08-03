@@ -495,4 +495,13 @@ public class DBManager {
         cnt[1] = dao.queryBuilder().count();
         return cnt;
     }
+
+    /**
+     * @param cardNo 卡号
+     * @return 是否在黑名单内
+     */
+    public static boolean queryBlack(String cardNo) {
+        BlackListCardDao dao = DBCore.getDaoSession().getBlackListCardDao();
+        return dao.queryBuilder().where(BlackListCardDao.Properties.Card_id.eq(cardNo)).count() > 0;
+    }
 }

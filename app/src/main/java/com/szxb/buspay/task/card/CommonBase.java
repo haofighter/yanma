@@ -92,6 +92,10 @@ public class CommonBase {
         return new ConsumeCard(sendData, isSign, "zibo",cardModuleType);
     }
 
+    public static void blackNotice(ConsumeCard response){
+
+    }
+
     /**
      * 检查余额并做提示
      *
