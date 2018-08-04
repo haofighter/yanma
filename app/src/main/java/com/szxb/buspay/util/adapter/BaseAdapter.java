@@ -26,10 +26,11 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseH
 
     private List<MainEntity> mList;
     private SparseBooleanArray mBooleanArray;
-    private int mLastCheckPosition = -1;
-    private int position = 0;
+    public int mLastCheckPosition = -1;
+    public int position = 0;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager manager;
+    private boolean suppSelect = false;
 
     public BaseAdapter(Context context, List<MainEntity> mList, RecyclerView mRecyclerView) {
         this.mList = mList;
@@ -44,7 +45,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseH
     }
 
     public void addData(List<MainEntity> list) {
-        this.mList.addAll(0,list);
+        this.mList.addAll(0, list);
         notifyDataSetChanged();
     }
 
@@ -71,6 +72,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseH
     }
 
     public void setItemChecked(int position) {
+
         mBooleanArray.put(position, true);
         if (mLastCheckPosition > -1) {
             mBooleanArray.put(mLastCheckPosition, false);
@@ -100,7 +102,6 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseH
         move();
     }
 
-
     //上一个
     public void upKey() {
         if (position == 0) {
@@ -129,7 +130,6 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseAdapter.BaseH
             mRecyclerView.scrollToPosition(n);
         }
     }
-
 
     protected abstract void convert(BaseHolder holder, MainEntity t, int position);
 

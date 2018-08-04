@@ -64,6 +64,7 @@ public class LoopCardThread_ZY extends Thread {
 
             //拦截黑名单
             //do
+            isBlack = DBManager.queryBlack(searchCard.cardNo);
 
             //1S防抖动
             if (!filter(SystemClock.elapsedRealtime(), lastTime)) {
@@ -180,79 +181,84 @@ public class LoopCardThread_ZY extends Thread {
             String balance = response.getCardBalance();
             String cardType = response.getCardType();
             if (TextUtils.equals(status, "00")) {
-                switch (cardType) {
-                    case "01"://普通卡和CPU福利卡
-                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE : Config.IC_RECHARGE);
-                        break;
-                    case "02"://学生卡
-                        zeroDis(response);
-                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_STUDENT : Config.IC_RECHARGE);
-                        break;
-                    case "03"://老年卡
-                        if (TextUtils.equals(response.getTransType(), "06")) {
-                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_OLD : Config.IC_RECHARGE);
-                        } else {
+                if (TextUtils.equals(response.getTransType(), "11")) {
+                    //黑名单卡锁卡交易
+                    notice(Config.IC_INVALID, "黑名单卡[" + searchCard.cardType + "]", false);
+                } else {
+                    switch (cardType) {
+                        case "01"://普通卡和CPU福利卡
+                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE : Config.IC_RECHARGE);
+                            break;
+                        case "02"://学生卡
                             zeroDis(response);
-                            checkTheBalance(response, Config.IC_OLD);
-                        }
-                        break;
-                    case "04"://免费卡
-                        if (TextUtils.equals(response.getTransType(), "06")) {
-                            //免费卡交易类型为06时判断余额是否小于5元
-                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_HONOR : Config.IC_RECHARGE);
-                        } else {
-                            zeroDis(response);
-                            checkTheBalance(response, Config.IC_HONOR);
-                        }
-                        break;
-                    case "05"://优惠卡
-                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_DIS : Config.IC_RECHARGE);
-                        break;
-                    case "06"://员工卡
-                        if (TextUtils.equals(response.getTransType(), "13")) {
-                            //下班
-                            offWork(response);
-                        } else {
-                            //员工卡正常消费
+                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_STUDENT : Config.IC_RECHARGE);
+                            break;
+                        case "03"://老年卡
+                            if (TextUtils.equals(response.getTransType(), "06")) {
+                                checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_OLD : Config.IC_RECHARGE);
+                            } else {
+                                zeroDis(response);
+                                checkTheBalance(response, Config.IC_OLD);
+                            }
+                            break;
+                        case "04"://免费卡
+                            if (TextUtils.equals(response.getTransType(), "06")) {
+                                //免费卡交易类型为06时判断余额是否小于5元
+                                checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_HONOR : Config.IC_RECHARGE);
+                            } else {
+                                zeroDis(response);
+                                checkTheBalance(response, Config.IC_HONOR);
+                            }
+                            break;
+                        case "05"://优惠卡
+                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_DIS : Config.IC_RECHARGE);
+                            break;
+                        case "06"://员工卡
+                            if (TextUtils.equals(response.getTransType(), "13")) {
+                                //下班
+                                offWork(response);
+                            } else {
+                                //员工卡正常消费
 //                            zeroDis(response);
 //                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE2 : Config.IC_RECHARGE);
-                        }
-                        break;
-                    case "09"://优抚卡
-                        if (TextUtils.equals(response.getTransType(), "06")) {
-                            //优抚卡交易类型为06时判断余额是否小于5元
-                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_DEFECT : Config.IC_RECHARGE);
-                        } else {
+                            }
+                            break;
+                        case "09"://优抚卡
+                            if (TextUtils.equals(response.getTransType(), "06")) {
+                                //优抚卡交易类型为06时判断余额是否小于5元
+                                checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_DEFECT : Config.IC_RECHARGE);
+                            } else {
+                                zeroDis(response);
+                                checkTheBalance(response, Config.IC_DEFECT);
+                            }
+                            break;
+                        case "10"://线路票价设置卡(只做签退用)
+                            offWork(response, Config.IC_MANAGER);
+                            break;
+                        case "11"://数据采集卡(只做签退用)
+                            offWork(response);
+                            break;
+                        case "12"://签点卡
+                            notice(Config.IC_BASE, "签点卡", true);
+                            break;
+                        case "13"://检测卡
+                            notice(Config.IC_BASE, "检测卡", true);
+                            break;
+                        case "18"://稽查卡
+                            notice(Config.IC_BASE, "稽查卡", true);
+                            break;
+                        case "0A"://月票卡
+                            String toast = "本次扣款:"
+                                    + hex2Int(response.getPayFee()) + "次\n余额:"
+                                    + hex2Int(response.getCardBalance()) + "次";
+                            notice(Config.IC_MONTH, toast, true);
+                            saveRecord(response);
+                            break;
+                        default://其他卡类型
                             zeroDis(response);
-                            checkTheBalance(response, Config.IC_DEFECT);
-                        }
-                        break;
-                    case "10"://线路票价设置卡(只做签退用)
-                        offWork(response, Config.IC_MANAGER);
-                        break;
-                    case "11"://数据采集卡(只做签退用)
-                        offWork(response);
-                        break;
-                    case "12"://签点卡
-                        notice(Config.IC_BASE, "签点卡", true);
-                        break;
-                    case "13"://检测卡
-                        notice(Config.IC_BASE, "检测卡", true);
-                        break;
-                    case "18"://稽查卡
-                        notice(Config.IC_BASE, "稽查卡", true);
-                        break;
-                    case "0A"://月票卡
-                        String toast = "本次扣款:"
-                                + hex2Int(response.getPayFee()) + "次\n余额:"
-                                + hex2Int(response.getCardBalance()) + "次";
-                        notice(Config.IC_MONTH, toast, true);
-                        saveRecord(response);
-                        break;
-                    default://其他卡类型
-                        zeroDis(response);
-                        checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE : Config.IC_RECHARGE);
-                        break;
+                            checkTheBalance(response, hex2Int(balance) > 500 ? Config.IC_BASE : Config.IC_RECHARGE);
+                            break;
+                    }
                 }
             } else if (status.equalsIgnoreCase("F1")) {
                 //卡片未启用

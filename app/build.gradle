@@ -17,23 +17,74 @@ android {
         }
     }
     buildTypes {
-
         debug {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+
     }
+
     greendao {
         schemaVersion 1
         daoPackage 'com.szxb.buspay.db.dao'
         targetGenDir 'src/main/java'
     }
+
+    productFlavors {
+        /**
+         * city
+         * 0：淄博 zibo.bin
+         * 1：泰安 taian.bin
+         * 2：莱芜长运 laiwu_cy.bin
+         * 3：招远 zhaoyuan.bin
+         * 4：荣成
+         * 5：潍坊
+         */
+        zibo_app {
+            versionCode 100
+            versionName "1.0.1"
+            buildConfigField 'String', 'LOG_TAG', '"zibo"'
+            buildConfigField 'String', 'BIN_NAME', '"zibo.bin"'
+            buildConfigField 'int', 'CITY', '0'
+        }
+
+        taian_app {
+            versionCode 100
+            versionName "1.0.1"
+            buildConfigField 'String', 'LOG_TAG', '"taian"'
+            buildConfigField 'String', 'BIN_NAME', '"taian.bin"'
+            buildConfigField 'int', 'CITY', '1'
+        }
+
+        zhaoyuan_app {
+            versionCode 100
+            versionName "3.0.0"
+            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
+            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
+            buildConfigField 'int', 'CITY', '3'
+        }
+
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (variant.buildType.name == 'debug') {
+                def fileName = "${variant.versionName}_${debugTime()}_${variant.productFlavors[0].name}.apk"
+                output.outputFile = new File(outputFile.parent, fileName)
+
+            }
+        }
+    }
+
+    //打包命令:gradlew.bat assembleDebug
 }
+
+static def debugTime() {
+    return new Date().format("yyMMddHHmm", TimeZone.getDefault())
+}
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')

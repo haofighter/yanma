@@ -56,7 +56,7 @@ public class BusApp extends Application {
      * 4：荣成
      * 5：潍坊
      */
-    private static int city = 0;
+    private static int city = BuildConfig.CITY;
 
     /**
      * taian.bin 泰安
@@ -64,7 +64,7 @@ public class BusApp extends Application {
      * laiwu_cy.bin 莱芜长运
      * zhaoyuan.bin 招远
      */
-    private static String binName = "zibo.bin";
+    private static String binName = BuildConfig.BIN_NAME;
 
     @Override
     public void onCreate() {
@@ -140,13 +140,13 @@ public class BusApp extends Application {
 
     private void initLog() {
         FormatStrategy format = PrettyFormatStrategy.newBuilder()
-                .tag("ziBoBus:")
+                .tag(BuildConfig.LOG_TAG)
                 .showThreadInfo(false)
                 .methodCount(1)
                 .build();
         SLog.addLogAdapter(new AndroidLogAdapter(format));
         FormatStrategy formatStrategy = CsvFormatStrategy.newBuilder()
-                .tag("ziBoBus:")
+                .tag(BuildConfig.LOG_TAG)
                 .fileName(BusApp.getPosManager().getBusNo())
                 .build();
         SLog.addLogAdapter(new DiskLogAdapter(formatStrategy));

@@ -11,6 +11,7 @@ import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
+import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
@@ -40,7 +41,7 @@ public class CommonBase {
         //未签到
         if (TextUtils.equals(searchCard.cardType, "06")) {
             //只允许普通员工签到
-            ConsumeCard response = CommonBase.response(0, 0, false, false, false, true,searchCard.cardModuleType);
+            ConsumeCard response = CommonBase.response(0, 0, false, false, false, true, searchCard.cardModuleType);
             SLog.d("CommonBase(empSign.java:44)签到>>" + response);
             if (TextUtils.equals(response.getStatus(), "00") &&
                     TextUtils.equals(response.getTransType(), "12")) {
@@ -50,6 +51,9 @@ public class CommonBase {
                 saveRecord(response);
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.SIGN));
             } else {
+                if (TextUtils.equals(response.getStatus(), "F2")) {
+                    DateUtil.setK21Time();
+                }
                 BusToast.showToast(BusApp.getInstance(), "签到失败[" + response.getStatus() + "|" + response.getTransType() + "]", false);
             }
         } else {
@@ -65,12 +69,11 @@ public class CommonBase {
      * @param pay_fee    实际扣款
      * @param normal_pay 普通卡金额
      * @param isBlack    是否是黑名单：0x01黑名单锁卡
-     *
      * @param isWhite    是否是白名单,预留
      * @return 消费响应
      */
     public static ConsumeCard response(int pay_fee, int normal_pay, boolean isBlack, boolean isWhite,
-                                       boolean workStatus, boolean isSign,String cardModuleType) {
+                                       boolean workStatus, boolean isSign, String cardModuleType) {
         int total_fee = BusApp.getPosManager().getBasePrice();
         byte[] data = new byte[64];
         byte[] amount = HexUtil.int2Bytes(pay_fee, 3);
@@ -89,10 +92,10 @@ public class CommonBase {
 
         SLog.d("CommonBase(response.java:86)发送的报文:" + HexUtil.printHexBinary(sendData));
         int ret = libszxb.qxcardprocess(sendData);
-        return new ConsumeCard(sendData, isSign, "zibo",cardModuleType);
+        return new ConsumeCard(sendData, isSign, "zibo", cardModuleType);
     }
 
-    public static void blackNotice(ConsumeCard response){
+    public static void blackNotice(ConsumeCard response) {
 
     }
 
