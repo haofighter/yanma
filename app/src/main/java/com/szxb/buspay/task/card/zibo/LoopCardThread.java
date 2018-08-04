@@ -61,10 +61,7 @@ public class LoopCardThread extends Thread {
 
             //拦截黑名单
             //do
-            if (DBManager.queryBlack(searchCard.cardNo)) {
-                //黑名单锁卡命令
-                isBlack = true;
-            }
+            isBlack = DBManager.queryBlack(searchCard.cardNo);
 
             //1S防抖动
             if (!filter(SystemClock.elapsedRealtime(), lastTime)) {

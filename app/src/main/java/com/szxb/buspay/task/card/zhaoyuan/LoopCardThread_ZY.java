@@ -32,7 +32,7 @@ import static com.szxb.buspay.util.Util.string2Int;
  * 作者：Tangren on 2018-07-19
  * 包名：com.szxb.buspay.task.card
  * 邮箱：996489865@qq.com
- * TODO:泰安
+ * TODO:招远
  */
 
 public class LoopCardThread_ZY extends Thread {
