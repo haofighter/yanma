@@ -56,7 +56,7 @@ public class BusApp extends Application {
      * 4：荣成
      * 5：潍坊
      */
-    private static int city = 3;
+    private static int city = 0;
 
     /**
      * taian.bin 泰安
@@ -64,7 +64,7 @@ public class BusApp extends Application {
      * laiwu_cy.bin 莱芜长运
      * zhaoyuan.bin 招远
      */
-    private static String binName = "zhaoyuan.bin";
+    private static String binName = "zibo.bin";
 
     @Override
     public void onCreate() {
