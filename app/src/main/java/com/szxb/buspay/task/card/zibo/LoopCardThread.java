@@ -87,7 +87,7 @@ public class LoopCardThread extends Thread {
             }
 
             //防止重复刷卡
-            //去重刷,同一个卡号3S内不提示
+            //去重刷,同一个卡号1.5S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
 //                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;

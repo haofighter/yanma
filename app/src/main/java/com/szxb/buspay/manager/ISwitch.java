@@ -14,4 +14,10 @@ public interface ISwitch {
     boolean isSuppIcPay();
 
     boolean isSuppUnionPay();
+
+    boolean isHalfPrices();
+
+    void setHalfPrices(boolean half);
+
+    boolean isSuppKeyBoard();
 }

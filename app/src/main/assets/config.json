@@ -11,6 +11,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
       "is_supp_union_pay":true,
+      "is_supp_key_board":false,
       "city": "淄博[0]"
     },
     {
@@ -24,6 +25,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
       "is_supp_union_pay":false,
+      "is_supp_key_board":false,
       "city": "泰安[1]"
     },
     {
@@ -37,6 +39,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
       "is_supp_union_pay":false,
+      "is_supp_key_board":false,
       "city": "莱芜长运[2]"
     },
     {
@@ -50,6 +53,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":true,
       "is_supp_union_pay":true,
+      "is_supp_key_board":true,
       "city": "招远[3]"
     },
     {
@@ -63,6 +67,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":false,
       "is_supp_union_pay":false,
+      "is_supp_key_board":false,
       "city": "荣成[4]"
     },
     {
@@ -76,6 +81,7 @@
       "is_supp_scan_pay":true,
       "is_supp_ic_pay":false,
       "is_supp_union_pay":false,
+      "is_supp_key_board":false,
       "city": "潍坊[5]"
     }
   ]

@@ -47,7 +47,7 @@ public class RecordThread extends Thread {
     @Override
     public void run() {
         super.run();
-        try{
+        try {
             if (!AppUtil.checkNetStatus()) {
                 //如果无网络,停止本次上传
                 return;
@@ -59,8 +59,8 @@ public class RecordThread extends Thread {
             } else if (TextUtils.equals(getName(), "union")) {
                 unionRecordTask();
             }
-        }catch (Exception e){
-            SLog.d("RecordThread(run.java:53)"+getName()+"任务异常>>>"+e.toString());
+        } catch (Exception e) {
+            SLog.d("RecordThread(run.java:53)" + getName() + "任务异常>>>" + e.toString());
         }
 
     }
@@ -128,7 +128,7 @@ public class RecordThread extends Thread {
             object.put("mchid", BusApp.getPosManager().getAppId());
 
 
-            object.put("halfprice", "0");
+            object.put("halfprice", BusApp.getPosManager().isHalfPrices() ? "1" : "0");
             object.put("keytype", TextUtils.equals(cardRecord.getCardModuleType(), "08") ? "0" : "31");
             object.put("citycode", cardRecord.getCardNo().substring(0, 4));
             object.put("internalcode", cardRecord.getCardNo().substring(4, 8));
@@ -137,8 +137,7 @@ public class RecordThread extends Thread {
             array.add(object);
         }
         map.put("data", array.toJSONString());
-        String url = "http://blackskin.imwork.net:35962/bipbus/interaction/carduploadzb";
-        JsonRequest request = new JsonRequest(url, RequestMethod.POST);
+        JsonRequest request = new JsonRequest(Config.IC_CARD_RECORD, RequestMethod.POST);
         request.add(map);
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
@@ -197,8 +196,7 @@ public class RecordThread extends Thread {
             array.add(object);
         }
         map.put("data", array.toJSONString());
-        String url = "http://112.74.102.125/bipbus/interaction/bankjourAll";
-        JsonRequest request = new JsonRequest(url);
+        JsonRequest request = new JsonRequest(Config.UNION_CARD_RECORD);
         request.add(map);
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {

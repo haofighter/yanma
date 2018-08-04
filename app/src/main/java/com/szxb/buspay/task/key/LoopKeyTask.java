@@ -1,11 +1,20 @@
 package com.szxb.buspay.task.key;
 
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.QRCode;
+import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.interfaces.OnKeyListener;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.CountTime;
+import com.szxb.buspay.util.HexUtil;
+import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.rx.RxBus;
+import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.buspay.util.tip.MainLooper;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
@@ -14,13 +23,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.szxb.buspay.util.HexUtil.printHexBinary;
+import static com.szxb.buspay.util.HexUtil.sendBackToKeyBoard;
 import static com.szxb.buspay.util.Util.checkEnterKey;
 
 /**
  * 作者: Tangren on 2017-12-08
  * 包名：szxb.com.commonbus.task.scan
  * 邮箱：996489865@qq.com
- * TODO:按键监听
+ * TODO:按键/票价键盘监听
  */
 
 public class LoopKeyTask {
@@ -48,11 +58,15 @@ public class LoopKeyTask {
     private ScheduledFuture<?> scheduledFuture;
 
     public void startLoopKey() {
+        libszxb.deviceSerialSetBaudrate(3, 115200);
         scheduledFuture = ThreadScheduledExecutorUtil.getInstance()
                 .getService().scheduleAtFixedRate(new Runnable() {
                     @Override
                     public void run() {
                         try {
+                            if (BusApp.getPosManager().isSuppKeyBoard()) {
+                                keyBord();
+                            }
                             enterKey();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -64,6 +78,52 @@ public class LoopKeyTask {
 
     }
 
+
+    private String tempPrices;
+
+    private void keyBord() {
+        byte[] recv = new byte[20];
+        int i = libszxb.deviceSerialRecv(3, recv, 50);
+        String keycode = HexUtil.printHexBinary(recv).substring(12, 14);
+        if (TextUtils.isEmpty(keycode) ||
+                TextUtils.equals(keycode, "00")) {
+            return;
+        }
+        SLog.d("LoopKeyTask(keyBord.java:89)" + keycode);
+        switch (keycode) {
+            case "2E"://.
+            case "23"://#
+            case "18"://退格
+                break;
+            case "0D"://归位键
+                tempPrices = null;
+                sendBackToKeyBoard("\b\b\b");
+                break;
+            case "2A":
+                if (!TextUtils.isEmpty(tempPrices)) {
+                    //当前票价的半价
+                    int basePrices = BusApp.getPosManager().getBasePrice();
+                    int halfPrices = basePrices / 2;
+                    BusApp.getPosManager().setBasePrice(halfPrices);
+                    BusApp.getPosManager().setHalfPrices(true);
+                    RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
+                    tempPrices = null;
+                }
+                break;
+            default:
+                if (BusApp.getPosManager().getLineInfoEntity() == null) {
+                    BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
+                    return;
+                }
+                String s = HexUtil.convertHexToString(keycode);
+                int code = Util.string2Int(s);
+                BusApp.getPosManager().setBasePrice(code * 100);
+                BusApp.getPosManager().setHalfPrices(false);
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
+                tempPrices = s;
+                break;
+        }
+    }
 
     private void enterKey() {
         byte[] b = new byte[5];

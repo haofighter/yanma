@@ -165,6 +165,12 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     //是否支付刷公交卡
     private boolean isSuppIcPay = false;
 
+    //是否支持票价键盘
+    private boolean isSuppKeyBoard = false;
+
+    //是否是半价(招远键盘使用)
+    private boolean halfPrice = false;
+
 
     //递增流水号
     private int numSeq = 0;
@@ -222,6 +228,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         ftpPort = configBean.getPort();
         ftpUser = configBean.getUser();
         ftpPsw = configBean.getPsw();
+        isSuppKeyBoard = configBean.isIs_supp_key_board();
         ftpEntity = new FTPEntity(ftpIP, ftpPort, ftpUser, ftpPsw);
     }
 
@@ -439,7 +446,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
 
     @Override
     public void setLineInfoEntity() {
-        lineInfoEntity=DBManager.readLine();
+        lineInfoEntity = DBManager.readLine();
     }
 
     @Override
@@ -569,5 +576,20 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     @Override
     public boolean isSuppUnionPay() {
         return isSuppUnionPay;
+    }
+
+    @Override
+    public boolean isHalfPrices() {
+        return halfPrice;
+    }
+
+    @Override
+    public void setHalfPrices(boolean half) {
+        this.halfPrice = half;
+    }
+
+    @Override
+    public boolean isSuppKeyBoard() {
+        return isSuppKeyBoard;
     }
 }

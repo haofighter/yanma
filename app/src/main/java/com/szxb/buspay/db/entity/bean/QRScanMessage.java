@@ -14,6 +14,7 @@ public class QRScanMessage {
     private PosRecord posRecord;
     private CntEntity cntEntity;
     private int result;
+    private String key;
 
 
     public PosRecord getPosRecord() {
@@ -37,6 +38,12 @@ public class QRScanMessage {
         this.result = result;
     }
 
+    public QRScanMessage(PosRecord posRecord, int result, String keyCode) {
+        this.posRecord = posRecord;
+        this.result = result;
+        this.key = keyCode;
+    }
+
 
     public QRScanMessage(CntEntity cntEntity, int result) {
         this.cntEntity = cntEntity;
@@ -49,6 +56,14 @@ public class QRScanMessage {
 
     public void setCntEntity(CntEntity cntEntity) {
         this.cntEntity = cntEntity;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override

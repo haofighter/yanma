@@ -57,6 +57,8 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.0'
     //热修复
     compile 'com.aliyun.ams:alicloud-android-hotfix:3.2.3'
+    //crash分析
+    compile 'com.tencent.bugly:crashreport:2.6.6'
     compile files('libs/commons-net-3.0.1.jar')
     compile files('libs/commons-codec-1.9.jar')
 

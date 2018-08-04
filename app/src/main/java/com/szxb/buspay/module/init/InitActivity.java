@@ -2,12 +2,11 @@ package com.szxb.buspay.module.init;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.MainActivity;
@@ -15,7 +14,9 @@ import com.szxb.buspay.R;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.interfaces.InitOnListener;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.tip.MainLooper;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.core.Iso8583MessageFactory;
 import com.szxb.java8583.module.ParamDownload;
@@ -38,41 +39,42 @@ import rx.schedulers.Schedulers;
 import static com.szxb.unionpay.unionutil.ParseUtil.parseMackey;
 
 /**
- * 作者：Tangren on 2018-07-18
- * 包名：com.szxb.buspay.module.init
+ * 作者：Tangren on 2018-08-03
+ * 包名：com.szxb.buspay
  * 邮箱：996489865@qq.com
  * TODO:一句话描述
  */
 
 public class InitActivity extends AppCompatActivity implements InitOnListener {
 
-    private PosInit init;
-    private ImageView img;
     private boolean lineOk = false;
     private boolean wcOk = false;
     private boolean binOk = false;
-    private AnimationDrawable animationDrawable;
+
+    private TextView update_info;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_init);
-        img = (ImageView) findViewById(R.id.progress);
-
-        animationDrawable = (AnimationDrawable) img.getBackground();
-        animationDrawable.start();
-
-        init = new PosInit();
+        setContentView(R.layout.activity);
+        update_info = (TextView) findViewById(R.id.update_info);
+        TextView tip_info = (TextView) findViewById(R.id.tip_info);
+        tip_info.setText(String.format("温馨提示:\n\t\t\t\t%1$s", Config.tip()));
+        update_info.setText("微信同步中\n");
+        PosInit init = new PosInit();
         init.setOnCallBack(this);
+        update_info.append("bin初始化中\n");
         initBin();
         initUnionPay();
         init.init();
         init.downLoadBlack();
         LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
+        update_info.append("线路文件同步中\n");
         if (lineInfoEntity != null) {
             init.download(lineInfoEntity.getFileName());
         } else {
             lineOk = true;
+            update_info.append("线路暂未设置\n");
         }
     }
 
@@ -95,17 +97,24 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
                 } else {
                     binOk = true;
                 }
+                MainLooper.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        update_info.append("bin更新完成\n");
+                    }
+                });
             }
         });
     }
 
     private static int aidCnt = 0;
 
-    public static void initUnionPay() {
+    public void initUnionPay() {
         boolean isSuppUnionPay = BusApp.getPosManager().isSuppUnionPay();
         if (!isSuppUnionPay) {
             return;
         }
+        update_info.append("银联签到中\n");
         Observable.create(new Observable.OnSubscribe<byte[]>() {
             @Override
             public void call(Subscriber<? super byte[]> subscriber) {
@@ -214,19 +223,15 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
                         SLog.d("InitZipActivity(call.java:183)更新失败:" + throwable.toString());
                     }
                 });
+        update_info.append("银联签到完成\n");
     }
 
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        animationDrawable.stop();
-    }
 
     @Override
     public void onCallBack(boolean isOk) {
         wcOk = true;
         SLog.d("InitActivity(onCallBack.java:94)微信初始化结束");
+        update_info.append("微信同步完成\n");
         if (lineOk && binOk) {
             startActivity(new Intent(InitActivity.this, MainActivity.class));
             finish();
@@ -237,6 +242,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     public void onFtpCallBack() {
         lineOk = true;
         SLog.d("InitActivity(onCallBack.java:106)FTP始化结束");
+        update_info.append("线路文件同步完成\n");
         if (wcOk && binOk) {
             startActivity(new Intent(InitActivity.this, MainActivity.class));
             finish();

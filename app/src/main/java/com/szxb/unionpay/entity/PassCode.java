@@ -64,7 +64,7 @@ public class PassCode {
 
         byte[] bytes = HexUtil.int2Bytes((getTAG9F10().length() / 2), 1);
         return "9F3602" + getTAG9F36() + "9505" + getTAG95() + "9F1E08" + HexUtil.bytesToHexString("00000000".getBytes()) + "9F10" + HexUtil.bytesToHexString(bytes) + getTAG9F10() + "9F2608" + getTAG9F26() + "9F2701" + getTAG9F27() + "9F3704" + getTAG9F37()
-                + "9A03" + getTAG9A() + "9C01" + getTAG9C() + "9F0206" + getTAG9F02() + "5F2A02" + getTAG5F2A() + "8202" + getTAG82() + "9F1A02" + getTAG9F1A() + "9F0306" + getTAG9F03() + "9F3303" +"E0E1C8" +"9F350122" + getTAG9F41();
+                + "9A03" + getTAG9A() + "9C01" + getTAG9C() + "9F0206" + getTAG9F02() + "5F2A02" + getTAG5F2A() + "8202" + getTAG82() + "9F1A02" + getTAG9F1A() + "9F0306" + getTAG9F03() + "9F3303" + "E0E1C8" + "9F350122" + getTAG9F41();
     }
 
     @SuppressLint("DefaultLocale")
@@ -236,7 +236,10 @@ public class PassCode {
     }
 
     public PassCode setTAG57(String TAG57) {
-        TAG57 = TAG57.substring(0, TAG57.indexOf("f"));
+        int index = TAG57.indexOf("f");
+        if (index > 0) {
+            TAG57 = TAG57.substring(0, TAG57.indexOf("f"));
+        }
         this.TAG57 = TAG57;
         return this;
     }

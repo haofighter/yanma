@@ -24,7 +24,11 @@ import com.szxb.buspay.task.card.zibo.LoopCardThread;
 import com.szxb.buspay.task.scan.LoopScanThread;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.util.AppUtil;
+import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
+import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.sound.SoundPoolUtil;
+import com.szxb.buspay.util.tip.BusToast;
 
 import java.util.concurrent.TimeUnit;
 
@@ -75,7 +79,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                                                             new LoopCardThread()
                             , 1000, 200, TimeUnit.MILLISECONDS);
         }
-
     }
 
     private void initDatas() {
@@ -98,6 +101,8 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
      * 设置票价
      */
     private void setPrices() {
+        //票价回显
+        Util.echo();
         String text = "票价:";
         String pricesStr = String.format("%1$s", fen2Yuan(BusApp.getPosManager().getBasePrice()));
         String text2 = "元";
@@ -129,6 +134,17 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
             case QRCode.RES_LAUNCHER:
                 version_name.setTextColor(getApplicationContext().getResources().getColor(R.color.colorAccent));
                 version_name.setText(String.format("%1$s!", version_name.getText().toString()));
+                break;
+            case QRCode.REFRESH_QR_CODE:
+                SoundPoolUtil.play(Config.EC_RE_QR_CODE);
+                BusToast.showToast(getApplicationContext(), "请刷新二维码[" + QRCode.REFRESH_QR_CODE + "]", false);
+                break;
+            case QRCode.QR_ERROR:
+                SoundPoolUtil.play(Config.QR_ERROR);
+                BusToast.showToast(getApplicationContext(), "二维码有误[" + QRCode.QR_ERROR + "]", false);
+                break;
+            case QRCode.KEY_CODE:
+                setPrices();
                 break;
             default:
                 break;
@@ -175,4 +191,5 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                 break;
         }
     }
+
 }

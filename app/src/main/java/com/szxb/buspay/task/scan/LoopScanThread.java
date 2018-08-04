@@ -7,14 +7,13 @@ import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.scan.PosRecord;
-import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.rx.RxBus;
-import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 
 import static com.szxb.buspay.util.Util.checkQR;
+import static com.szxb.buspay.util.Util.checkQRMy;
 
 /**
  * 作者：Tangren on 2018-07-19
@@ -38,7 +37,7 @@ public class LoopScanThread extends Thread {
             if (barcode > 0) {
                 String result = new String(recs, 0, barcode);
                 if (PosScanManager.isTenQRcode(result)) {
-                    if (BusApp.getPosManager().isSuppScanPay()) {
+                    if (!BusApp.getPosManager().isSuppScanPay()) {
                         //本线路不支持扫码
                         BusToast.showToast(BusApp.getInstance(), "本线路暂不支持扫码乘车", false);
                         return;
@@ -52,15 +51,11 @@ public class LoopScanThread extends Thread {
 
                     PosScanManager.getInstance().txposScan(result);
                 } else if (PosScanManager.isMyQRcode(result)) {
-                    if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) {
+                    if (!checkQRMy(SystemClock.elapsedRealtime(), lastTime)) {
                         return;
                     }
                     PosScanManager.getInstance().xbposScan(result);
                 } else {
-                    if (!checkQR(SystemClock.elapsedRealtime(), lastTime)) {
-                        return;
-                    }
-                    SoundPoolUtil.play(Config.QR_ERROR);
                     BusToast.showToast(BusApp.getInstance(), "二维码有误", false);
                 }
                 tem = result;

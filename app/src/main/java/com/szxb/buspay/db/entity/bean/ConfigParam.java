@@ -8,8 +8,8 @@ import java.util.List;
  * 邮箱：996489865@qq.com
  * TODO:一句话描述
  */
-
 public class ConfigParam {
+
 
     private List<ConfigBean> config;
 
@@ -33,6 +33,7 @@ public class ConfigParam {
          * is_supp_scan_pay : true    是否支持扫码支付
          * is_supp_ic_pay : true      是否支持ic卡支付
          * is_supp_union_pay : false  是否支持银联卡支付
+         * is_supp_key_board : false  是否票价键盘
          * city : 淄博[0]
          */
 
@@ -46,6 +47,7 @@ public class ConfigParam {
         private boolean is_supp_scan_pay;
         private boolean is_supp_ic_pay;
         private boolean is_supp_union_pay;
+        private boolean is_supp_key_board;
         private String city;
 
         public String getIp() {
@@ -126,6 +128,14 @@ public class ConfigParam {
 
         public void setIs_supp_union_pay(boolean is_supp_union_pay) {
             this.is_supp_union_pay = is_supp_union_pay;
+        }
+
+        public boolean isIs_supp_key_board() {
+            return is_supp_key_board;
+        }
+
+        public void setIs_supp_key_board(boolean is_supp_key_board) {
+            this.is_supp_key_board = is_supp_key_board;
         }
 
         public String getCity() {

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.db.manager.DBCore;
@@ -24,8 +25,10 @@ import com.szxb.mlog.FormatStrategy;
 import com.szxb.mlog.PrettyFormatStrategy;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.config.UnionPayManager;
+import com.taobao.sophix.PatchStatus;
 import com.taobao.sophix.SophixManager;
 import com.taobao.sophix.listener.PatchLoadStatusListener;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.yanzhenjie.nohttp.InitializationConfig;
 import com.yanzhenjie.nohttp.NoHttp;
 import com.yanzhenjie.nohttp.OkHttpNetworkExecutor;
@@ -53,7 +56,7 @@ public class BusApp extends Application {
      * 4：荣成
      * 5：潍坊
      */
-    private static int city = 0;
+    private static int city = 3;
 
     /**
      * taian.bin 泰安
@@ -61,7 +64,7 @@ public class BusApp extends Application {
      * laiwu_cy.bin 莱芜长运
      * zhaoyuan.bin 招远
      */
-    private static String binName = "zibo.bin";
+    private static String binName = "zhaoyuan.bin";
 
     @Override
     public void onCreate() {
@@ -90,6 +93,9 @@ public class BusApp extends Application {
         initService();
 
         ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
+
+        SophixManager.getInstance().queryAndLoadNewPatch();
+        CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
     }
 
     //连接服务
@@ -163,7 +169,16 @@ public class BusApp extends Application {
                 .setPatchLoadStatusStub(new PatchLoadStatusListener() {
                     @Override
                     public void onLoad(final int mode, final int code, final String info, final int handlePatchVersion) {
-
+                        if (code == PatchStatus.CODE_LOAD_SUCCESS) {
+                            Log.d("BusApp",
+                                    "onLoad(BusApp.java:169)补丁加载成功>>handlePatchVersion=" + handlePatchVersion);
+                        } else if (code == PatchStatus.CODE_LOAD_RELAUNCH) {
+                            Log.d("BusApp",
+                                    "onLoad(BusApp.java:175)补丁重启生效>>handlePatchVersion=" + handlePatchVersion);
+                        } else {
+                            Log.d("BusApp",
+                                    "onLoad(BusApp.java:176)code=" + code + ">>其他错误>>handlePatchVersion=" + handlePatchVersion + ">>info=" + info);
+                        }
                     }
                 }).initialize();
 

@@ -1,50 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="400dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center"
+    android:background="@drawable/shape_init"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:text="[1.0.0]"
-        android:textColor="@color/colorWhite"
-        android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/welcome"
-        android:layout_width="wrap_content"
+        android:id="@+id/tip"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/config"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:text="欢迎使用本软件"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="同步中"
         android:textColor="@color/colorWhite"
-        android:textSize="55sp"
-        android:textStyle="italic" />
+        android:textSize="28sp" />
 
     <TextView
-        android:id="@+id/config"
-        android:layout_width="wrap_content"
+        android:id="@+id/tip_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tip"
+        android:layout_marginTop="7dp"
+        android:gravity="center"
+        android:text="…正在同步参数…"
+        android:visibility="gone"
+        android:textColor="@color/colorWhite"
+        android:textSize="23sp" />
+
+    <TextView
+        android:id="@+id/update_info"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="请先扫码配置参数信息"
+        android:gravity="center"
+        android:text="具体信息"
         android:textColor="@color/colorWhite"
-        android:textSize="45sp" />
+        android:textSize="16sp" />
 
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tip_info"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/config"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:src="@mipmap/scan"
-        android:textSize="45sp" />
-
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="5dp"
+        android:textStyle="italic|bold"
+        android:layout_marginBottom="3dp"
+        android:text="温馨提示:\n\t\t\t\t退一步心顺路宽都平安，抢半步车挤人怨招祸端！"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp" />
 </RelativeLayout>

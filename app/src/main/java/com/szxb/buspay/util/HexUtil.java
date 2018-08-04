@@ -4,12 +4,12 @@ import android.os.Environment;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.MainActivity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.util.rx.RxBus;
+import com.szxb.jni.libszxb;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -168,6 +168,69 @@ public class HexUtil {
         return b;
     }
 
+    /**
+     * byte 转hex
+     *
+     * @param src
+     * @return
+     */
+    public static String bytesToHexString(byte[] src) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (byte aSrc : src) {
+            int v = aSrc & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+    }
+
+
+    public static String convertHexToString(String hex) {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder temp = new StringBuilder();
+        for (int i = 0; i < hex.length() - 1; i += 2) {
+            String output = hex.substring(i, (i + 2));
+            int decimal = Integer.parseInt(output, 16);
+            sb.append((char) decimal);
+            temp.append(decimal);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 票价键盘回显
+     *
+     * @param str .
+     */
+    public static void sendBackToKeyBoard(String str) {
+        str = Util.addZeroForNum(str, 3);
+        byte[] by = str.getBytes();
+        byte[] sendoffs = new byte[20];
+        sendoffs[0] = (byte) 0xaa;
+        sendoffs[1] = (byte) 0xbb;
+        sendoffs[2] = (byte) 0x00;
+        sendoffs[3] = (byte) 0x03;
+        sendoffs[4] = (byte) 0x08;
+        sendoffs[5] = (byte) 0x02;
+        sendoffs[6] = by[0];
+        sendoffs[7] = by[1];
+        sendoffs[8] = by[2];
+        sendoffs[9] = (byte) 0x00;
+        sendoffs[10] = (byte) 0x00;
+
+        //声明一个数组
+        byte[] sendoff = new byte[50];
+        libszxb.deviceSerialSend(3, sendoffs, 11);
+        libszxb.deviceSerialRecv(3, sendoff, 50);
+    }
+
     public static void parseLine(LineInfoEntity onLineInfo) {
         parseLine(onLineInfo, null);
     }
@@ -185,7 +248,7 @@ public class HexUtil {
         if (busNo != null) {
             BusApp.getPosManager().setBusNo(busNo);
         }
-        if (AppUtil.isForeground(MainActivity.class.getName())) {
+        if (AppUtil.isForeground("com.szxb.buspay.MainActivity")) {
             RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_VIEW));
         }
     }

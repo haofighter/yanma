@@ -118,13 +118,19 @@ public class UnionCard {
                     break;
                 }
 
+                if (TextUtils.isEmpty(retStr[1])) {
+                    ret = NULL;
+                    SLog.d("UnionCard(run.java:123)retStr[1]==NULL");
+                    break;
+                }
                 listTLV = TLV.decodingTLV(retStr[1]);
                 mapTLV = TLV.decodingTLV(listTLV);
 
                 listTLV = TLV.decodingPDOL(mapTLV.get("9f38"));
-                mapTLV = TLV.decodingTLV(listTLV);
 
-                SLog.d("UnionCard(run.java:127)9f38="+mapTLV.get("9f38"));
+                SLog.d("UnionCard(run.java:126)9f38>>" + mapTLV.get("9f38"));
+
+                mapTLV = TLV.decodingTLV(listTLV);
 
                 int len = 0;
                 StringBuilder pDOLBuilder = new StringBuilder();
@@ -181,12 +187,17 @@ public class UnionCard {
                             String transTime = getCurrentDate("HHmmss");
                             pDOLBuilder.append(transTime);
                             break;
+                        case "df69"://
+                            pDOLBuilder.append("01");
+                            break;
                     }
                 }
 
                 String GPO = "80a80000"
                         + Integer.toHexString(len + 2) + "83"
                         + Integer.toHexString(len) + pDOLBuilder.toString();
+
+                SLog.d("UnionCard(run.java:191)GPO=" + GPO);
 
                 retStr = libszxb.RFID_APDU(GPO);
                 if (null == retStr) {
@@ -195,14 +206,32 @@ public class UnionCard {
                     break;
                 }
 
-                if (!retStr[0].equalsIgnoreCase("9000")) {
-                    ret = INVALID;
-                    SLog.d("UnionCard(run.java:198)>>>无效");
+                SLog.d("UnionCard(run.java:209)fuck>>209");
+
+                if (TextUtils.isEmpty(retStr[0])) {
+                    ret = NULL;
+                    SLog.d("UnionCard(run.java:206)retStr[0]==NULL");
                     break;
                 }
 
+                SLog.d("UnionCard(run.java:216)fuck>>216");
+
+                if (!retStr[0].equalsIgnoreCase("9000")) {
+                    ret = INVALID;
+                    SLog.d("UnionCard(run.java:198)>>>无效>>retStr[0]=" + retStr[0]);
+                    break;
+                }
+
+                if (TextUtils.isEmpty(retStr[1])) {
+                    ret = NULL;
+                    SLog.d("UnionCard(run.java:218)retStr[1]==NULL");
+                    break;
+                }
+
+
                 listTLV = TLV.decodingTLV(retStr[1]);
                 mapTLV = TLV.decodingTLV(listTLV);
+
 
                 if (mapTLV.containsKey("9f36")) {
                     retPassCode.setTAG9F36(mapTLV.get("9f36"));
@@ -234,7 +263,15 @@ public class UnionCard {
                 }
 
                 BusllPosManage.getPosManager().setTradeSeq();
-                String mainCardNo = retPassCode.getTAG57().substring(0, retPassCode.getTAG57().indexOf("d"));
+
+                int index = retPassCode.getTAG57().indexOf("d");
+
+                SLog.d("UnionCard(run.java:263)getTAG57=" + retPassCode.getTAG57() + "<<index=" + index);
+
+                String mainCardNo = retPassCode.getTAG57();
+                if (index > 0) {
+                    mainCardNo = retPassCode.getTAG57().substring(0, index);
+                }
                 String cardNum = retPassCode.getTAG5F34();
                 String cardData = retPassCode.getTAG57();
                 String tlv = retPassCode.toString();

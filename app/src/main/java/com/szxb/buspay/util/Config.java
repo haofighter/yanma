@@ -39,8 +39,11 @@ public class Config {
     //小兵腾讯支付
     public static final String XBPAY = IP + "/bipbus/interaction/posrecv";
 
-    //流水上传
-    public static final String POST_BILL = IP + "/bipbus/interaction/posjour";
+    //IC卡上传
+    public static final String IC_CARD_RECORD = IP + "/bipbus/interaction/carduploadzb";
+
+    //银联卡记录
+    public static final String UNION_CARD_RECORD = IP + "/bipbus/interaction/bankjourAll";
 
 
     public static final int SCAN_SUCCESS = 1;//1.扫码成功
@@ -139,5 +142,33 @@ public class Config {
 
     //查看参数信息
     public static final int POSITION_READ_PARAM = POSITION_EXPORT_3_M + 1;
+
+    public static String tip() {
+        return tip[(int) (Math.random() * 20)];
+    }
+
+    //交通提示语
+    private static String[] tip = new String[]{
+            "安全靠着你我他，和谐交通靠大家！",
+            "你争我抢道路窄，互谦互让心路宽！",
+            "与文明一起上路，伴平安一起回家！",
+            "人人需要文明交通，交通需要人人文明！",
+            "用礼让传递文明，用安全构筑和谐！",
+            "出行因礼让而畅通，道路因畅通而和谐！",
+            "一路文明一路情，用安全构筑和谐！",
+            "带十分小心上路，携一份平安回家！",
+            "出行多点小心，家人少点担心！",
+            "冒险是事故之根，谨慎为安全之本！",
+            "文明在于一言一行，安全源于一点一滴",
+            "创优良交通秩序，闪精神文明之光！",
+            "交通安全系万家，平平安安是幸福！",
+            "安全开车是大事，文明走路非小节！",
+            "红灯常在心中亮，绿灯才能伴一生！",
+            "树立安全第一的思想，落实预防为主的方针",
+            "多一分麻痹，多一分危险。多一些谨慎，多一些安全！",
+            "交通安全系万家，平平安安是幸福！",
+            "创优良交通秩序，闪精神文明之光！",
+            "文明在于一言一行，安全源于一点一滴！"
+    };
 
 }

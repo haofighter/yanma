@@ -140,3 +140,7 @@ public static java.lang.String TABLENAME;
 -dontwarn com.alibaba.sdk.android.utils.**
 #防止inline
 -dontoptimize
+
+#crash分析
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

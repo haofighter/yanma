@@ -144,4 +144,7 @@ public class QRCode {
     public static final int QR_MOREN = 25;
 
     public static final int RES_LAUNCHER = 26;
+
+    //按键
+    public static final int KEY_CODE = 27;
 }

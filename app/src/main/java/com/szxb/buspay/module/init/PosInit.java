@@ -156,9 +156,9 @@ public class PosInit {
                     public void call(Boolean aBoolean) {
                         SLog.d("PosInit(call.java:147)扫码初始化:" + aBoolean);
                         if (listener != null) {
-                            BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化成功" : "扫码初始化失败", aBoolean);
                             listener.onCallBack(aBoolean);
                         }
+                        BusToast.showToast(BusApp.getInstance(), aBoolean ? "扫码初始化成功" : "扫码初始化失败", aBoolean);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -429,8 +429,8 @@ public class PosInit {
                     }
                     if (jsonObject != null) {
                         version = jsonObject.getString("blackversion");
-                        SLog.d("PosInit(call.java:432)当前版本="+version);
-                        SLog.d("PosInit(call.java:433)上一个版本:"+BusApp.getPosManager().getBlackVersion());
+                        SLog.d("PosInit(call.java:432)当前版本=" + version);
+                        SLog.d("PosInit(call.java:433)上一个版本:" + BusApp.getPosManager().getBlackVersion());
                         return Observable.just(HexUtil.checkBlackVersion(version));
                     }
                 }
@@ -455,7 +455,7 @@ public class PosInit {
                         try {
                             BlackList black = new Gson().fromJson(new String(blackList, "GB2312"), BlackList.class);
                             if (black != null) {
-                                SLog.d("PosInit(call.java:456)黑名单文件内容>>"+black.getBlacklist().toString());
+                                SLog.d("PosInit(call.java:456)黑名单文件内容>>" + black.getBlacklist().toString());
                                 BlackListCardDao dao = getDaoSession().getBlackListCardDao();
                                 dao.deleteAll();
                                 List<String> blacklist = black.getBlacklist();

@@ -6,6 +6,7 @@ import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.http.CallServer;
 import com.szxb.buspay.http.HttpListener;
 import com.szxb.buspay.util.Config;
+import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
@@ -148,7 +149,7 @@ public class UnionPay {
                                         SLog.d("UnionPay(success.java:136)卡过期");
                                         break;
                                     default:
-                                        BusToast.showToast(BusApp.getInstance().getApplicationContext(), "刷卡失败,其他错误[" + resCode + "]", false);
+                                        BusToast.showToast(BusApp.getInstance().getApplicationContext(), "刷卡失败[" + Util.unionPayStatus(resCode) + "]", false);
                                         break;
                                 }
                             }

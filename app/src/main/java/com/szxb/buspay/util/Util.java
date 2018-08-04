@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
+import com.szxb.buspay.BusApp;
 import com.szxb.mlog.SLog;
 
 import java.io.BufferedReader;
@@ -41,7 +42,19 @@ public class Util {
      * @return
      */
     public static boolean checkQR(long currentTime, long lastTime) {
-        return currentTime - lastTime > 2000;
+        return currentTime - lastTime > 1500;
+    }
+
+
+    /**
+     * 两次扫码间隔
+     *
+     * @param currentTime
+     * @param lastTime
+     * @return
+     */
+    public static boolean checkQRMy(long currentTime, long lastTime) {
+        return currentTime - lastTime > 3000;
     }
 
 
@@ -125,7 +138,7 @@ public class Util {
     public static boolean check(String temCardNo, String cardNo, long lastTime) {
 
         return (!TextUtils.equals(temCardNo, cardNo) //不是相同的卡
-                || checkSwipe(SystemClock.elapsedRealtime(), lastTime)//或者间隔超过3S
+                || checkSwipe(SystemClock.elapsedRealtime(), lastTime)//或者间隔超过1.5S
         )
                 && filter(SystemClock.elapsedRealtime(), lastTime);//两次刷卡间隔大于1S(防止语音叠加)
     }
@@ -203,6 +216,8 @@ public class Util {
                 return "余额不足";
             case "54":
                 return "卡过期";
+            case "57":
+                return "此卡不允许交易";
             case "58":
                 return "无效终端";
             case "98":
@@ -261,5 +276,39 @@ public class Util {
             }
         }
         return str;
+    }
+
+    /**
+     * @param str       .
+     * @param strLength .
+     * @return 字符串补0
+     */
+    public static String addZeroForNum(String str, int strLength) {
+        int strLen = str.length();
+        if (strLen < strLength) {
+            while (strLen < strLength) {
+                // sb.append(str).append("0");//右补0
+                str = str + "0";// 左补0
+                strLen = str.length();
+            }
+        } else if (strLen > strLength) {
+            str = str.substring(0, strLength);
+        }
+        return str;
+    }
+
+
+    /***
+     * 票价回显
+     */
+    public static void echo() {
+        boolean isSuppKeyBoard = BusApp.getPosManager().isSuppKeyBoard();
+        if (isSuppKeyBoard) {
+            int basePrice = BusApp.getPosManager().getBasePrice();
+            double dou = (double) basePrice / 100;
+            DecimalFormat df = new DecimalFormat("#0.0");
+            String keyCode = df.format(dou);
+            HexUtil.sendBackToKeyBoard(keyCode);
+        }
     }
 }
