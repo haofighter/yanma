@@ -90,8 +90,8 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         setPrices();
         station_name.setText(BusApp.getPosManager().getChinese_name());
         sign_time.setText(DateUtil.getCurrentDate("yyyy-MM-dd"));
-        version_name.setText("[" + AppUtil.getVersionName(getApplicationContext()) + "]\n"+BuildConfig.BIN_NAME);
-        sign_version.setText("[" + AppUtil.getVersionName(getApplicationContext()) + "]");
+        version_name.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()),BuildConfig.BIN_NAME));
+        sign_version.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()),BuildConfig.BIN_NAME));
         sign_bus_no.setText(BusApp.getPosManager().getBusNo());
         bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
                 BusApp.getPosManager().getBusNo(), BusApp.getPosManager().getDriverNo()));

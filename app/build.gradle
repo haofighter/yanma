@@ -21,6 +21,7 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+
         }
 
     }
@@ -59,7 +60,7 @@ android {
 
         zhaoyuan_app {
             versionCode 100
-            versionName "3.0.0"
+            versionName "1.0.1"
             buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
             buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
             buildConfigField 'int', 'CITY', '3'

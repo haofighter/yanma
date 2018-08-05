@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static com.szxb.buspay.util.HexUtil.printHexBinary;
 import static com.szxb.buspay.util.HexUtil.sendBackToKeyBoard;
 import static com.szxb.buspay.util.Util.checkEnterKey;
+import static com.szxb.buspay.util.Util.string2Int;
 
 /**
  * 作者: Tangren on 2017-12-08
@@ -105,6 +106,9 @@ public class LoopKeyTask {
                     int basePrices = BusApp.getPosManager().getBasePrice();
                     int halfPrices = basePrices / 2;
                     BusApp.getPosManager().setBasePrice(halfPrices);
+                    String[] coefficient = BusApp.getPosManager().getCoefficent();
+                    BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * halfPrices / 100);
+                    BusApp.getPosManager().setUnionPayPrice(string2Int(coefficient[9]) * halfPrices / 100);
                     BusApp.getPosManager().setHalfPrices(true);
                     RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
                     tempPrices = null;
@@ -118,6 +122,9 @@ public class LoopKeyTask {
                 String s = HexUtil.convertHexToString(keycode);
                 int code = Util.string2Int(s);
                 BusApp.getPosManager().setBasePrice(code * 100);
+                String[] coefficient = BusApp.getPosManager().getCoefficent();
+                BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * (code * 100) / 100);
+                BusApp.getPosManager().setUnionPayPrice(string2Int(coefficient[9]) * (code * 100) / 100);
                 BusApp.getPosManager().setHalfPrices(false);
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
                 tempPrices = s;
