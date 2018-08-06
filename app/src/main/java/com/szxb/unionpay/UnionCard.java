@@ -206,15 +206,11 @@ public class UnionCard {
                     break;
                 }
 
-                SLog.d("UnionCard(run.java:209)fuck>>209");
-
                 if (TextUtils.isEmpty(retStr[0])) {
                     ret = NULL;
                     SLog.d("UnionCard(run.java:206)retStr[0]==NULL");
                     break;
                 }
-
-                SLog.d("UnionCard(run.java:216)fuck>>216");
 
                 if (!retStr[0].equalsIgnoreCase("9000")) {
                     ret = INVALID;
@@ -286,15 +282,13 @@ public class UnionCard {
 
                 SLog.d("run(LoopThread.java:233)mainCardNo=" + mainCardNo + ",cardNum=" + cardNum + ",cardData=" + cardData + ",tlv=" + tlv);
 
-                SLog.d("run(LoopThread.java:235)mackey=" + BusllPosManage.getPosManager().getMacKey());
-
                 BusCard busCard = new BusCard();
                 busCard.setMainCardNo(mainCardNo);
                 busCard.setCardNum(cardNum);
                 busCard.setMagTrackData(cardData);
                 busCard.setTlv55(tlv);
                 busCard.setMacKey(BusllPosManage.getPosManager().getMacKey());
-                busCard.setMoney(1);
+                busCard.setMoney(money);
                 busCard.setTradeSeq(BusllPosManage.getPosManager().getTradeSeq());
 
                 Iso8583Message iso8583Message = BankPay.getInstance().payMessage(busCard);

@@ -2,6 +2,7 @@ package com.szxb.buspay.task.card.zibo;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
@@ -45,7 +46,6 @@ public class LoopCardThread extends Thread {
     public void run() {
         super.run();
         try {
-
             byte[] searchBytes = new byte[16];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
@@ -54,6 +54,7 @@ public class LoopCardThread extends Thread {
 
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
+                searchCard = null;
                 return;
             }
 
@@ -65,6 +66,8 @@ public class LoopCardThread extends Thread {
 
             //1S防抖动
             if (!filter(SystemClock.elapsedRealtime(), lastTime)) {
+                Log.d("LoopCardThread",
+                        "run(LoopCardThread.java:67)防抖动>>>lastTime=" + lastTime);
                 return;
             }
 
@@ -78,7 +81,7 @@ public class LoopCardThread extends Thread {
                     || TextUtils.equals(searchCard.cardType, "03")
                     || TextUtils.equals(searchCard.cardType, "04")) {
                 //如果属于上述卡类型,如果票价小于普通卡金额做1分钟去重
-                if (filterOneMinute()) {
+                if (filterOneMinute(searchCard)) {
                     return;
                 }
             }
@@ -86,11 +89,11 @@ public class LoopCardThread extends Thread {
             //防止重复刷卡
             //去重刷,同一个卡号1.5S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
+                Log.d("LoopCardThread",
+                        "run(LoopCardThread.java:91)防止重复刷卡>>cardNoTemp=" + cardNoTemp + ",cardNo=" + searchCard.cardNo + ",lastTime=" + lastTime);
 //                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }
-
-            SLog.d("LoopCardThread(run.java:82)寻卡数据>>>" + searchCard);
 
             //1.判断是否已签到
             //2.未签到
@@ -108,7 +111,7 @@ public class LoopCardThread extends Thread {
                 if (TextUtils.equals(searchCard.cardType, "06")) {
                     String empNo = BusApp.getPosManager().getEmpNo();
                     if (!TextUtils.equals(searchCard.cityCode + searchCard.cardNo, empNo)) {
-                        if (filterOneMinute()) {
+                        if (filterOneMinute(searchCard)) {
                             return;
                         }
                     }
@@ -119,13 +122,14 @@ public class LoopCardThread extends Thread {
 
             cardNoTemp = searchCard.cardNo;
             lastTime = SystemClock.elapsedRealtime();
+            searchCard = null;
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
         }
     }
 
-    private boolean filterOneMinute() {
+    private boolean filterOneMinute(SearchCard searchCard) {
         int normalAmount = payFee(CardTypeZiBo.CARD_NORMAL);
         int currentAmount = payFee(searchCard.cardType);
         SLog.d("LoopCardThread(run.java:148)普通卡金额=" + normalAmount + ",当前卡金额=" + currentAmount);

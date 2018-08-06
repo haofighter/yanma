@@ -57,6 +57,7 @@ public class LoopCardThread_ZY extends Thread {
 
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
+                searchCard = null;
                 return;
             }
 
@@ -126,6 +127,7 @@ public class LoopCardThread_ZY extends Thread {
 
             cardNoTemp = searchCard.cardNo;
             lastTime = SystemClock.elapsedRealtime();
+            searchCard = null;
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
