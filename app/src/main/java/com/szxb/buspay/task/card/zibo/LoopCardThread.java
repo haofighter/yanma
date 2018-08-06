@@ -2,7 +2,6 @@ package com.szxb.buspay.task.card.zibo;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
@@ -49,7 +48,14 @@ public class LoopCardThread extends Thread {
             byte[] searchBytes = new byte[16];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
+                if (status == -2) {
+                    //重启K21
+                    SLog.d("LoopCardThread(run.java:55)status==2>>尝试重启K21");
+                    libszxb.deviceReset();
+                }
                 SLog.e("LoopCardThread(run.java:19)寻卡状态=" + status);
+                searchCard = null;
+                return;
             }
 
             if (searchBytes[0] != (byte) 0x00) {
@@ -66,8 +72,6 @@ public class LoopCardThread extends Thread {
 
             //1S防抖动
             if (!filter(SystemClock.elapsedRealtime(), lastTime)) {
-                Log.d("LoopCardThread",
-                        "run(LoopCardThread.java:67)防抖动>>>lastTime=" + lastTime);
                 return;
             }
 
@@ -89,8 +93,6 @@ public class LoopCardThread extends Thread {
             //防止重复刷卡
             //去重刷,同一个卡号1.5S内不提示
             if (!Util.check(cardNoTemp, searchCard.cardNo, lastTime)) {
-                Log.d("LoopCardThread",
-                        "run(LoopCardThread.java:91)防止重复刷卡>>cardNoTemp=" + cardNoTemp + ",cardNo=" + searchCard.cardNo + ",lastTime=" + lastTime);
 //                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }

@@ -54,7 +54,14 @@ public class LoopCardThread_GJ extends Thread {
             byte[] searchBytes = new byte[16];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
-                SLog.e("LoopCardThread(run.java:19)寻卡状态=" + status);
+                if (status == -2) {
+                    //重启K21
+                    SLog.d("LoopCardThread_GJ(run.java:55)status==2>>尝试重启K21");
+                    libszxb.deviceReset();
+                }
+                SLog.e("LoopCardThread_GJ(run.java:19)寻卡状态=" + status);
+                searchCard = null;
+                return;
             }
 
             if (searchBytes[0] != (byte) 0x00) {

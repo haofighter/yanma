@@ -152,6 +152,7 @@ public class DateUtil {
         int sec = now.get(Calendar.SECOND);
         if (Calendar.getInstance().get(Calendar.YEAR) >= 2018) {
             try {
+                SLog.d("DateUtil(setK21Time.java:155)开始校准K21时间>>>" + Calendar.getInstance().get(Calendar.YEAR));
                 libszxb.deviceSettime(year, month, day, hour, min, sec);
             } catch (Exception e) {
                 e.printStackTrace();

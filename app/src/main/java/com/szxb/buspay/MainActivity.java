@@ -170,6 +170,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
 
 
     private void initDate() {
+        DateUtil.setK21Time();
         ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
