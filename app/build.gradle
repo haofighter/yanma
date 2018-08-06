@@ -50,21 +50,21 @@ android {
             buildConfigField 'int', 'CITY', '0'
         }
 
-//        taian_app {
-//            versionCode 100
-//            versionName "1.0.1"
-//            buildConfigField 'String', 'LOG_TAG', '"taian"'
-//            buildConfigField 'String', 'BIN_NAME', '"taian.bin"'
-//            buildConfigField 'int', 'CITY', '1'
-//        }
-//
-//        zhaoyuan_app {
-//            versionCode 100
-//            versionName "1.0.1"
-//            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
-//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
-//            buildConfigField 'int', 'CITY', '3'
-//        }
+        taian_app {
+            versionCode 100
+            versionName "1.0.1"
+            buildConfigField 'String', 'LOG_TAG', '"taian"'
+            buildConfigField 'String', 'BIN_NAME', '"taian.bin"'
+            buildConfigField 'int', 'CITY', '1'
+        }
+
+        zhaoyuan_app {
+            versionCode 100
+            versionName "1.0.1"
+            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
+            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
+            buildConfigField 'int', 'CITY', '3'
+        }
 
     }
 
