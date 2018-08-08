@@ -95,87 +95,21 @@ public class ConsumeCard {
     private Integer upStatus;
     //单条记录
     private String singleRecord;
+
+    //是否半价(招远使用)
+    private String isHalfPrices = "0";
+
+    //商户号
+    private String mchId = "00000000";
+
+    //公司号
+    private String companyNo = "000000";
+
     private String reserve_1;
     private String reserve_2;
     private String reserve_3;
-
-    public ConsumeCard(byte[] receDatas, boolean isSignOrBack) {
-        int index = 0;
-        byte[] status_byte = new byte[1];
-        arraycopy(receDatas, index, status_byte, 0, status_byte.length);
-        status = HexUtil.printHexBinary(status_byte);
-
-        byte[] cardType_byte = new byte[1];
-        arraycopy(receDatas, index += status_byte.length, cardType_byte, 0, cardType_byte.length);
-        cardType = HexUtil.printHexBinary(cardType_byte);
-
-        byte[] transType_byte = new byte[1];
-        arraycopy(receDatas, index += cardType_byte.length, transType_byte, 0, transType_byte.length);
-        transType = HexUtil.printHexBinary(transType_byte);
-
-        byte[] transNo_byte = new byte[3];
-        arraycopy(receDatas, index += transType_byte.length, transNo_byte, 0, transNo_byte.length);
-        transNo = HexUtil.printHexBinary(transNo_byte);
-
-        byte[] cardNo_byte = new byte[8];
-        arraycopy(receDatas, index += transNo_byte.length, cardNo_byte, 0, cardNo_byte.length);
-        cardNo = HexUtil.bcd2Str(cardNo_byte);
-
-        byte[] cardBalance_byte = new byte[3];
-        arraycopy(receDatas, index += cardNo_byte.length, cardBalance_byte, 0, cardBalance_byte.length);
-        cardBalance = Util.hex2IntStr(HexUtil.printHexBinary(cardBalance_byte));
-
-        byte[] payFee_byte = new byte[3];
-        arraycopy(receDatas, index += cardBalance_byte.length, payFee_byte, 0, payFee_byte.length);
-        payFee = Util.hex2IntStr(HexUtil.printHexBinary(payFee_byte));
-
-        byte[] transTime_byte = new byte[7];
-        arraycopy(receDatas, index += payFee_byte.length, transTime_byte, 0, transTime_byte.length);
-        transTime = HexUtil.bcd2Str(transTime_byte);
-
-        byte[] transNo2_byte = new byte[2];
-        arraycopy(receDatas, index += transTime_byte.length, transNo2_byte, 0, transNo2_byte.length);
-        transNo2 = HexUtil.printHexBinary(transNo2_byte);
-
-        byte[] tac_byte = new byte[4];
-        arraycopy(receDatas, index += transNo2_byte.length, tac_byte, 0, tac_byte.length);
-        tac = isSignOrBack ? HexUtil.bcd2Str(tac_byte) : HexUtil.printHexBinary(tac_byte);
-
-        byte[] lineNoe_byte = new byte[2];
-        arraycopy(receDatas, index += tac_byte.length, lineNoe_byte, 0, lineNoe_byte.length);
-        lineNo = HexUtil.printHexBinary(lineNoe_byte);
-
-        byte[] busNo_byte = new byte[3];
-        arraycopy(receDatas, index += lineNoe_byte.length, busNo_byte, 0, busNo_byte.length);
-        busNo = HexUtil.bcd2Str(busNo_byte);
-
-        byte[] driverNo_byte = new byte[4];
-        arraycopy(receDatas, index += busNo_byte.length, driverNo_byte, 0, driverNo_byte.length);
-        driverNo = HexUtil.bcd2Str(driverNo_byte);
-
-        byte[] pasmNo_byte = new byte[6];
-        arraycopy(receDatas, index += driverNo_byte.length, pasmNo_byte, 0, pasmNo_byte.length);
-        pasmNo = HexUtil.bcd2Str(pasmNo_byte);
-
-        byte[] direction_byte = new byte[1];
-        arraycopy(receDatas, index += pasmNo_byte.length, direction_byte, 0, direction_byte.length);
-        direction = HexUtil.printHexBinary(direction_byte);
-
-        byte[] stationId_byte = new byte[1];
-        arraycopy(receDatas, index += direction_byte.length, stationId_byte, 0, stationId_byte.length);
-        stationId = HexUtil.printHexBinary(stationId_byte);
-
-        byte[] fareFlag_byte = new byte[1];
-        arraycopy(receDatas, index + stationId_byte.length, fareFlag_byte, 0, fareFlag_byte.length);
-        fareFlag = HexUtil.printHexBinary(fareFlag_byte);
-
-        upStatus = 0;
-        uniqueFlag = pasmNo + transNo + transTime;
-        byte[] recordData = new byte[50];
-        arraycopy(receDatas, 0, recordData, 0, recordData.length);
-        singleRecord = HexUtil.printHexBinary(recordData);
-        SLog.d("ConsumeCard(ConsumeCard.java:119)" + toString());
-    }
+    private String reserve_4;
+    private String reserve_5;
 
     public ConsumeCard(byte[] receDatas, boolean isSignOrBack, String city, String cardModuleType) {
         int index = 0;
@@ -242,6 +176,10 @@ public class ConsumeCard {
             getLw(receDatas, index + pasmNo_byte.length);
         }
 
+
+        isHalfPrices = BusApp.getPosManager().isHalfPrices() ? "1" : "0";
+        mchId = BusApp.getPosManager().getAppId();
+        companyNo = BusApp.getPosManager().getUnitno();
     }
 
     /**
@@ -291,12 +229,12 @@ public class ConsumeCard {
         SLog.d("ConsumeCard(getLw.java:271)" + BusApp.getPosManager().getAppId() + ">>" + toString());
     }
 
-    @Generated(hash = 878111215)
-    public ConsumeCard(Long id, String status, String cardType, String cardModuleType, String transType, String transNo, String cardNo,
-                       String cardBalance, String payFee, String transTime, String transNo2, String tac, String lineNo, String busNo, String driverNo,
-                       String pasmNo, String direction, String stationId, String fareFlag, String localLineNo, String localBusNo, String localDriverNo,
-                       String algFlag, String issuerFlag, String cardChildType, String cpuVersion, String uniqueFlag, Integer upStatus,
-                       String singleRecord, String reserve_1, String reserve_2, String reserve_3) {
+    @Generated(hash = 1273169348)
+    public ConsumeCard(Long id, String status, String cardType, String cardModuleType, String transType, String transNo, String cardNo, String cardBalance, String payFee,
+                       String transTime, String transNo2, String tac, String lineNo, String busNo, String driverNo, String pasmNo, String direction, String stationId, String fareFlag,
+                       String localLineNo, String localBusNo, String localDriverNo, String algFlag, String issuerFlag, String cardChildType, String cpuVersion, String uniqueFlag,
+                       Integer upStatus, String singleRecord, String isHalfPrices, String mchId, String companyNo, String reserve_1, String reserve_2, String reserve_3,
+                       String reserve_4, String reserve_5) {
         this.id = id;
         this.status = status;
         this.cardType = cardType;
@@ -326,9 +264,14 @@ public class ConsumeCard {
         this.uniqueFlag = uniqueFlag;
         this.upStatus = upStatus;
         this.singleRecord = singleRecord;
+        this.isHalfPrices = isHalfPrices;
+        this.mchId = mchId;
+        this.companyNo = companyNo;
         this.reserve_1 = reserve_1;
         this.reserve_2 = reserve_2;
         this.reserve_3 = reserve_3;
+        this.reserve_4 = reserve_4;
+        this.reserve_5 = reserve_5;
     }
 
     @Generated(hash = 476783687)
@@ -623,5 +566,45 @@ public class ConsumeCard {
 
     public void setCardModuleType(String cardModuleType) {
         this.cardModuleType = cardModuleType;
+    }
+
+    public String getIsHalfPrices() {
+        return this.isHalfPrices;
+    }
+
+    public void setIsHalfPrices(String isHalfPrices) {
+        this.isHalfPrices = isHalfPrices;
+    }
+
+    public String getReserve_4() {
+        return this.reserve_4;
+    }
+
+    public void setReserve_4(String reserve_4) {
+        this.reserve_4 = reserve_4;
+    }
+
+    public String getReserve_5() {
+        return this.reserve_5;
+    }
+
+    public void setReserve_5(String reserve_5) {
+        this.reserve_5 = reserve_5;
+    }
+
+    public String getMchId() {
+        return this.mchId;
+    }
+
+    public void setMchId(String mchId) {
+        this.mchId = mchId;
+    }
+
+    public String getCompanyNo() {
+        return this.companyNo;
+    }
+
+    public void setCompanyNo(String companyNo) {
+        this.companyNo = companyNo;
     }
 }

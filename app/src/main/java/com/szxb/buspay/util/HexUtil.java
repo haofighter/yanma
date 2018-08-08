@@ -10,6 +10,7 @@ import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.jni.libszxb;
+import com.szxb.mlog.SLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -249,6 +250,7 @@ public class HexUtil {
             BusApp.getPosManager().setBusNo(busNo);
         }
         if (AppUtil.isForeground("com.szxb.buspay.MainActivity")) {
+            SLog.d("HexUtil(parseLine.java:252)Rx=" + RxBus.getInstance().hasObservers());
             RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_VIEW));
         }
     }

@@ -42,7 +42,7 @@ public class RxBus {
     }
 
     /**
-     * 发送一个新事件
+     * 发送一个新事件(失败了继续发送)
      *
      * @param o
      */
@@ -50,7 +50,15 @@ public class RxBus {
         do {
             bus.onNext(o);
         } while (!hasObservers());
+    }
 
+    /**
+     * 发送一个新事件(仅仅发送一次)
+     *
+     * @param o
+     */
+    public void sendSingle(QRScanMessage o) {
+        bus.onNext(o);
     }
 
     /**

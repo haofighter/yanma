@@ -2,6 +2,7 @@ package com.szxb.buspay.db.manager;
 
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -58,6 +59,10 @@ public class DBManager {
         infoEntity.setOpenid(openID);
         infoEntity.setQrcode(qrCode);
         infoEntity.setPay_fee(pay_fee);
+
+        Log.d("TenPosReportManager",
+                "posScan(TenPosReportManager.java:64)微信实际扣款=" + pay_fee);
+
         ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("weChat", infoEntity));
     }
 

@@ -16,19 +16,7 @@
         android:text="同步中"
         android:textColor="@color/colorWhite"
         android:textSize="28sp" />
-
-    <TextView
-        android:id="@+id/tip_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tip"
-        android:layout_marginTop="7dp"
-        android:gravity="center"
-        android:text="…正在同步参数…"
-        android:visibility="gone"
-        android:textColor="@color/colorWhite"
-        android:textSize="23sp" />
-
+    
     <TextView
         android:id="@+id/update_info"
         android:layout_width="match_parent"

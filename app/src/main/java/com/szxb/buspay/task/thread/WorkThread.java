@@ -119,6 +119,7 @@ public class WorkThread extends Thread {
         params.put("postdate", DateUtil.getCurrentDate());
         params.put("lineno", BusApp.getPosManager().getLineNo());
         params.put("type", "1");
+        params.put("paytype", "0");
         JsonRequest request = new JsonRequest(url);
         request.add(params);
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);

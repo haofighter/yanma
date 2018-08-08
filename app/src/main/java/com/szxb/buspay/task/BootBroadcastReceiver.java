@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.szxb.buspay.module.init.InitActivity;
+import com.szxb.mlog.SLog;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
                 mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(mainActivityIntent);
             } else {
+                SLog.d("BootBroadcastReceiver(onReceive.java:44)Activity已经启动>>>");
             }
         }
 

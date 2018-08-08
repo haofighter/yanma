@@ -82,7 +82,7 @@ public class RecordThread extends Thread {
             //交易类型
             object.put("tradeType", cardRecord.getTransType());
             //设备交易序号
-            object.put("psamTradeCount", cardRecord.getDriverNo());
+            object.put("psamTradeCount", cardRecord.getTransNo());
             //卡号
             object.put("cardNo", cardRecord.getCardNo());
             //卡金额
@@ -98,7 +98,7 @@ public class RecordThread extends Thread {
             //TAC
             object.put("tACCode", cardRecord.getTac());
             //
-            object.put("companyNo", BusApp.getPosManager().getUnitno());
+            object.put("companyNo", cardRecord.getCompanyNo());
             //
             object.put("lineNo", cardRecord.getLineNo());
             //
@@ -123,12 +123,12 @@ public class RecordThread extends Thread {
             object.put("backup", "0000000000");
 
             //
-            object.put("termid", BusApp.getPosManager().getDriverNo());
+            object.put("termid", BusApp.getPosManager().getPosSN());
             object.put("termseq", Util.Random(10));
-            object.put("mchid", BusApp.getPosManager().getAppId());
+            object.put("mchid", cardRecord.getMchId());
 
 
-            object.put("halfprice", BusApp.getPosManager().isHalfPrices() ? "1" : "0");
+            object.put("halfprice", cardRecord.getIsHalfPrices());
             object.put("keytype", TextUtils.equals(cardRecord.getCardModuleType(), "08") ? "0" : "31");
             object.put("citycode", cardRecord.getCardNo().substring(0, 4));
             object.put("internalcode", cardRecord.getCardNo().substring(4, 8));

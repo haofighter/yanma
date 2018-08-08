@@ -2,9 +2,11 @@ package com.szxb.unionpay.unionutil;
 
 import android.util.Log;
 
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.UnionAidEntityDao;
 import com.szxb.buspay.db.dao.UnionPayEntityDao;
 import com.szxb.buspay.db.manager.DBCore;
+import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.core.Iso8583MessageFactory;
 import com.szxb.java8583.module.ParamDownload;
@@ -41,8 +43,6 @@ import static java.lang.System.arraycopy;
 public class ParseUtil {
 
     public static void parseMackey(String value) {
-        Log.d("ParseUtil",
-                "success(ParseUtil.java:27)解析mac");
         byte[] field_60_data = hex2byte(value);
         int i = 0;
         byte[] pinKey = new byte[16];
@@ -70,9 +70,14 @@ public class ParseUtil {
             arraycopy(crcdata, 0, macCrc, 0, macCrc.length);
             if (Arrays.equals(macCrc, macKeyCrc)) {
                 BusllPosManage.getPosManager().setMacKey(macKeyHex);
-                Log.d("ParseUtil",
-                        "success(ParseUtil.java:49)mac保存成功");
+                BusToast.showToast(BusApp.getInstance(), "银联签到成功", true);
+                SLog.d("ParseUtil(parseMackey.java:74)银联Mac 保存成功");
+            } else {
+                BusToast.showToast(BusApp.getInstance(), "银联签到失败[NEQ]", false);
+                SLog.d("ParseUtil(parseMackey.java:77)银联签到失败[NEQ]");
             }
+
+            SLog.d("ParseUtil(parseMackey.java:80)商户号="+BusllPosManage.getPosManager().getMchId()+",终端号="+BusllPosManage.getPosManager().getPosSn()+",秘钥="+BusllPosManage.getPosManager().getKey());
         }
     }
 

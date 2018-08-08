@@ -60,7 +60,7 @@ android {
 
         zhaoyuan_app {
             versionCode 100
-            versionName "1.0.1"
+            versionName "1.0.3"
             buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
             buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
             buildConfigField 'int', 'CITY', '3'
@@ -83,7 +83,7 @@ android {
 }
 
 static def debugTime() {
-    return new Date().format("yyMMddHHmm", TimeZone.getDefault())
+    return new Date().format("yyMMdd", TimeZone.getDefault())
 }
 
 

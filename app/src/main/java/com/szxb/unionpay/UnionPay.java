@@ -93,6 +93,7 @@ public class UnionPay {
                         Iso8583MessageFactory factory = SingletonFactory.forQuickStart();
                         factory.setSpecialFieldHandle(62, new SpecialField62());
                         Iso8583Message message0810 = factory.parse(response.get());
+
                         if (what == UnionConfig.SIGN) {//签到
                             if (message0810.getValue(39).getValue().equals("00")) {
                                 String batchNum = message0810.getValue(60).getValue().substring(2, 8);

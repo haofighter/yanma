@@ -53,9 +53,14 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         public final static Property UniqueFlag = new Property(26, String.class, "uniqueFlag", false, "UNIQUE_FLAG");
         public final static Property UpStatus = new Property(27, Integer.class, "upStatus", false, "UP_STATUS");
         public final static Property SingleRecord = new Property(28, String.class, "singleRecord", false, "SINGLE_RECORD");
-        public final static Property Reserve_1 = new Property(29, String.class, "reserve_1", false, "RESERVE_1");
-        public final static Property Reserve_2 = new Property(30, String.class, "reserve_2", false, "RESERVE_2");
-        public final static Property Reserve_3 = new Property(31, String.class, "reserve_3", false, "RESERVE_3");
+        public final static Property IsHalfPrices = new Property(29, String.class, "isHalfPrices", false, "IS_HALF_PRICES");
+        public final static Property MchId = new Property(30, String.class, "mchId", false, "MCH_ID");
+        public final static Property CompanyNo = new Property(31, String.class, "companyNo", false, "COMPANY_NO");
+        public final static Property Reserve_1 = new Property(32, String.class, "reserve_1", false, "RESERVE_1");
+        public final static Property Reserve_2 = new Property(33, String.class, "reserve_2", false, "RESERVE_2");
+        public final static Property Reserve_3 = new Property(34, String.class, "reserve_3", false, "RESERVE_3");
+        public final static Property Reserve_4 = new Property(35, String.class, "reserve_4", false, "RESERVE_4");
+        public final static Property Reserve_5 = new Property(36, String.class, "reserve_5", false, "RESERVE_5");
     }
 
 
@@ -100,9 +105,14 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
                 "\"UNIQUE_FLAG\" TEXT UNIQUE ," + // 26: uniqueFlag
                 "\"UP_STATUS\" INTEGER," + // 27: upStatus
                 "\"SINGLE_RECORD\" TEXT," + // 28: singleRecord
-                "\"RESERVE_1\" TEXT," + // 29: reserve_1
-                "\"RESERVE_2\" TEXT," + // 30: reserve_2
-                "\"RESERVE_3\" TEXT);"); // 31: reserve_3
+                "\"IS_HALF_PRICES\" TEXT," + // 29: isHalfPrices
+                "\"MCH_ID\" TEXT," + // 30: mchId
+                "\"COMPANY_NO\" TEXT," + // 31: companyNo
+                "\"RESERVE_1\" TEXT," + // 32: reserve_1
+                "\"RESERVE_2\" TEXT," + // 33: reserve_2
+                "\"RESERVE_3\" TEXT," + // 34: reserve_3
+                "\"RESERVE_4\" TEXT," + // 35: reserve_4
+                "\"RESERVE_5\" TEXT);"); // 36: reserve_5
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_CONSUME_CARD_CARD_NO ON CONSUME_CARD" +
                 " (\"CARD_NO\" ASC);");
@@ -263,19 +273,44 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(29, singleRecord);
         }
  
+        String isHalfPrices = entity.getIsHalfPrices();
+        if (isHalfPrices != null) {
+            stmt.bindString(30, isHalfPrices);
+        }
+ 
+        String mchId = entity.getMchId();
+        if (mchId != null) {
+            stmt.bindString(31, mchId);
+        }
+ 
+        String companyNo = entity.getCompanyNo();
+        if (companyNo != null) {
+            stmt.bindString(32, companyNo);
+        }
+ 
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(30, reserve_1);
+            stmt.bindString(33, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(31, reserve_2);
+            stmt.bindString(34, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(32, reserve_3);
+            stmt.bindString(35, reserve_3);
+        }
+ 
+        String reserve_4 = entity.getReserve_4();
+        if (reserve_4 != null) {
+            stmt.bindString(36, reserve_4);
+        }
+ 
+        String reserve_5 = entity.getReserve_5();
+        if (reserve_5 != null) {
+            stmt.bindString(37, reserve_5);
         }
     }
 
@@ -428,19 +463,44 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             stmt.bindString(29, singleRecord);
         }
  
+        String isHalfPrices = entity.getIsHalfPrices();
+        if (isHalfPrices != null) {
+            stmt.bindString(30, isHalfPrices);
+        }
+ 
+        String mchId = entity.getMchId();
+        if (mchId != null) {
+            stmt.bindString(31, mchId);
+        }
+ 
+        String companyNo = entity.getCompanyNo();
+        if (companyNo != null) {
+            stmt.bindString(32, companyNo);
+        }
+ 
         String reserve_1 = entity.getReserve_1();
         if (reserve_1 != null) {
-            stmt.bindString(30, reserve_1);
+            stmt.bindString(33, reserve_1);
         }
  
         String reserve_2 = entity.getReserve_2();
         if (reserve_2 != null) {
-            stmt.bindString(31, reserve_2);
+            stmt.bindString(34, reserve_2);
         }
  
         String reserve_3 = entity.getReserve_3();
         if (reserve_3 != null) {
-            stmt.bindString(32, reserve_3);
+            stmt.bindString(35, reserve_3);
+        }
+ 
+        String reserve_4 = entity.getReserve_4();
+        if (reserve_4 != null) {
+            stmt.bindString(36, reserve_4);
+        }
+ 
+        String reserve_5 = entity.getReserve_5();
+        if (reserve_5 != null) {
+            stmt.bindString(37, reserve_5);
         }
     }
 
@@ -481,9 +541,14 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
             cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26), // uniqueFlag
             cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27), // upStatus
             cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28), // singleRecord
-            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29), // reserve_1
-            cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30), // reserve_2
-            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31) // reserve_3
+            cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29), // isHalfPrices
+            cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30), // mchId
+            cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31), // companyNo
+            cursor.isNull(offset + 32) ? null : cursor.getString(offset + 32), // reserve_1
+            cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33), // reserve_2
+            cursor.isNull(offset + 34) ? null : cursor.getString(offset + 34), // reserve_3
+            cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35), // reserve_4
+            cursor.isNull(offset + 36) ? null : cursor.getString(offset + 36) // reserve_5
         );
         return entity;
     }
@@ -519,9 +584,14 @@ public class ConsumeCardDao extends AbstractDao<ConsumeCard, Long> {
         entity.setUniqueFlag(cursor.isNull(offset + 26) ? null : cursor.getString(offset + 26));
         entity.setUpStatus(cursor.isNull(offset + 27) ? null : cursor.getInt(offset + 27));
         entity.setSingleRecord(cursor.isNull(offset + 28) ? null : cursor.getString(offset + 28));
-        entity.setReserve_1(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
-        entity.setReserve_2(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
-        entity.setReserve_3(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
+        entity.setIsHalfPrices(cursor.isNull(offset + 29) ? null : cursor.getString(offset + 29));
+        entity.setMchId(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
+        entity.setCompanyNo(cursor.isNull(offset + 31) ? null : cursor.getString(offset + 31));
+        entity.setReserve_1(cursor.isNull(offset + 32) ? null : cursor.getString(offset + 32));
+        entity.setReserve_2(cursor.isNull(offset + 33) ? null : cursor.getString(offset + 33));
+        entity.setReserve_3(cursor.isNull(offset + 34) ? null : cursor.getString(offset + 34));
+        entity.setReserve_4(cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35));
+        entity.setReserve_5(cursor.isNull(offset + 36) ? null : cursor.getString(offset + 36));
      }
     
     @Override

@@ -9,8 +9,12 @@ import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
 import com.szxb.buspay.module.init.PosInit;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.java8583.core.Iso8583Message;
+import com.szxb.java8583.module.SignIn;
 import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.SLog;
+import com.szxb.unionpay.UnionPay;
+import com.szxb.unionpay.config.UnionConfig;
 
 /**
  * 作者: Tangren on 2017-09-08
@@ -64,9 +68,13 @@ public class XBPosReportManager {
                     UnionPayParam unionPayParam = new Gson().fromJson(resultUnion, UnionPayParam.class);
                     if (unionPayParam != null) {
                         BusllPosManage.getPosManager().setMachId(unionPayParam.getMch());
-                        BusllPosManage.getPosManager().setMacKey(unionPayParam.getKey());
+                        BusllPosManage.getPosManager().setKey(unionPayParam.getKey());
                         BusllPosManage.getPosManager().setPosSn(unionPayParam.getSn());
-                        BusToast.showToast(BusApp.getInstance(), "银联参数设置成功\n请检查是否生效", true);
+                        BusToast.showToast(BusApp.getInstance(), "银联参数设置成功\n正在重新签到", true);
+
+                        BusllPosManage.getPosManager().setTradeSeq();
+                        Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
+                        UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
                     }
                     break;
                 case QRCode.QR_MOREN:

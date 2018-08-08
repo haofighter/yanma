@@ -75,7 +75,7 @@ public class Util {
             return Integer.valueOf(var, 16);
         } catch (Exception e) {
             e.printStackTrace();
-            SLog.d("Util(string2Int.java:33)var=" + var + ",数字类型转换异常>>" + e.toString());
+            SLog.d("Util(string2Int.java:79)var=" + var + ",数字类型转换异常>>" + e.toString());
             return 100;
         }
     }

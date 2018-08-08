@@ -34,15 +34,15 @@ public class UnionConfig {
     }
 
     public static String getUnionPonSn() {
-        return (String) CommonSharedPreferences.get("union_pos_sn", "37002321");
+        return (String) CommonSharedPreferences.get("union_pos_sn", "00000000");
     }
 
     public static String getMch() {
-        return (String) CommonSharedPreferences.get("mch", "438153341310001");
+        return (String) CommonSharedPreferences.get("mch", "000000000000000");
     }
 
     public static String key() {
-        return (String) CommonSharedPreferences.get("key", "F870B9AD203B37F768863EDC8652E343");
+        return (String) CommonSharedPreferences.get("key", "00000000000000000000000000000000");
     }
 
 
