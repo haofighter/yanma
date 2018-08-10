@@ -16,6 +16,7 @@ import com.szxb.buspay.db.entity.card.BlackListCard;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
 import com.szxb.buspay.db.entity.scan.PublicKeyEntity;
+import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.JsonRequest;
 import com.szxb.buspay.interfaces.InitOnListener;
@@ -24,6 +25,7 @@ import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.HexUtil;
+import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.ftp.FTP;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.param.sign.FileByte;
@@ -493,6 +495,52 @@ public class PosInit {
                     @Override
                     public void call(Throwable throwable) {
                         SLog.e("PosInit(call.java:487)更新黑名异常>>" + throwable.toString());
+                    }
+                });
+    }
+
+
+    public void downUnionPayParamFile() {
+        final FTPEntity ftpEntity = BusApp.getPosManager().getFTP();
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                int i = new FTP()
+                        .builder(ftpEntity.getI())
+                        .setPort(ftpEntity.getP())
+                        .setLogin(ftpEntity.getU(), ftpEntity.getPsw())
+                        .setPosSn(BusApp.getPosManager().getPosSN())
+                        .setPath(Environment.getExternalStorageDirectory() + "/")
+                        .setFTPPath("unionpay/")
+                        .downUnionPayParasFile();
+                if (i == 1) {
+                    SLog.d("PosInit(call.java:517)读取文件>>>");
+                    String lastParamsFileName = BusApp.getPosManager().getLastParamsFileName();
+                    SLog.d("PosInit(call.java:519)lastParamsFileName=" + lastParamsFileName);
+                    byte[] params = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/" + lastParamsFileName);
+                    try {
+                        SLog.d("PosInit(call.java:522)params长度="+params.length);
+                        UnionPayParam unionParam = new Gson().fromJson(new String(params, "GBK"), UnionPayParam.class);
+                        SLog.d("PosInit(call.java:523)unionParam=" + unionParam);
+                        Util.updateUnionParam(unionParam);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        SLog.e("PosInit(call.java:528)异常>>>" + e.toString());
+                    }
+                }
+                subscriber.onNext(i);
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer i) {
+                        SLog.d("PosInit(call.java:535)银联参数>>" + i);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        SLog.e("PosInit(call.java:540)银联参数跟新失败>>" + throwable.toString());
                     }
                 });
     }

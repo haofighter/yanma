@@ -81,4 +81,8 @@ public class FetchAppConfig {
     public static String getLastBlackVersion() {
         return (String) CommonSharedPreferences.get("last_black_version", "0");
     }
+
+    public static String getLastParamsFileName() {
+        return (String) CommonSharedPreferences.get("last_params_file_name", "0");
+    }
 }

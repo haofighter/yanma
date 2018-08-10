@@ -96,4 +96,8 @@ public interface IPosManager {
 
     String getBlackVersion();
 
+    void setLastParamsFileName(String var);
+
+    String getLastParamsFileName();
+
 }

@@ -6,7 +6,14 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
+import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.java8583.core.Iso8583Message;
+import com.szxb.java8583.module.SignIn;
+import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.SLog;
+import com.szxb.unionpay.UnionPay;
+import com.szxb.unionpay.config.UnionConfig;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -309,6 +316,25 @@ public class Util {
             DecimalFormat df = new DecimalFormat("#0.0");
             String keyCode = df.format(dou);
             HexUtil.sendBackToKeyBoard(keyCode);
+        }
+    }
+
+    /**
+     * 更新银联参数
+     *
+     * @param unionPayParam .
+     */
+    public static void updateUnionParam(UnionPayParam unionPayParam) {
+        if (unionPayParam != null) {
+            BusllPosManage.getPosManager().setMachId(unionPayParam.getMch());
+            BusllPosManage.getPosManager().setKey(unionPayParam.getKey());
+            BusllPosManage.getPosManager().setPosSn(unionPayParam.getSn());
+            BusToast.showToast(BusApp.getInstance(), "银联参数设置成功\n正在重新签到", true);
+
+            SLog.d("Util(updateUnionParam.java:334)银联参数设置成功>>>马上签到");
+            BusllPosManage.getPosManager().setTradeSeq();
+            Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
+            UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
         }
     }
 }

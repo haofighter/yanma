@@ -52,6 +52,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     private boolean binOk = false;
 
     private TextView update_info;
+    private PosInit init;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +62,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
         TextView tip_info = (TextView) findViewById(R.id.tip_info);
         tip_info.setText(String.format("温馨提示:\n\t\t\t\t%1$s", Config.tip()));
         update_info.setText("微信同步中\n");
-        PosInit init = new PosInit();
+        init = new PosInit();
         init.setOnCallBack(this);
         update_info.append("bin初始化中\n");
         initBin();
@@ -112,6 +113,12 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     public void initUnionPay() {
         boolean isSuppUnionPay = BusApp.getPosManager().isSuppUnionPay();
         if (!isSuppUnionPay) {
+            return;
+        }
+        init.downUnionPayParamFile();
+        String posSn = BusllPosManage.getPosManager().getPosSn();
+        if (TextUtils.equals(posSn, "00000000")) {
+            SLog.d("InitActivity(initUnionPay.java:120)银联参数暂未配置>>");
             return;
         }
         update_info.append("银联签到中\n");

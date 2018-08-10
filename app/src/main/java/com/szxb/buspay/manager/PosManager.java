@@ -136,6 +136,9 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     //上个黑名单版本
     private String lastBlackVersion;
 
+    //上一个银联参数文件
+    private String lastParamsFileName;
+
     /**
      * ################淄博      栖霞、招远           莱芜                泰安、沂源
      * coefficient[0]:普通卡      普通卡              普通卡                 普通卡
@@ -212,6 +215,8 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         numSeq = Integer.valueOf(FetchAppConfig.getNumSeq());
         chineseName = FetchAppConfig.chinese_name();
         lastBlackVersion = FetchAppConfig.getLastBlackVersion();
+
+        lastParamsFileName=FetchAppConfig.getLastParamsFileName();
     }
 
     private void config(int city) {
@@ -493,6 +498,17 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     @Override
     public String getBlackVersion() {
         return lastBlackVersion;
+    }
+
+    @Override
+    public void setLastParamsFileName(String var) {
+        this.lastParamsFileName=var;
+        CommonSharedPreferences.put("last_params_file_name",var);
+    }
+
+    @Override
+    public String getLastParamsFileName() {
+        return lastParamsFileName;
     }
 
     @Override

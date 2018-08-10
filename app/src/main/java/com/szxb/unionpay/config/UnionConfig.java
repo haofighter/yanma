@@ -12,6 +12,13 @@ import com.szxb.buspay.db.sp.CommonSharedPreferences;
 public class UnionConfig {
 
     /**
+     * @return TPDU
+     */
+    public static String getTpdu() {
+        return (String) CommonSharedPreferences.get("tp_du", "0000000000");
+    }
+
+    /**
      * @return 操作员编号
      */
     public static String operatorNumber() {
@@ -64,15 +71,23 @@ public class UnionConfig {
 
     //null
     public static final int NULL = -1;
+    public static final int NULL2 = -2;
+    public static final int NULL3 = -3;
+    public static final int NULL4 = -4;
+    public static final int NULL5 = -5;
+    public static final int NULL6 = -6;
+    public static final int NULL7 = -7;
 
     //invalid
-    public static final int INVALID = -2;
+    public static final int INVALID = -8;
+
+    public static final int INVALID2 = -11;
 
     //exception
-    public static final int EXCEPTION = -3;
+    public static final int EXCEPTION = -9;
 
     //repeat
-    public static final int REPEAT = -4;
+    public static final int REPEAT = -10;
 
 
 }

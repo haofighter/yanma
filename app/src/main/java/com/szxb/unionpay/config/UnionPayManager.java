@@ -1,5 +1,6 @@
 package com.szxb.unionpay.config;
 
+import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
 import com.szxb.java8583.module.manager.IManager;
 
@@ -37,7 +38,7 @@ public class UnionPayManager implements IManager {
     /**
      * 银联分配
      */
-    private String TPDU;
+    private String TPDU="0000000000";
 
     /**
      * 银联分配设备号
@@ -67,6 +68,12 @@ public class UnionPayManager implements IManager {
     @Override
     public void loadFromPrefs() {
         mch_id = UnionConfig.getMch();
+        String binName = BuildConfig.BIN_NAME;
+//        if (binName.contains("zibo")) {
+//            TPDU = "6005010000";
+//        } else if (binName.contains("zhaoyuan")) {
+//            TPDU = "6004500000";
+//        }
         TPDU = "6005010000";
         tradeSeq = UnionConfig.tradeSeq();
         key = UnionConfig.key();

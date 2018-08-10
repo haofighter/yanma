@@ -34,7 +34,11 @@ import java.util.Random;
 import static com.szxb.buspay.util.DateUtil.getCurrentDate;
 import static com.szxb.unionpay.config.UnionConfig.EXCEPTION;
 import static com.szxb.unionpay.config.UnionConfig.INVALID;
+import static com.szxb.unionpay.config.UnionConfig.INVALID2;
 import static com.szxb.unionpay.config.UnionConfig.NULL;
+import static com.szxb.unionpay.config.UnionConfig.NULL2;
+import static com.szxb.unionpay.config.UnionConfig.NULL3;
+import static com.szxb.unionpay.config.UnionConfig.NULL4;
 import static com.szxb.unionpay.config.UnionConfig.REPEAT;
 
 /**
@@ -109,17 +113,20 @@ public class UnionCard {
                 if (retStr == null || retStr[0] == null) {
                     SLog.d("UnionCard(run.java:110)RFID_APDU>>NULL>>aid=" + aid);
                     ret = NULL;
+                    tempStr = "0";
                     break;
                 }
 
                 if (!retStr[0].equals("9000")) {
                     SLog.d("run(LoopThread.java:134)>> -2>>>[0]=" + retStr[0]);
                     ret = INVALID;
+                    tempStr = "0";
                     break;
                 }
 
                 if (TextUtils.isEmpty(retStr[1])) {
-                    ret = NULL;
+                    ret = NULL2;
+                    tempStr = "0";
                     SLog.d("UnionCard(run.java:123)retStr[1]==NULL");
                     break;
                 }
@@ -201,25 +208,28 @@ public class UnionCard {
 
                 retStr = libszxb.RFID_APDU(GPO);
                 if (null == retStr) {
-                    ret = NULL;
+                    ret = NULL3;
+                    tempStr = "0";
                     SLog.d("UnionCard(run.java:192)RFID_APDU>>NULL");
                     break;
                 }
 
                 if (TextUtils.isEmpty(retStr[0])) {
-                    ret = NULL;
+                    ret = NULL4;
+                    tempStr = "0";
                     SLog.d("UnionCard(run.java:206)retStr[0]==NULL");
                     break;
                 }
 
                 if (!retStr[0].equalsIgnoreCase("9000")) {
-                    ret = INVALID;
+                    ret = INVALID2;
                     SLog.d("UnionCard(run.java:198)>>>无效>>retStr[0]=" + retStr[0]);
                     break;
                 }
 
                 if (TextUtils.isEmpty(retStr[1])) {
                     ret = NULL;
+                    tempStr = "0";
                     SLog.d("UnionCard(run.java:218)retStr[1]==NULL");
                     break;
                 }
@@ -329,6 +339,9 @@ public class UnionCard {
                 break;
             } while (true);
 
+            if (ret != 0) {
+                BusToast.showToast(BusApp.getInstance(), "刷卡失败[" + ret + "]", false);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             ret = EXCEPTION;

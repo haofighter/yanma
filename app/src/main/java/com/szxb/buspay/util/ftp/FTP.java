@@ -1,10 +1,13 @@
 package com.szxb.buspay.util.ftp;
 
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.szxb.buspay.BusApp;
 import com.szxb.mlog.SLog;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.BufferedOutputStream;
@@ -37,6 +40,8 @@ public class FTP {
 
     private String[] ftpPaths;
     private String packgeName;
+
+    private String posSn;
 
     public FTP builder(String url) {
         this.url = url;
@@ -81,6 +86,11 @@ public class FTP {
 
     public FTP setPackgeName(String packgeName) {
         this.packgeName = packgeName;
+        return this;
+    }
+
+    public FTP setPosSn(String posSn) {
+        this.posSn = posSn;
         return this;
     }
 
@@ -174,8 +184,8 @@ public class FTP {
             ftp.enterLocalPassiveMode();
             buffOut = new BufferedOutputStream(new FileOutputStream(path + sinfileName), 8 * 1024);
             success = ftp.retrieveFile(ftpPath, buffOut);
-            
-            SLog.d("FTP(download.java:178)检索文件："+success);
+
+            SLog.d("FTP(download.java:178)检索文件：" + success);
 
             buffOut.flush();
             buffOut.close();
@@ -192,7 +202,7 @@ public class FTP {
             }
         } catch (IOException e) {
             success = false;
-            SLog.d("FTP(download.java:193)FTP异常"+e.toString());
+            SLog.d("FTP(download.java:193)FTP异常" + e.toString());
             e.printStackTrace();
         }
 
@@ -253,6 +263,69 @@ public class FTP {
             success = false;
             Log.d("FTP",
                     "call(FTP.java:257)FTP异常" + e.toString());
+            e.printStackTrace();
+        }
+
+        return success;
+    }
+
+
+    public int downUnionPayParasFile() {
+        int success = 0;
+        FTPClient ftp = new FTPClient();
+        BufferedOutputStream buffOut = null;
+        int reply;
+        ftp.setConnectTimeout(10000);
+        try {
+            ftp.connect(url, port);// 连接FTP服务器
+            ftp.login(username, password);// 登录
+            //连接的状态码
+            reply = ftp.getReplyCode();
+            Log.d("FTP", reply + "11111");
+            ftp.setDataTimeout(10000);
+            //判断是否连接上ftp
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                ftp.disconnect();
+                return success;
+            }
+
+            ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+            ftp.setBufferSize(1024);
+            ftp.setControlEncoding("UTF-8");
+            ftp.enterLocalPassiveMode();
+            FTPFile[] ftpFile = ftp.listFiles(ftpPath);
+            for (FTPFile file : ftpFile) {
+                //如果包含
+                if (file.getName().contains(posSn)) {
+                    String lastParamFileName = BusApp.getPosManager().getLastParamsFileName();
+                    //判断是否需要更新
+                    if (!TextUtils.equals(lastParamFileName, file.getName())) {
+                        //下载更新
+                        SLog.d("FTP(downUnionPayParasFile.java:306)下载银联参数文件>>" + file.getName());
+                        buffOut = new BufferedOutputStream(new FileOutputStream(path + file.getName()), 8 * 1024);
+                        ftp.retrieveFile(ftpPath+ file.getName(), buffOut);
+                        success = 1;
+                        buffOut.flush();
+                        buffOut.close();
+                        BusApp.getPosManager().setLastParamsFileName(file.getName());
+                    } else {
+                        success = 2;
+                        SLog.d("FTP(downUnionPayParasFile.java:309)银联参数文件无需更新>>当前版本=" + lastParamFileName + "ftp版本=" + file.getName());
+                    }
+                }
+            }
+            ftp.logout();
+            ftp.disconnect();
+            //判断是否退出成功，不成功就再断开连接。
+            if (ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException ioe) {
+                    SLog.e("FTP(downUnionPayParasFile.java:321)IOException异常>>" + ioe.toString());
+                }
+            }
+        } catch (IOException e) {
+            SLog.e("FTP(downUnionPayParasFile.java:326)IOException异常>>" + e.toString());
             e.printStackTrace();
         }
 

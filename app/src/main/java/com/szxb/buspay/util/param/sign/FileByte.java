@@ -19,7 +19,6 @@ public class FileByte {
     public static byte[] File2byte(String filePath) {
         byte[] buffer = null;
         try {
-
             File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -32,7 +31,7 @@ public class FileByte {
             bos.close();
             buffer = bos.toByteArray();
         } catch (Exception e) {
-            SLog.d("File2byte(FileByte.java:39)" + e.getMessage());
+            SLog.e("File2byte(FileByte.java:39)文件读取失败>>" + e.getMessage());
             e.printStackTrace();
 
         }
