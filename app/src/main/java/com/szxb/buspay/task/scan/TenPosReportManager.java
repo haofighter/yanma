@@ -63,7 +63,7 @@ public class TenPosReportManager {
                     //String open_id, String pub_key, int payfee, byte scene, byte scantype, String pos_id, String pos_trx_id, String aes_mac_root
                     verify = wxSdk.verify(open_id
                             , BusApp.getPosManager().getPublicKey(String.valueOf(key_id))
-                            , 1//金额
+                            , BusApp.getPosManager().getWcPayPrice()//金额
                             , (byte) 1
                             , (byte) 1
                             , BusApp.getPosManager().getDriverNo()

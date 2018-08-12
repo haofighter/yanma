@@ -83,6 +83,7 @@ public class Util {
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("Util(string2Int.java:79)var=" + var + ",数字类型转换异常>>" + e.toString());
+            BusToast.showToast(BusApp.getInstance(), "数字类型转换异常[" + var + "]", false);
             return 100;
         }
     }

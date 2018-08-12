@@ -106,6 +106,10 @@ public class LoopKeyTask {
                     SLog.d("LoopKeyTask(keyBord.java:106)接收到半价通知>>");
                     int basePrices = BusApp.getPosManager().getBasePrice();
                     int halfPrices = basePrices / 2;
+                    if (halfPrices > 900) {
+                        BusToast.showToast(BusApp.getInstance(), "键盘按键出了小差\n请重试[" + halfPrices + "]", false);
+                        return;
+                    }
                     BusApp.getPosManager().setBasePrice(halfPrices);
                     String[] coefficient = BusApp.getPosManager().getCoefficent();
                     BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * halfPrices / 100);
@@ -125,9 +129,13 @@ public class LoopKeyTask {
                     BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
                     return;
                 }
-                SLog.d("LoopKeyTask(keyBord.java:122)接收到键盘命令>>开始更新票价");
                 String s = HexUtil.convertHexToString(keycode);
+                SLog.d("LoopKeyTask(keyBord.java:122)接收到键盘命令>>开始更新票价>>票价=" + s);
                 int code = Util.string2Int(s);
+                if (code * 100 > 900) {
+                    BusToast.showToast(BusApp.getInstance(), "键盘按键出了小差\n请重试[" + s + "]", false);
+                    return;
+                }
                 BusApp.getPosManager().setBasePrice(code * 100);
                 String[] coefficient = BusApp.getPosManager().getCoefficent();
                 BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * (code * 100) / 100);
@@ -135,10 +143,12 @@ public class LoopKeyTask {
                 BusApp.getPosManager().setHalfPrices(false);
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
 
-                SLog.d("LoopKeyTask(keyBord.java:138)微信：" + BusApp.getPosManager().getWcPayPrice()
+                SLog.d("LoopKeyTask(keyBord.java:138)"
+                        + "微信：" + BusApp.getPosManager().getWcPayPrice()
+                        + "银联：" + BusApp.getPosManager().getUnionPayPrice()
                         + ",基础金额=" + BusApp.getPosManager().getBasePrice()
-                        + "微信折扣：" + BusApp.getPosManager().getCoefficent()[8]
-                        + "银联折扣:" + BusApp.getPosManager().getCoefficent()[9]);
+                        + ",微信折扣：" + BusApp.getPosManager().getCoefficent()[8]
+                        + ",银联折扣:" + BusApp.getPosManager().getCoefficent()[9]);
                 tempPrices = s;
                 break;
         }
