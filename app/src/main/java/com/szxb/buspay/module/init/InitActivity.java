@@ -115,7 +115,7 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
         if (!isSuppUnionPay) {
             return;
         }
-        init.downUnionPayParamFile();
+        init.downUnionPayParamFile(false);
         String posSn = BusllPosManage.getPosManager().getPosSn();
         if (TextUtils.equals(posSn, "00000000")) {
             SLog.d("InitActivity(initUnionPay.java:120)银联参数暂未配置>>");

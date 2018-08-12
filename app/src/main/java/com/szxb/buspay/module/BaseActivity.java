@@ -334,7 +334,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                     mRecordList.add(mainEntity);
                 }
             }
-            recordAdapter.position=0;
+            recordAdapter.position = 0;
             recordAdapter.setItemChecked(0);
             recordAdapter.refreshData(mRecordList);
         } else if (position == POSITION_SCAN_RECORD) {//扫码记录
@@ -356,7 +356,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 mainEntity.setPay_money(fen2Yuan(scanInfo.getPay_fee()));
                 mRecordList.add(mainEntity);
             }
-            recordAdapter.position=0;
+            recordAdapter.position = 0;
             recordAdapter.setItemChecked(0);
             recordAdapter.refreshData(mRecordList);
         } else if (position == POSITION_UNION_RECORD) {//银联卡记录
@@ -378,7 +378,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 mainEntity.setPay_money(fen2Yuan(string2Int(unionPayEntity.getPayFee())));
                 mRecordList.add(mainEntity);
             }
-            recordAdapter.position=0;
+            recordAdapter.position = 0;
             recordAdapter.setItemChecked(0);
             recordAdapter.refreshData(mRecordList);
         } else if (position == POSITION_CNT) {//当天汇总
@@ -394,6 +394,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             init.init();
             if (lineInfoEntity != null) {
                 init.download(lineInfoEntity.getFileName());
+            }
+            if (BusApp.getPosManager().isSuppUnionPay()) {
+                init.downUnionPayParamFile(true);
             }
             onKeyCancel();
         } else if (position == POSITION_EXPORT_DB) {//数据库导出

@@ -147,4 +147,6 @@ public class QRCode {
 
     //按键
     public static final int KEY_CODE = 27;
+
+    public static final int UPDATE_UNION_PARAMS = 28;
 }

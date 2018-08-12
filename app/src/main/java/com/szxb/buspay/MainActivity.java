@@ -147,6 +147,9 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
             case QRCode.KEY_CODE:
                 setPrices();
                 break;
+            case QRCode.UPDATE_UNION_PARAMS:
+                version_name.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()), BusApp.getPosManager().isSuppUnionPay() ? BusllPosManage.getPosManager().getPosSn() : BuildConfig.BIN_NAME));
+                break;
             default:
                 break;
         }

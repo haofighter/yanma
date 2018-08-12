@@ -6,7 +6,11 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.QRCode;
+import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
+import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.SignIn;
@@ -336,6 +340,8 @@ public class Util {
             BusllPosManage.getPosManager().setTradeSeq();
             Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
             UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
+
+            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.UPDATE_UNION_PARAMS));
         }
     }
 }

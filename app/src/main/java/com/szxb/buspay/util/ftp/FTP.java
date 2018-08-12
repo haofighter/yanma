@@ -270,7 +270,7 @@ public class FTP {
     }
 
 
-    public int downUnionPayParasFile() {
+    public int downUnionPayParasFile(boolean forceUpdate) {
         int success = 0;
         FTPClient ftp = new FTPClient();
         BufferedOutputStream buffOut = null;
@@ -299,11 +299,11 @@ public class FTP {
                 if (file.getName().contains(posSn)) {
                     String lastParamFileName = BusApp.getPosManager().getLastParamsFileName();
                     //判断是否需要更新
-                    if (!TextUtils.equals(lastParamFileName, file.getName())) {
+                    if (!TextUtils.equals(lastParamFileName, file.getName()) || forceUpdate) {
                         //下载更新
                         SLog.d("FTP(downUnionPayParasFile.java:306)下载银联参数文件>>" + file.getName());
                         buffOut = new BufferedOutputStream(new FileOutputStream(path + file.getName()), 8 * 1024);
-                        ftp.retrieveFile(ftpPath+ file.getName(), buffOut);
+                        ftp.retrieveFile(ftpPath + file.getName(), buffOut);
                         success = 1;
                         buffOut.flush();
                         buffOut.close();

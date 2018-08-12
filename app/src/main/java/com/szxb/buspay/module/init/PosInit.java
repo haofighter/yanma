@@ -500,7 +500,7 @@ public class PosInit {
     }
 
 
-    public void downUnionPayParamFile() {
+    public void downUnionPayParamFile(final boolean forceUpdate) {
         final FTPEntity ftpEntity = BusApp.getPosManager().getFTP();
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
@@ -512,7 +512,7 @@ public class PosInit {
                         .setPosSn(BusApp.getPosManager().getPosSN())
                         .setPath(Environment.getExternalStorageDirectory() + "/")
                         .setFTPPath("unionpay/")
-                        .downUnionPayParasFile();
+                        .downUnionPayParasFile(forceUpdate);
                 if (i == 1) {
                     SLog.d("PosInit(call.java:517)读取文件>>>");
                     String lastParamsFileName = BusApp.getPosManager().getLastParamsFileName();
