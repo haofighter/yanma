@@ -89,7 +89,9 @@ public class TenPosReportManager {
                     posRecord.setBus_no(BusApp.getPosManager().getBusNo());
                     posRecord.setUnitno(BusApp.getPosManager().getUnitno());
                     posRecord.setDriveno(BusApp.getPosManager().getDriverNo());
-                    posRecord.setBus_line_name(BusApp.getPosManager().getLineName());
+
+                    posRecord.setBus_line_name(BusApp.getPosManager().getLineNo());
+
                     posRecord.setPos_no(BusApp.getPosManager().getPosSN());
                     posRecord.setBus_line_no(BusApp.getPosManager().getLineNo());
                     posRecord.setIn_station_id(1);

@@ -39,7 +39,7 @@ public class CalibrateTime {
     }
 
     public void request() {
-        String url = "http://139.199.158.253/bipeqt/interaction/getStandardTime";
+        String url = "http://134.175.56.14/bipeqt/interaction/getStandardTime";
         JsonRequest request = new JsonRequest(url, RequestMethod.POST);
         request.setRetryCount(5);
         CallServer.getHttpclient().add(0, request, new HttpListener<JSONObject>() {

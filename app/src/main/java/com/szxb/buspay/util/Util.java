@@ -232,6 +232,8 @@ public class Util {
                 return "此卡不允许交易";
             case "58":
                 return "无效终端";
+            case "97":
+                return "终端未登记";
             case "98":
                 return "超时";
             case "A0":

@@ -1,7 +1,5 @@
 package com.szxb.buspay.util.param;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.szxb.buspay.db.entity.scan.PosRecord;
@@ -42,8 +40,6 @@ public class ParamsUtil {
 
     //扣款
     public static Map<String, Object> requestMap(PosRecord record) {
-        Log.d("ParamsUtil",
-                "run(ParamsUtil.java:41)车牌号:" + record.getBus_no());
         JSONObject object = new JSONObject();
         object.put("open_id", record.getOpen_id());
         object.put("mch_trx_id", record.getMch_trx_id());

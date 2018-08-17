@@ -29,6 +29,7 @@ public class TimeSettleTask extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         if (BusApp.getPosManager().isSuppScanPay()) {
             ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 1, 60, TimeUnit.SECONDS);
         }
