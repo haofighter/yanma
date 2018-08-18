@@ -92,11 +92,14 @@ public class BusApp extends Application {
         startService(timeSettleTaskIntent);
         initService();
 
+        //校准时间
+        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
+
+        //状态上报
         ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
 
         SophixManager.getInstance().queryAndLoadNewPatch();
         CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
-
     }
 
     //连接服务

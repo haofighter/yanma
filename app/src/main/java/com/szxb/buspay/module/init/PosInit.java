@@ -29,6 +29,7 @@ import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.ftp.FTP;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.param.sign.FileByte;
+import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.mlog.SLog;
 import com.yanzhenjie.nohttp.rest.Response;
@@ -381,6 +382,9 @@ public class PosInit {
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean aBoolean) {
+                        if (aBoolean) {
+                            SoundPoolUtil.play(Config.IC_SET);
+                        }
                         BusToast.showToast(BusApp.getInstance(), aBoolean ? "线路更新成功" : "线路更新失败", aBoolean);
                         if (listener != null) {
                             listener.onFtpCallBack();
@@ -519,7 +523,7 @@ public class PosInit {
                     SLog.d("PosInit(call.java:519)lastParamsFileName=" + lastParamsFileName);
                     byte[] params = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/" + lastParamsFileName);
                     try {
-                        SLog.d("PosInit(call.java:522)params长度="+params.length);
+                        SLog.d("PosInit(call.java:522)params长度=" + params.length);
                         UnionPayParam unionParam = new Gson().fromJson(new String(params, "GBK"), UnionPayParam.class);
                         SLog.d("PosInit(call.java:523)unionParam=" + unionParam);
                         Util.updateUnionParam(unionParam);

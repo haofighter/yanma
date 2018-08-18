@@ -31,15 +31,15 @@ public class TimeSettleTask extends Service {
         super.onCreate();
 
         if (BusApp.getPosManager().isSuppScanPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 1, 60, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 30, 60, TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 1, 140, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 140, TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppUnionPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 1, 160, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 30, 160, TimeUnit.SECONDS);
         }
     }
 

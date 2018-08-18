@@ -10,6 +10,8 @@ import com.szxb.buspay.http.CallServer;
 import com.szxb.buspay.http.HttpListener;
 import com.szxb.buspay.http.JsonRequest;
 import com.szxb.buspay.module.init.PosInit;
+import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
@@ -17,6 +19,7 @@ import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.mlog.SLog;
 import com.yanzhenjie.nohttp.rest.Response;
 
+import java.util.Calendar;
 import java.util.Map;
 
 import static com.szxb.buspay.util.Config.QR_ERROR;
@@ -74,26 +77,35 @@ public class PosRequest {
                 SoundPoolUtil.play(Config.EC_BALANCE);
                 BusToast.showToast(BusApp.getInstance(), "余额不足[" + QRCode.EC_BALANCE + "]", false);
                 break;
-            case QRCode.REFRESH_QR_CODE://请刷新二维码
             case QRCode.EC_CODE_TIME://二维码过期
+                String noticeStr;
+                //检查当前日期是否正常(>=2018)
+                if (Calendar.getInstance().get(Calendar.YEAR) < 2018) {
+                    noticeStr = "正在校准时间[请重试]";
+                    SLog.d("PosRequest(request.java:83)二维码过期[10006]>>>并且当前时间小于2018>>开始校准时间");
+                    ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("reg_time"));
+                } else {
+                    noticeStr = "二维码过期[10006]";
+                    SoundPoolUtil.play(Config.EC_RE_QR_CODE);
+                }
+                BusToast.showToast(BusApp.getInstance(), noticeStr, false);
+                break;
+            case QRCode.REFRESH_QR_CODE://请刷新二维码
             case QRCode.EC_MAC_SIGN_ERR://mac校验失败
             case QRCode.EC_USER_SIGN://二维码签名错误
             case QRCode.EC_FORMAT://二维码格式错误
             case QRCode.EC_USER_PUBLIC_KEY://卡证书用户公钥错误
             case QRCode.EC_CARD_PUBLIC_KEY://卡证书公钥错误
             case QRCode.EC_PARAM_ERR://参数错误
+            case QRCode.EC_CARD_CERT_TIME://卡证书过期，提示用户联网刷新二维码
                 SoundPoolUtil.play(Config.EC_RE_QR_CODE);
                 BusToast.showToast(BusApp.getInstance(), "请刷新二维码[" + message.getResult() + "]", false);
-                break;
-            case QRCode.EC_CARD_CERT_TIME://卡证书过期，提示用户联网刷新二维码
-                SoundPoolUtil.play(Config.EC_CARD_CERT_TIME);
-                BusToast.showToast(BusApp.getInstance(), "请联网刷新二维码[" + QRCode.EC_CARD_CERT_TIME + "]", false);
                 break;
             default:
                 SoundPoolUtil.play(Config.VERIFY_FAIL);
                 BusToast.showToast(BusApp.getInstance(), "验码失败[" + message.getResult() + "]", false);
-                if (message.getResult()==-1){
-                    PosInit posInit=new PosInit();
+                if (message.getResult() == -1) {
+                    PosInit posInit = new PosInit();
                     posInit.init();
                 }
                 break;

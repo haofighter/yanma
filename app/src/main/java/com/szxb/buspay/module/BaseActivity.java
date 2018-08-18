@@ -26,7 +26,6 @@ import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.interfaces.OnKeyListener;
 import com.szxb.buspay.module.init.PosInit;
-import com.szxb.buspay.task.CalibrateTime;
 import com.szxb.buspay.task.key.LoopKeyTask;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
@@ -409,7 +408,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             onKeyCancel();
         } else if (position == POSITION_TIME) {//校准时间
             BusToast.showToast(getApplicationContext(), "开始校准时间", true);
-            CalibrateTime.getInstance().request();
+            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("reg_time"));
             onKeyCancel();
         } else if (position == POSITION_EXPORT_7) {//导出7天记录
             export(7);
@@ -427,7 +426,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             line_name.setText(String.format("线路名\n%1$s", BusApp.getPosManager().getChinese_name()));
             driver_no.setText(String.format("司机号\n%1$s", BusApp.getPosManager().getDriverNo()));
             union_pos_sn.setText(String.format("银联POS编号\n%1$s", BusllPosManage.getPosManager().getPosSn()));
-            pos_sn.setText(String.format("车载编号\n%1$s", BusApp.getPosManager().getBusNo()));
+            pos_sn.setText(String.format("车辆编号\n%1$s", BusApp.getPosManager().getBusNo()));
             black_version.setText(String.format("黑名单版本\n%1$s", BusApp.getPosManager().getBlackVersion()));
             long[] longs = DBManager.queryBlackListCnt();
             black_cnt.setText(String.format("黑名单数量\n%1$d|%2$d", longs[0], longs[1]));

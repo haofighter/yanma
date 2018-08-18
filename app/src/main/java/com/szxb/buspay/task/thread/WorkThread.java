@@ -2,7 +2,6 @@ package com.szxb.buspay.task.thread;
 
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 import com.szxb.buspay.BusApp;
@@ -17,10 +16,12 @@ import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.JsonRequest;
 import com.szxb.buspay.util.AppUtil;
+import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.unionpay.entity.UnionPayEntity;
+import com.yanzhenjie.nohttp.RequestMethod;
 import com.yanzhenjie.nohttp.rest.Response;
 import com.yanzhenjie.nohttp.rest.SyncRequestExecutor;
 
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
+import static com.szxb.buspay.util.DateUtil.setTime;
 
 /**
  * 作者：Tangren on 2018-07-20
@@ -102,6 +104,12 @@ public class WorkThread extends Thread {
             exportFile(posDirectory, sdDirectory);
         } else if (TextUtils.equals(name, "pos_status_push")) {
             pushStatus();
+        } else if (TextUtils.equals(name, "app_reg_time")) {
+            //校准时钟(不提示)
+            retTime(false);
+        } else if (TextUtils.equals(name, "reg_time")) {
+            //校准时钟
+            retTime(true);
         }
 
     }
@@ -124,9 +132,29 @@ public class WorkThread extends Thread {
         request.add(params);
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
-            Log.d("PosRequest",
-                    "run(PosRequest.java:44)" + execute.get().toJSONString());
         }
+    }
+
+    /**
+     * 校准时间
+     */
+    private void retTime(boolean isTip) {
+        JsonRequest request = new JsonRequest(Config.REG_TIME_URL, RequestMethod.POST);
+        request.setRetryCount(2);
+        Response<JSONObject> response = SyncRequestExecutor.INSTANCE.execute(request);
+        if (response.isSucceed()) {
+            JSONObject object = response.get();
+            String rescode = object.getString("rescode");
+            if (TextUtils.equals("0000", rescode)) {
+                String time = object.getString("date");
+                setTime(time, isTip);
+            }
+        } else {
+            if (isTip) {
+                BusToast.showToast(BusApp.getInstance(), "时钟校准失败[ENT_ERROR]", false);
+            }
+        }
+
     }
 
     /**

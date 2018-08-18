@@ -2,7 +2,6 @@ package com.szxb.buspay.task.scan;
 
 import com.google.gson.Gson;
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.db.entity.bean.FTPEntity;
 import com.szxb.buspay.db.entity.bean.LINEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
@@ -46,12 +45,7 @@ public class XBPosReportManager {
             }
             switch (codeType) {
                 case QRCode.CONFIG_CODE_FTP:
-                    String resultFTP = qrcode.substring(8, qrcode.length());
-                    FTPEntity ftpEntity = new Gson().fromJson(resultFTP, FTPEntity.class);
-                    if (ftpEntity != null) {
-                        BusApp.getPosManager().setFTP(ftpEntity);
-                        BusToast.showToast(BusApp.getInstance(), "FTP设置成功\n重启生效", true);
-                    }
+
                     break;
                 case QRCode.CONFIG_CODE_MCH:
 
@@ -65,7 +59,6 @@ public class XBPosReportManager {
                     Util.updateUnionParam(unionPayParam);
                     break;
                 case QRCode.QR_MOREN:
-                    LINEntity linEntityMore = new Gson().fromJson(qrcode.substring(10, qrcode.length()), LINEntity.class);
 
 
                     break;

@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 
 import com.szxb.buspay.R;
+import com.szxb.mlog.SLog;
 
 
 /**
@@ -25,34 +26,33 @@ public class SoundPoolUtil {
     private static Context mContext;
 
     private static int sounds[] = new int[]{
-            R.raw.scan_success,//1.扫码成功
-            R.raw.ec_re_qr_code,//2.请刷新二维码
-            R.raw.ec_code_time,//3.二维码过期
-            R.raw.ec_card_cert_time,//4.请联网刷新二维码
-            R.raw.ec_fee,//5.超出最大金额
-            R.raw.verify_fail,//6.验码失败
-            R.raw.ec_balance,//7.余额不足
-            R.raw.ic_base,//8,铛
-            R.raw.ic_base2,//9,铛铛
-            R.raw.ic_dis,//10.优惠卡
-            R.raw.ic_emp,//11.员工卡
-            R.raw.ic_blood,//12.无偿献血卡
-            R.raw.ic_free,//13.免费卡
-            R.raw.ic_honor,//14.荣军卡
-            R.raw.ic_old,//15.老年卡
-            R.raw.ic_student,//16.学生卡
-            R.raw.ic_invalid,//17.卡失效
-            R.raw.ic_love,//18.爱心卡
-            R.raw.ic_to_work,//19.上班
-            R.raw.ic_off_work,//20.下班
-            R.raw.ic_push_money,//21请投币
-            R.raw.ic_re,//22重新刷卡
-            R.raw.ic_yearly,//23请年检
-            R.raw.qr_error,//24.二维码有误
-            R.raw.ic_recharge,//25.请充值
-            R.raw.ic_defect,//26.优抚卡
-            R.raw.ic_manager,//27.管理卡
-            R.raw.ic_month,//26.月票卡
+            R.raw.scan_success,//扫码成功
+            R.raw.ec_re_qr_code,//请刷新二维码
+            R.raw.ec_fee,//超出最大金额
+            R.raw.verify_fail,//验码失败
+            R.raw.ec_balance,//余额不足
+            R.raw.ic_base,//铛
+            R.raw.ic_base2,//铛铛
+            R.raw.ic_dis,//优惠卡
+            R.raw.ic_emp,//员工卡
+            R.raw.ic_blood,//无偿献血卡
+            R.raw.ic_free,//免费卡
+            R.raw.ic_honor,//荣军卡
+            R.raw.ic_old,//老年卡
+            R.raw.ic_student,//学生卡
+            R.raw.ic_invalid,//卡失效
+            R.raw.ic_love,//.爱心卡
+            R.raw.ic_to_work,//上班
+            R.raw.ic_off_work,//下班
+            R.raw.ic_push_money,//请投币
+            R.raw.ic_re,//重新刷卡
+            R.raw.ic_yearly,//请年检
+            R.raw.qr_error,//二维码有误
+            R.raw.ic_recharge,//.请充值
+            R.raw.ic_defect,//.优抚卡
+            R.raw.ic_manager,//管理卡
+            R.raw.ic_month,//月票卡
+            R.raw.beep2,//.当
     };
 
     /**
@@ -75,12 +75,14 @@ public class SoundPoolUtil {
     /**
      * 播放声音
      *
-     * @param soundID
+     * @param soundID .
      */
     public synchronized static void play(int soundID) {
         int play = mSoundPlayer.play(soundID, 1, 1, 0, 0, 1);
         if (play == 0) {
+            SLog.e("SoundPoolUtil(play.java:84)SoundPoolUtil播放失败>>音源ID=" + soundID);
             if (soundID > 0) {
+                SLog.e("SoundPoolUtil(play.java:87)使用playMedia播放");
                 playMedia(sounds[soundID - 1]);
             }
         }
@@ -99,6 +101,7 @@ public class SoundPoolUtil {
             mediaPlayer.start();
         } catch (Exception e) {
             e.printStackTrace();
+            SLog.e("SoundPoolUtil(playMedia.java:106)playMedia播放异常>>>soundID=" + soundID + ">>>>>>>" + e.toString());
         }
 
     }

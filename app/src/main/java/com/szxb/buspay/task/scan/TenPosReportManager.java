@@ -90,6 +90,7 @@ public class TenPosReportManager {
                     posRecord.setUnitno(BusApp.getPosManager().getUnitno());
                     posRecord.setDriveno(BusApp.getPosManager().getDriverNo());
 
+                    //line_name作为line_no处理
                     posRecord.setBus_line_name(BusApp.getPosManager().getLineNo());
 
                     posRecord.setPos_no(BusApp.getPosManager().getPosSN());

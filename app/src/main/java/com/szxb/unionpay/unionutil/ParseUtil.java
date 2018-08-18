@@ -77,7 +77,7 @@ public class ParseUtil {
                 SLog.d("ParseUtil(parseMackey.java:77)银联签到失败[NEQ]");
             }
 
-            SLog.d("ParseUtil(parseMackey.java:80)商户号="+BusllPosManage.getPosManager().getMchId()+",终端号="+BusllPosManage.getPosManager().getPosSn()+",秘钥="+BusllPosManage.getPosManager().getKey());
+            SLog.d("ParseUtil(parseMackey.java:80)商户号=" + BusllPosManage.getPosManager().getMchId() + ",终端号=" + BusllPosManage.getPosManager().getPosSn() + ",秘钥=" + BusllPosManage.getPosManager().getKey());
         }
     }
 

@@ -2,6 +2,7 @@ package com.szxb.buspay.util;
 
 import android.util.Log;
 
+import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
@@ -150,7 +151,7 @@ public class DateUtil {
         int hour = now.get(Calendar.HOUR_OF_DAY);
         int min = now.get(Calendar.MINUTE);
         int sec = now.get(Calendar.SECOND);
-        if (Calendar.getInstance().get(Calendar.YEAR) >= 2018) {
+        if (year >= 2018) {
             try {
                 SLog.d("DateUtil(setK21Time.java:155)开始校准K21时间>>>" + Calendar.getInstance().get(Calendar.YEAR));
                 libszxb.deviceSettime(year, month, day, hour, min, sec);
@@ -166,7 +167,7 @@ public class DateUtil {
      *
      * @param time .
      */
-    public static void setTime(String time) {
+    public static void setTime(String time, boolean isTip) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("zh", "CN"));
             Date date = format.parse(time);
@@ -183,9 +184,19 @@ public class DateUtil {
             int day = calendar.get(Calendar.DAY_OF_MONTH);
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int min = calendar.get(Calendar.MINUTE);
-            BusApp.getInstance().getmService().setDateTime(year, month, day, hour, min);
-            setK21Time();
-            BusToast.showToast(BusApp.getInstance(), "校准成功", true);
+            IToolInterface iToolInterface = BusApp.getInstance().getmService();
+            if (iToolInterface != null) {
+                iToolInterface.setDateTime(year, month, day, hour, min);
+                setK21Time();
+                if (isTip) {
+                    BusToast.showToast(BusApp.getInstance(), "校准成功", true);
+                }
+            } else {
+                if (isTip) {
+                    BusToast.showToast(BusApp.getInstance(), "校准失败[NULL]", true);
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("DateUtil(setTime.java:190)时间校准失败>>" + e.toString());
