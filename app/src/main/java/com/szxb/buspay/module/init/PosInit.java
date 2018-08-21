@@ -231,7 +231,7 @@ public class PosInit {
                             }
                         }
                     }
-                    SLog.d("PosInit(call.java:188)" + jsonObject);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

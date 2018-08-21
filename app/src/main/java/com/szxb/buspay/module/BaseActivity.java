@@ -14,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.TextView;
 
+import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.R;
 import com.szxb.buspay.db.entity.bean.CntEntity;
@@ -53,6 +54,7 @@ import static com.szxb.buspay.util.Config.POSITION_BUS_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_CHECK_NET;
 import static com.szxb.buspay.util.Config.POSITION_CNT;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_1_M;
+import static com.szxb.buspay.util.Config.POSITION_EXPORT_3_M;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_7;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_DB;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_LOG;
@@ -99,6 +101,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     protected TextView city_code, ten_mach_id, union_mch_id;
     protected TextView line_name, driver_no, union_pos_sn;
     protected TextView pos_sn, black_version, black_cnt;
+    protected TextView bin_name, app_version,sn;
 
     private void initCntView() {
         ic_card_swipe_cnt = (TextView) findViewById(R.id.ic_card_swipe_cnt);
@@ -136,6 +139,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         pos_sn = (TextView) findViewById(R.id.pos_sn);
         black_version = (TextView) findViewById(R.id.black_version);
         black_cnt = (TextView) findViewById(R.id.black_cnt);
+
+        bin_name = (TextView) findViewById(R.id.bin_name);
+        app_version = (TextView) findViewById(R.id.app_version);
+        sn = (TextView) findViewById(R.id.sn);
     }
 
     //签到view
@@ -223,7 +230,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                             showCnt(qrScanMessage.getCntEntity());
                         } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
                             //网络状态发送改变
-                            hasNetWork(AppUtil.checkNetStatus());
+                            hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -318,6 +325,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             if (zibo != null) {
                 for (ConsumeCard consumeCard : zibo) {
                     MainEntity mainEntity = new MainEntity();
+                    mainEntity.setCardType(consumeCard.getCardType());
                     mainEntity.setType(0);
                     mainEntity.setStatus(consumeCard.getUpStatus());
                     mainEntity.setTime(consumeCard.getTransTime());
@@ -403,7 +411,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         } else if (position == POSITION_EXPORT_LOG) {//日志导出
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_log"));
         } else if (position == POSITION_CHECK_NET) {//检测网络
-            boolean b = AppUtil.checkNetStatus();
+            boolean b = AppUtil.getNetWorkState(getApplicationContext());
             BusToast.showToast(getApplicationContext(), b ? "网络已连接" : "未检测到网络", b);
             onKeyCancel();
         } else if (position == POSITION_TIME) {//校准时间
@@ -414,6 +422,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             export(7);
         } else if (position == POSITION_EXPORT_1_M) {//导出1个月记录
             export(30);
+        } else if (position == POSITION_EXPORT_3_M) {//导出3个月记录
+            export(90);
         } else if (position == POSITION_READ_PARAM) {//参数信息
             onKeyCancel();
             childViewShow = true;
@@ -430,6 +440,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             black_version.setText(String.format("黑名单版本\n%1$s", BusApp.getPosManager().getBlackVersion()));
             long[] longs = DBManager.queryBlackListCnt();
             black_cnt.setText(String.format("黑名单数量\n%1$d|%2$d", longs[0], longs[1]));
+            bin_name.setText(String.format("BIN版本\n%1$s", BuildConfig.BIN_NAME));
+            app_version.setText(String.format("软件版本\n%1$s", AppUtil.getVersionName(this)));
+            sn.setText(String.format("SN编号\n%1$s", BusApp.getPosManager().getPosSN()));
         }
     }
 
@@ -508,7 +521,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     @Override
     protected void onResume() {
         super.onResume();
-        hasNetWork(AppUtil.checkNetStatus());
+        hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
     }
 
     private void hasNetWork(boolean b) {

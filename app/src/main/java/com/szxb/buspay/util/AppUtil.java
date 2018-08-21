@@ -75,9 +75,34 @@ public class AppUtil {
      */
     public static boolean checkNetStatus() {
         ConnectivityManager cm = (ConnectivityManager) BusApp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo current = cm.getActiveNetworkInfo();
-        return current != null && current.isAvailable();
+        NetworkInfo networkInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        Boolean isWifiConn = networkInfo.isConnected();
+        NetworkInfo networkInfo_ = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        Boolean isMobileConn = networkInfo_.isConnected();
+        return isWifiConn || isMobileConn;
     }
+
+    /**
+     * @param context 。
+     * @return 是否有网络
+     */
+    public static boolean getNetWorkState(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager
+                .getActiveNetworkInfo();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            if (activeNetworkInfo.getType() == (ConnectivityManager.TYPE_WIFI)) {
+                return true;
+            } else if (activeNetworkInfo.getType() == (ConnectivityManager.TYPE_MOBILE)) {
+                return true;
+            }
+        } else {
+            return false;
+        }
+        return false;
+    }
+
 
     /**
      * 将sp值转换为px值，保证文字大小不变

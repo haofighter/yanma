@@ -52,7 +52,9 @@ public class SoundPoolUtil {
             R.raw.ic_defect,//.优抚卡
             R.raw.ic_manager,//管理卡
             R.raw.ic_month,//月票卡
-            R.raw.beep2,//.当
+            R.raw.beep2,//.设置音
+            R.raw.ic_lllegal_card,//.非法卡
+            R.raw.ic_error,//.错误
     };
 
     /**

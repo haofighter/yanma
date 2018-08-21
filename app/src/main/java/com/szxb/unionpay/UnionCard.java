@@ -9,6 +9,7 @@ import com.szxb.buspay.db.dao.UnionAidEntityDao;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.szxb.buspay.task.card.CommonBase.notice;
 import static com.szxb.buspay.util.DateUtil.getCurrentDate;
 import static com.szxb.unionpay.config.UnionConfig.EXCEPTION;
 import static com.szxb.unionpay.config.UnionConfig.INVALID;
@@ -104,9 +106,13 @@ public class UnionCard {
 
         try {
             money = BusApp.getPosManager().getUnionPayPrice();
-//            money = 1;
-            do {
 
+            if (money > 1500) {
+                notice(Config.EC_FEE, "金额超出最大限制[" + money + "]", false);
+                return;
+            }
+
+            do {
                 String sAID = "00A40400" + String.format("%02X", aid.length() / 2) + aid;
                 String[] retStr = libszxb.RFID_APDU(sAID);
 

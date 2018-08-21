@@ -2,6 +2,7 @@ package com.szxb.buspay;
 
 import android.graphics.Color;
 import android.os.Message;
+import android.os.RemoteException;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -29,7 +30,6 @@ import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
-import com.szxb.java8583.module.manager.BusllPosManage;
 
 import java.util.concurrent.TimeUnit;
 
@@ -80,6 +80,19 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                                     new LoopCardThread()
                             , 1000, 200, TimeUnit.MILLISECONDS);
         }
+
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BusApp.getInstance().getmService().setDateTime(2018,8,21,11,23,56);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 5000);
+
     }
 
     private void initDatas() {
@@ -87,11 +100,10 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         if (TextUtils.equals(driverNo, String.format("%08d", 0))) {
             main_sign.setVisibility(View.VISIBLE);
         }
-
         setPrices();
         station_name.setText(BusApp.getPosManager().getChinese_name());
         sign_time.setText(DateUtil.getCurrentDate("yyyy-MM-dd"));
-        version_name.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()), BusApp.getPosManager().isSuppUnionPay() ? BusllPosManage.getPosManager().getPosSn() : BuildConfig.BIN_NAME));
+        version_name.setText(String.format("[%1$s]", AppUtil.getVersionName(getApplicationContext())));
         sign_version.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()), BuildConfig.BIN_NAME));
         sign_bus_no.setText(BusApp.getPosManager().getBusNo());
         bus_no.setText(String.format("车辆号:%1$s\n司机号:%2$s",
@@ -148,7 +160,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                 setPrices();
                 break;
             case QRCode.UPDATE_UNION_PARAMS:
-                version_name.setText(String.format("[%1$s]\n%2$s", AppUtil.getVersionName(getApplicationContext()), BusApp.getPosManager().isSuppUnionPay() ? BusllPosManage.getPosManager().getPosSn() : BuildConfig.BIN_NAME));
+
                 break;
             default:
                 break;

@@ -2,10 +2,12 @@ package com.szxb.buspay.module.init;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.szxb.buspay.BusApp;
@@ -54,11 +56,16 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
     private TextView update_info;
     private PosInit init;
 
+    private AnimationDrawable drawable;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity);
         update_info = (TextView) findViewById(R.id.update_info);
+        ImageView progress = (ImageView) findViewById(R.id.progress);
+        drawable= (AnimationDrawable) progress.getBackground();
+        drawable.start();
         TextView tip_info = (TextView) findViewById(R.id.tip_info);
         tip_info.setText(String.format("温馨提示:\n\t\t\t\t%1$s", Config.tip()));
         update_info.setText("微信同步中\n");
@@ -253,6 +260,14 @@ public class InitActivity extends AppCompatActivity implements InitOnListener {
         if (wcOk && binOk) {
             startActivity(new Intent(InitActivity.this, MainActivity.class));
             finish();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (drawable!=null){
+            drawable.stop();
         }
     }
 }

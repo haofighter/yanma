@@ -169,7 +169,7 @@ public class DateUtil {
      */
     public static void setTime(String time, boolean isTip) {
         try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("zh", "CN"));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale("zh", "CN"));
             Date date = format.parse(time);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
@@ -178,15 +178,18 @@ public class DateUtil {
             calendar.get(Calendar.DATE);
             calendar.get(Calendar.HOUR);
             calendar.get(Calendar.MINUTE);
+            calendar.get(Calendar.SECOND);
 
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH) + 1;
             int day = calendar.get(Calendar.DAY_OF_MONTH);
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
             int min = calendar.get(Calendar.MINUTE);
+            int second = calendar.get(Calendar.SECOND);
+
             IToolInterface iToolInterface = BusApp.getInstance().getmService();
             if (iToolInterface != null) {
-                iToolInterface.setDateTime(year, month, day, hour, min);
+                iToolInterface.setDateTime(year, month, day, hour, min, second);
                 setK21Time();
                 if (isTip) {
                     BusToast.showToast(BusApp.getInstance(), "校准成功", true);

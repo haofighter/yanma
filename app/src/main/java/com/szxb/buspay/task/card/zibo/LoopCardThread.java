@@ -250,11 +250,11 @@ public class LoopCardThread extends Thread {
 
             } else if (status.equalsIgnoreCase("F1")) {
                 //卡片未启用
-                notice(Config.IC_PUSH_MONEY, "卡片未启用[F1]", false);
+                notice(Config.IC_ERROR, "卡片未启用[F1]", false);
                 this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F2")) {
                 //卡片过期
-                notice(Config.IC_PUSH_MONEY, "卡片过期[F2]", false);
+                notice(Config.IC_ERROR, "卡片过期[F2]", false);
                 DateUtil.setK21Time();
                 this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F3")) {
@@ -263,7 +263,7 @@ public class LoopCardThread extends Thread {
                 this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F4")) {
                 //此卡为黑名单卡(已经锁了)
-                notice(Config.IC_PUSH_MONEY, "黑名单卡[F4]", false);
+                notice(Config.IC_LLLEGAL, "黑名单卡[F4]", false);
                 this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F5")) {
                 //不是本系统卡

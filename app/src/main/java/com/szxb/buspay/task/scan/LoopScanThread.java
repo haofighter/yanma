@@ -56,7 +56,7 @@ public class LoopScanThread extends Thread {
                     }
                     PosScanManager.getInstance().xbposScan(result);
                 } else {
-                    BusToast.showToast(BusApp.getInstance(), "二维码有误", false);
+//                    BusToast.showToast(BusApp.getInstance(), "二维码有误", false);
                 }
                 tem = result;
                 lastTime = SystemClock.elapsedRealtime();

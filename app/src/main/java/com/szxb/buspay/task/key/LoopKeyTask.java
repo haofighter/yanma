@@ -106,8 +106,8 @@ public class LoopKeyTask {
                     SLog.d("LoopKeyTask(keyBord.java:106)接收到半价通知>>");
                     int basePrices = BusApp.getPosManager().getBasePrice();
                     int halfPrices = basePrices / 2;
-                    if (halfPrices > 900) {
-                        BusToast.showToast(BusApp.getInstance(), "键盘按键出了小差\n请重试[" + halfPrices + "]", false);
+                    if (halfPrices > 450) {
+                        BusToast.showToast(BusApp.getInstance(), "按键金额超出限制\n请重试[" + halfPrices + "]", false);
                         return;
                     }
                     BusApp.getPosManager().setBasePrice(halfPrices);
@@ -124,7 +124,16 @@ public class LoopKeyTask {
                     tempPrices = null;
                 }
                 break;
-            default:
+            case "30":
+            case "31":
+            case "32":
+            case "33":
+            case "34":
+            case "35":
+            case "36":
+            case "37":
+            case "38":
+            case "39":
                 if (BusApp.getPosManager().getLineInfoEntity() == null) {
                     BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
                     return;
@@ -133,13 +142,14 @@ public class LoopKeyTask {
                 SLog.d("LoopKeyTask(keyBord.java:122)接收到键盘命令>>开始更新票价>>票价=" + s);
                 int code = Util.string2Int(s);
                 if (code * 100 > 900) {
-                    BusToast.showToast(BusApp.getInstance(), "键盘按键出了小差\n请重试[" + s + "]", false);
+                    BusToast.showToast(BusApp.getInstance(), "按键金额超出限制\n请重试[" + s + "]", false);
                     return;
                 }
-                BusApp.getPosManager().setBasePrice(code * 100);
+                int basePrice = code * 100;
+                BusApp.getPosManager().setBasePrice(basePrice);
                 String[] coefficient = BusApp.getPosManager().getCoefficent();
-                BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * (code * 100) / 100);
-                BusApp.getPosManager().setUnionPayPrice(string2Int(coefficient[9]) * (code * 100) / 100);
+                BusApp.getPosManager().setWcPrice(string2Int(coefficient[8]) * code);
+                BusApp.getPosManager().setUnionPayPrice(string2Int(coefficient[9]) * code);
                 BusApp.getPosManager().setHalfPrices(false);
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.KEY_CODE));
 

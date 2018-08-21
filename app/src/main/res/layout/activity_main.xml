@@ -14,7 +14,7 @@
         android:id="@+id/net_status"
         android:layout_width="match_parent"
         android:layout_height="23dp"
-        android:background="@color/colorAccent"
+        android:background="@color/colorEx"
         android:text="网络连接异常"
         android:gravity="center"
         android:textColor="@color/colorWhite"

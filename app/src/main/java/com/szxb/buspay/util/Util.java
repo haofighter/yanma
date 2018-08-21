@@ -6,11 +6,8 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.db.entity.bean.QRCode;
-import com.szxb.buspay.db.entity.bean.QRScanMessage;
-import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
-import com.szxb.buspay.util.rx.RxBus;
+import com.szxb.buspay.task.card.zibo.CardTypeZiBo;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.SignIn;
@@ -254,6 +251,31 @@ public class Util {
 
 
     /**
+     * @param cardType 卡类型
+     * @return 淄博
+     */
+    public static String getCardTypeText(String cardType) {
+        if (TextUtils.isEmpty(cardType)) {
+            return "";
+        }
+        switch (cardType) {
+            case CardTypeZiBo.CARD_NORMAL:
+                return "[普通卡]";
+            case CardTypeZiBo.CARD_MEMORY:
+                return "[纪念卡]";
+            case CardTypeZiBo.CARD_STUDENT:
+                return "[学生卡]";
+            case CardTypeZiBo.CARD_OLD:
+                return "[老年卡]";
+            case CardTypeZiBo.CARD_FREE:
+                return "[免费卡]";
+            case CardTypeZiBo.CARD_EMP:
+                return "[员工卡]";
+        }
+        return "";
+    }
+
+    /**
      * @param fileName 文件名
      * @param context  .
      * @return 本地配置参数
@@ -343,7 +365,7 @@ public class Util {
             Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
             UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
 
-            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.UPDATE_UNION_PARAMS));
+//            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.UPDATE_UNION_PARAMS));
         }
     }
 }

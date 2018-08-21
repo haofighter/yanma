@@ -103,6 +103,10 @@ public class Config {
 
     public static final int IC_SET = IC_MONTH + 1;//.设置音
 
+    public static final int IC_LLLEGAL = IC_SET + 1;//.非法卡
+
+    public static final int IC_ERROR = IC_LLLEGAL + 1;//错误
+
 
     //菜单
     //公交卡刷卡

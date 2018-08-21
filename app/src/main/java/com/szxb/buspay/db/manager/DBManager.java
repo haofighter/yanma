@@ -296,8 +296,13 @@ public class DBManager {
                 + startTime
                 + " AND "
                 + endTime
-                + " AND "
-                + "CARD_TYPE != '0A'";//扣次卡除外
+                + " AND " + "CARD_TYPE != '0A'"//扣次卡除外
+                + " AND " + "CARD_TYPE != '10'"//线路卡除外
+                + " AND " + "CARD_TYPE != '11'"//下班卡除外
+                + " AND " + "CARD_TYPE != '12'"//签点卡除外
+                + " AND " + "CARD_TYPE != '13'"//检测卡除外
+                + " AND " + "CARD_TYPE != '18'"//稽查卡除外
+                + " AND " + "CARD_TYPE != '06'";//员工卡也除外
 
         int[] cnt = cnt(icSql);
 

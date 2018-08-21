@@ -12,6 +12,7 @@ public class MainEntity {
     private String card_money;
     private String pay_money;
     private String time;
+    private String cardType;
     private int status;
     private int type;//0:刷卡，1：扫码，2：银联卡
 
@@ -29,6 +30,14 @@ public class MainEntity {
         this.card_money = card_money;
         this.pay_money = pay_money;
         this.time = time;
+    }
+
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
     public int getType() {

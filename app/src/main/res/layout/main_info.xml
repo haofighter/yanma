@@ -133,6 +133,42 @@
                 android:textSize="18sp" />
         </TableRow>
 
+        <TableRow
+            android:divider="@drawable/line"
+            android:orientation="horizontal"
+            android:showDividers="beginning|middle|end">
+
+            <TextView
+                android:id="@+id/bin_name"
+                android:layout_width="1dp"
+                android:layout_height="80dp"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:padding="8dp"
+                android:text="BIN版本\nQ600000000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/app_version"
+                android:layout_width="1dp"
+                android:layout_height="80dp"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:padding="8dp"
+                android:text="程序版本\n1.0.0"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/sn"
+                android:layout_width="1dp"
+                android:layout_height="80dp"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:padding="8dp"
+                android:text="预留"
+                android:textSize="18sp" />
+        </TableRow>
+
     </TableLayout>
 
 </LinearLayout>
