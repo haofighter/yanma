@@ -11,12 +11,12 @@
         android:id="@+id/tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:gravity="center"
+        android:layout_marginLeft="5dp"
         android:text="同步中"
         android:textColor="@color/colorWhite"
-        android:textSize="28sp" />
+        android:textSize="23sp" />
 
     <ImageView
         android:id="@+id/progress"
@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="11dp"
+        android:layout_centerHorizontal="true"
         android:layout_toRightOf="@id/tip"
         android:background="@drawable/progress_list" />
 

@@ -5,11 +5,14 @@ import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.LINEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
-import com.szxb.buspay.module.init.PosInit;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.update.BaseRequest;
 import com.szxb.mlog.SLog;
+
+import java.util.List;
 
 /**
  * 作者: Tangren on 2017-09-08
@@ -60,7 +63,6 @@ public class XBPosReportManager {
                     break;
                 case QRCode.QR_MOREN:
 
-
                     break;
                 default:
                     BusToast.showToast(BusApp.getInstance(), "线路正在更新", true);
@@ -69,8 +71,9 @@ public class XBPosReportManager {
                     if (linEntity != null) {
                         String fileName = HexUtil.fileName(linEntity.getL());
                         SLog.d("XBPosReportManager(posScan.java:70)需要下载的文件名：" + fileName);
-                        PosInit init = new PosInit();
-                        init.downloadAppointFile(fileName, linEntity.getN());
+
+                        List<BaseRequest> taskList = AppUtil.getDownloadAppointFileList(fileName, linEntity.getN());
+                        AppUtil.run(taskList, null);
                     }
                     break;
             }

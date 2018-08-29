@@ -325,7 +325,7 @@ public class UnionCard {
                 payEntity.setMainCardNo(mainCardNo);
                 payEntity.setBatchNum(BusllPosManage.getPosManager().getBatchNum());
                 payEntity.setBus_line_name(BusApp.getPosManager().getChinese_name());
-                payEntity.setBus_line_no(BusApp.getPosManager().getLineName());
+                payEntity.setBus_line_no(BusApp.getPosManager().getLineNo());
                 payEntity.setDriverNum(BusApp.getPosManager().getDriverNo());
                 payEntity.setUnitno(BusApp.getPosManager().getUnitno());
                 payEntity.setUpStatus(1);//0已支付、1未支付

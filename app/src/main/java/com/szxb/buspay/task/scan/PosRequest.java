@@ -9,16 +9,19 @@ import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.CallServer;
 import com.szxb.buspay.http.HttpListener;
 import com.szxb.buspay.http.JsonRequest;
-import com.szxb.buspay.module.init.PosInit;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
+import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.update.BaseRequest;
 import com.szxb.mlog.SLog;
 import com.yanzhenjie.nohttp.rest.Response;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import static com.szxb.buspay.util.Config.QR_ERROR;
@@ -55,8 +58,8 @@ public class PosRequest {
                 SoundPoolUtil.play(SCAN_SUCCESS);
                 BusToast.showToast(BusApp.getInstance(), "扫码成功", true);
                 message.getPosRecord().setMch_trx_id(BusApp.getPosManager().getmchTrxId());
-//                Map<String, Object> map = ParamsUtil.requestMap(message.getPosRecord());
-//                requestTX(1000, Config.XBPAY, map);
+                Map<String, Object> map = ParamsUtil.requestMap(message.getPosRecord());
+                requestTX(1000, Config.XBPAY, map);
                 break;
             case QRCode.QR_ERROR://非腾讯或者小兵二维码
             case QRCode.EC_CARD_CERT_SIGN_ALG_NOT_SUPPORT://卡证书签名算法不支持
@@ -104,8 +107,8 @@ public class PosRequest {
                 SoundPoolUtil.play(Config.VERIFY_FAIL);
                 BusToast.showToast(BusApp.getInstance(), "验码失败[" + message.getResult() + "]", false);
                 if (message.getResult() == -1) {
-                    PosInit posInit = new PosInit();
-                    posInit.init();
+                    List<BaseRequest> taskList = AppUtil.getScanInit();
+                    AppUtil.run(taskList, null);
                 }
                 break;
         }

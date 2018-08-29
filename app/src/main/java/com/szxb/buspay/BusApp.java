@@ -12,6 +12,7 @@ import com.lilei.tool.tool.IToolInterface;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
 import com.szxb.buspay.task.TaskDelFile;
+import com.szxb.buspay.task.service.RecordThread;
 import com.szxb.buspay.task.service.TimeSettleTask;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
@@ -93,13 +94,12 @@ public class BusApp extends Application {
         initService();
 
         //校准时间
-//        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
-
-        //状态上报
-        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
+        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
 
         SophixManager.getInstance().queryAndLoadNewPatch();
         CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
+
+        initTask();
     }
 
     //连接服务
@@ -186,5 +186,23 @@ public class BusApp extends Application {
                     }
                 }).initialize();
 
+    }
+
+    private void initTask() {
+
+        //状态上报
+        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
+
+        if (BusApp.getPosManager().isSuppScanPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 30, 60, TimeUnit.SECONDS);
+        }
+
+        if (BusApp.getPosManager().isSuppIcPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 140, TimeUnit.SECONDS);
+        }
+
+        if (BusApp.getPosManager().isSuppUnionPay()) {
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 30, 160, TimeUnit.SECONDS);
+        }
     }
 }

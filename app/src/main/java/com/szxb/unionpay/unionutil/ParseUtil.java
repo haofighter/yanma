@@ -22,12 +22,17 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 import java.util.Arrays;
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.szxb.java8583.util.EncodeUtil.hex2byte;
 import static com.szxb.java8583.util.MacEcbUtils.bytesToHexString;
@@ -70,7 +75,7 @@ public class ParseUtil {
             arraycopy(crcdata, 0, macCrc, 0, macCrc.length);
             if (Arrays.equals(macCrc, macKeyCrc)) {
                 BusllPosManage.getPosManager().setMacKey(macKeyHex);
-                BusToast.showToast(BusApp.getInstance(), "银联签到成功", true);
+//                BusToast.showToast(BusApp.getInstance(), "银联签到成功", true);
                 SLog.d("ParseUtil(parseMackey.java:74)银联Mac 保存成功");
             } else {
                 BusToast.showToast(BusApp.getInstance(), "银联签到失败[NEQ]", false);
@@ -124,9 +129,9 @@ public class ParseUtil {
     private static int aidCnt = 0;
 
     public static void initUnionPay() {
-        Observable.create(new Observable.OnSubscribe<byte[]>() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<byte[]>() {
             @Override
-            public void call(Subscriber<? super byte[]> subscriber) {
+            public void subscribe(@NonNull ObservableEmitter<byte[]> subscriber) throws Exception {
                 //1.签到
                 BusllPosManage.getPosManager().setTradeSeq();
                 Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
@@ -148,19 +153,19 @@ public class ParseUtil {
                 if (ParseUtil.isUpdateParams()) {
                     subscriber.onNext(exe);
                 } else {
-                    subscriber.isUnsubscribed();
+                    subscriber.isDisposed();
                 }
             }
-        }).flatMap(new Func1<byte[], Observable<byte[]>>() {
+        }).flatMap(new Function<byte[], ObservableSource<byte[]>>() {
             @Override
-            public Observable<byte[]> call(byte[] bytes) {
+            public ObservableSource<byte[]> apply(@NonNull byte[] bytes) throws Exception {
                 //2.查询需要下载的参数
                 byte[] exe = UnionPay.getInstance().exeSyncSSL(ParamDownload.getInstance().aidMessage().getBytes());
                 return Observable.just(exe);
             }
-        }).flatMap(new Func1<byte[], Observable<String>>() {
+        }).flatMap(new Function<byte[], ObservableSource<String>>() {
             @Override
-            public Observable<String> call(byte[] bytes) {
+            public ObservableSource<String> apply(@NonNull byte[] bytes) throws Exception {
                 if (bytes == null) {
                     SLog.d("InitZipActivity(call.java:118)参数查询失败>>");
                 } else {
@@ -177,19 +182,19 @@ public class ParseUtil {
                 SLog.d("InitZipActivity(call.java:125)indexList:" + adiList);
                 String macs[] = adiList.split(",");
                 aidCnt = macs.length;
-                return Observable.from(macs);
+                return Observable.fromArray(macs);
             }
-        }).flatMap(new Func1<String, Observable<byte[]>>() {
+        }).flatMap(new Function<String, ObservableSource<byte[]>>() {
             @Override
-            public Observable<byte[]> call(String s) {
+            public ObservableSource<byte[]> apply(@NonNull String s) throws Exception {
                 //3.依次下载参数
                 SLog.d("InitZipActivity(call.java:140)下载参数中>>");
                 byte[] exe = UnionPay.getInstance().exeSyncSSL(ParamDownload.getInstance().messageAID(s).getBytes());
                 return Observable.just(exe);
             }
-        }).flatMap(new Func1<byte[], Observable<Integer>>() {
+        }).flatMap(new Function<byte[], ObservableSource<Integer>>() {
             @Override
-            public Observable<Integer> call(byte[] bytes) {
+            public ObservableSource<Integer> apply(@NonNull byte[] bytes) throws Exception {
                 Iso8583MessageFactory factory = SingletonFactory.forQuickStart();
                 factory.setSpecialFieldHandle(62, new SpecialField62());
                 Iso8583Message message0810 = factory.parse(bytes);
@@ -200,23 +205,23 @@ public class ParseUtil {
                 aidCnt -= 1;
                 return Observable.just(aidCnt);
             }
-        }).filter(new Func1<Integer, Boolean>() {
+        }).filter(new Predicate<Integer>() {
             @Override
-            public Boolean call(Integer integer) {
+            public boolean test(@NonNull Integer integer) throws Exception {
                 return integer <= 0;
             }
-        }).flatMap(new Func1<Integer, Observable<byte[]>>() {
+        }).flatMap(new Function<Integer, ObservableSource<byte[]>>() {
             @Override
-            public Observable<byte[]> call(Integer integer) {
+            public ObservableSource<byte[]> apply(@NonNull Integer integer) throws Exception {
                 //4.下载参数结束
                 byte[] exe = UnionPay.getInstance().exeSyncSSL(ParamDownload.getInstance().messageAIDEnd().getBytes());
                 return Observable.just(exe);
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<byte[]>() {
+                .subscribe(new Consumer<byte[]>() {
                     @Override
-                    public void call(byte[] bytes) {
+                    public void accept(@NonNull byte[] bytes) throws Exception {
                         Iso8583MessageFactory factory = SingletonFactory.forQuickStart();
                         factory.setSpecialFieldHandle(62, new SpecialField62());
                         Iso8583Message message0810 = factory.parse(bytes);
@@ -226,9 +231,9 @@ public class ParseUtil {
                         }
                         SLog.d("InitZipActivity(call.java:178)" + message0810.toFormatString());
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(@NonNull Throwable throwable) throws Exception {
                         SLog.d("InitZipActivity(call.java:183)更新失败:" + throwable.toString());
                     }
                 });

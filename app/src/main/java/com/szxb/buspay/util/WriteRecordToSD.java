@@ -14,11 +14,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * 作者：Tangren on 2018-01-18
@@ -47,9 +50,9 @@ public class WriteRecordToSD {
 
     public void writer(final int day, final String scanPath, final String cardPath, final String unionPath) {
 
-        Observable.create(new Observable.OnSubscribe<Boolean>() {
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
+            public void subscribe(@NonNull ObservableEmitter<Boolean> subscriber) throws Exception {
                 boolean success = false;
                 try {
                     List<ScanInfoEntity> scanRecord = DBManager.getScanRecordList(day);
@@ -118,18 +121,18 @@ public class WriteRecordToSD {
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Boolean>() {
+                .subscribe(new Consumer<Boolean>() {
                     @Override
-                    public void call(Boolean aBoolean) {
+                    public void accept(@NonNull Boolean aBoolean) throws Exception {
                         if (aBoolean) {
                             BusToast.showToast(BusApp.getInstance(), "导出成功", true);
                         } else {
                             BusToast.showToast(BusApp.getInstance(), "导出失败\n请检查SD卡", false);
                         }
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(@NonNull Throwable throwable) throws Exception {
                         SLog.e("WriteRecordToSD(call.java:133)导出失败>>" + throwable.toString());
                         BusToast.showToast(BusApp.getInstance(), "导出失败\n" + throwable.toString(), false);
                     }

@@ -2,12 +2,15 @@ package com.szxb.buspay.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.FTPEntity;
 import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
 import com.szxb.buspay.task.card.zibo.CardTypeZiBo;
+import com.szxb.buspay.util.ftp.FTP;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.SignIn;
@@ -365,7 +368,45 @@ public class Util {
             Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
             UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
 
-//            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.UPDATE_UNION_PARAMS));
         }
     }
+
+    /**
+     * @param fileName 文件名
+     * @param ftpPath  ftp路径
+     * @param tag      tag
+     * @return 下载
+     */
+    public static boolean download(String fileName, String ftpPath, String tag) {
+        FTPEntity ftpEntity = BusApp.getPosManager().getFTP();
+        return new FTP()
+                .builder(ftpEntity.getI())
+                .setPort(ftpEntity.getP())
+                .setLogin(ftpEntity.getU(), ftpEntity.getPsw())
+                .setFileName(fileName)
+                .setPath(Environment.getExternalStorageDirectory() + "/")
+                .setFTPPath(ftpPath)
+                .setTag(tag)
+                .download();
+    }
+
+    /**
+     * @param forceUpdate 是否强制更新
+     * @param ftpPath  ftp路径
+     * @param tag      tag
+     * @return 下载
+     */
+    public static int downUnionPayParasFile(boolean forceUpdate, String ftpPath, String tag) {
+        FTPEntity ftpEntity = BusApp.getPosManager().getFTP();
+        return new FTP()
+                .builder(ftpEntity.getI())
+                .setPort(ftpEntity.getP())
+                .setLogin(ftpEntity.getU(), ftpEntity.getPsw())
+                .setPosSn(BusApp.getPosManager().getPosSN())
+                .setPath(Environment.getExternalStorageDirectory() + "/")
+                .setFTPPath(ftpPath)
+                .setTag(tag)
+                .downUnionPayParasFile(forceUpdate);
+    }
+
 }

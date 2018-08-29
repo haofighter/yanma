@@ -22,11 +22,9 @@ import com.szxb.buspay.db.entity.bean.MainEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
-import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.interfaces.OnKeyListener;
-import com.szxb.buspay.module.init.PosInit;
 import com.szxb.buspay.task.key.LoopKeyTask;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
@@ -37,6 +35,9 @@ import com.szxb.buspay.util.adapter.HomeParentAdapter;
 import com.szxb.buspay.util.adapter.RecordAdapter;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.update.BaseRequest;
+import com.szxb.buspay.util.update.OnResponse;
+import com.szxb.buspay.util.update.ResponseMessage;
 import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
@@ -44,10 +45,11 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.szxb.buspay.db.manager.DBManager.queryScanRecord;
 import static com.szxb.buspay.util.Config.POSITION_BUS_RECORD;
@@ -74,7 +76,7 @@ import static com.szxb.buspay.util.Util.string2Int;
  * TODO:一句话描述
  */
 
-public abstract class BaseActivity extends AppCompatActivity implements OnKeyListener {
+public abstract class BaseActivity extends AppCompatActivity implements OnKeyListener, OnResponse {
 
     //菜单view
     protected RecyclerView recyclerView;
@@ -101,7 +103,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     protected TextView city_code, ten_mach_id, union_mch_id;
     protected TextView line_name, driver_no, union_pos_sn;
     protected TextView pos_sn, black_version, black_cnt;
-    protected TextView bin_name, app_version,sn;
+    protected TextView bin_name, app_version, sn;
 
     private void initCntView() {
         ic_card_swipe_cnt = (TextView) findViewById(R.id.ic_card_swipe_cnt);
@@ -182,7 +184,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     private LoopKeyTask instance;
 
-    private Subscription subscribe;
+    private Disposable subscribe;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -216,11 +218,12 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     private void initRx() {
         subscribe = RxBus.getInstance().toObservable(QRScanMessage.class)
+                .onBackpressureDrop()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<QRScanMessage>() {
+                .subscribe(new Consumer<QRScanMessage>() {
                     @Override
-                    public void call(QRScanMessage qrScanMessage) {
+                    public void accept(@NonNull QRScanMessage qrScanMessage) throws Exception {
                         message(qrScanMessage);
                         if (qrScanMessage.getResult() == QRCode.STOP_CNT) {
                             //关闭菜单页
@@ -233,13 +236,12 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                             hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
                         }
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(@NonNull Throwable throwable) throws Exception {
                         SLog.d("BaseActivity(call.java:115)Rx异常>>" + throwable.toString());
                     }
                 });
-
     }
 
 
@@ -396,15 +398,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("cnt"));
         } else if (position == POSITION_UPDATE_PARAMS) {//手动更新参数
             BusToast.showToast(BusApp.getInstance(), "开始更新请稍后", true);
-            LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
-            PosInit init = new PosInit();
-            init.init();
-            if (lineInfoEntity != null) {
-                init.download(lineInfoEntity.getFileName());
-            }
-            if (BusApp.getPosManager().isSuppUnionPay()) {
-                init.downUnionPayParamFile(true);
-            }
+            List<BaseRequest> taskList = AppUtil.getRequestList();
+            AppUtil.run(taskList, this);
             onKeyCancel();
         } else if (position == POSITION_EXPORT_DB) {//数据库导出
             ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_db"));
@@ -533,9 +528,17 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         super.onDestroy();
         instance.cancel();
         onKeyCancel();
-        if (subscribe != null && !subscribe.isUnsubscribed()) {
-            subscribe.unsubscribe();
+        if (subscribe != null && !subscribe.isDisposed()) {
+            subscribe.dispose();
         }
     }
 
+    @Override
+    public void response(boolean success, ResponseMessage response) {
+        BusToast.showToast(getApplicationContext(), response.getMsg(),
+                response.getStatus()
+                        == ResponseMessage.SUCCESSFUL || response.getStatus()
+                        == ResponseMessage.SUCCESS || response.getStatus()
+                        == ResponseMessage.NOUPDATE);
+    }
 }

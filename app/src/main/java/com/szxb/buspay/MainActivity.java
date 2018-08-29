@@ -2,7 +2,6 @@ package com.szxb.buspay;
 
 import android.graphics.Color;
 import android.os.Message;
-import android.os.RemoteException;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -42,7 +41,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
     private TextView time, station_name, prices, version_name, bus_no;
     private TextView sign_time, sign_version, sign_bus_no;
 
-
     @Override
     protected int rootView() {
         return R.layout.activity_main;
@@ -80,18 +78,6 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
                                     new LoopCardThread()
                             , 1000, 200, TimeUnit.MILLISECONDS);
         }
-
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    BusApp.getInstance().getmService().setDateTime(2018,8,21,11,23,56);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 5000);
 
     }
 

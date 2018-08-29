@@ -3,12 +3,14 @@ package com.szxb.buspay.util;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.util.rx.RxBus;
+import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 
@@ -251,6 +253,7 @@ public class HexUtil {
         }
         if (AppUtil.isForeground("com.szxb.buspay.MainActivity")) {
             SLog.d("HexUtil(parseLine.java:252)Rx=" + RxBus.getInstance().hasObservers());
+            SoundPoolUtil.play(Config.IC_SET);
             RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.REFRESH_VIEW));
         }
     }
@@ -262,5 +265,24 @@ public class HexUtil {
     public static boolean checkBlackVersion(String version) {
         String lastBlackVersion = BusApp.getPosManager().getBlackVersion();
         return !TextUtils.equals(lastBlackVersion, version);
+    }
+
+
+    /**
+     * 格式转换
+     *
+     * @param data .
+     */
+    public static JSONObject parseObject(byte[] data) {
+        if (data == null) {
+            return null;
+        }
+        try {
+            return JSONObject.parseObject(new String(data, "GB2312"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            SLog.d("Util(parseObject.java:386)不支持的编码格式" + e.toString());
+        }
+        return null;
     }
 }

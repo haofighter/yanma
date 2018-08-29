@@ -11,7 +11,15 @@ import android.net.NetworkInfo;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.card.LineInfoEntity;
+import com.szxb.buspay.util.update.BaseRequest;
+import com.szxb.buspay.util.update.DownloadBlackRequest;
+import com.szxb.buspay.util.update.DownloadLineRequest;
+import com.szxb.buspay.util.update.DownloadScanRequest;
+import com.szxb.buspay.util.update.DownloadUnionPayRequest;
+import com.szxb.buspay.util.update.OnResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -115,4 +123,84 @@ public class AppUtil {
         return (int) (spValue * fontScale + 0.5f);
     }
 
+    /**
+     * @return 任务队列
+     */
+    public static List<BaseRequest> getRequestList() {
+        List<BaseRequest> taskList = new ArrayList<>();
+        if (BusApp.getPosManager().isSuppUnionPay()) {
+            DownloadUnionPayRequest payRequest = new DownloadUnionPayRequest();
+            payRequest.setForceUpdate(false);
+            taskList.add(payRequest);
+        }
+
+        LineInfoEntity lineInfoEntity = BusApp.getPosManager().getLineInfoEntity();
+        if (lineInfoEntity != null) {
+            DownloadLineRequest lineRequest = new DownloadLineRequest();
+            lineRequest.setFileName(lineInfoEntity.getFileName());
+            lineRequest.setForceUpdate(false);
+            taskList.add(lineRequest);
+        }
+
+        DownloadBlackRequest blackRequest = new DownloadBlackRequest();
+        taskList.add(blackRequest);
+
+        DownloadScanRequest scanRequest = new DownloadScanRequest();
+        taskList.add(scanRequest);
+
+        return taskList;
+    }
+
+    /**
+     * @param fileName 线路文件名
+     * @param busNo    车辆号
+     * @return 指定更新线路
+     */
+    public static List<BaseRequest> getDownloadAppointFileList(String fileName, final String busNo) {
+        List<BaseRequest> taskList = new ArrayList<>();
+        DownloadLineRequest lineRequest = new DownloadLineRequest();
+        lineRequest.setFileName(fileName);
+        lineRequest.setBusNo(busNo);
+        lineRequest.setForceUpdate(true);
+        taskList.add(lineRequest);
+        return taskList;
+    }
+
+    /**
+     * @return 二维码任务
+     */
+    public static List<BaseRequest> getScanInit() {
+        List<BaseRequest> taskList = new ArrayList<>();
+        DownloadScanRequest scanRequest = new DownloadScanRequest();
+        taskList.add(scanRequest);
+        return taskList;
+    }
+
+    /**
+     * 执行更新任务
+     *
+     * @param taskList   任务队列
+     * @param onResponse 回调
+     */
+    public static void run(List<BaseRequest> taskList, OnResponse onResponse) {
+        for (Object object : taskList) {
+            if (object instanceof DownloadBlackRequest) {
+                DownloadBlackRequest blackRequest = (DownloadBlackRequest) object;
+                blackRequest.getDisposable();
+                blackRequest.setOnResponse(onResponse);
+            } else if (object instanceof DownloadLineRequest) {
+                DownloadLineRequest lineRequest = (DownloadLineRequest) object;
+                lineRequest.getDisposable();
+                lineRequest.setOnResponse(onResponse);
+            } else if (object instanceof DownloadScanRequest) {
+                DownloadScanRequest scanRequest = (DownloadScanRequest) object;
+                scanRequest.getDisposable();
+                scanRequest.setOnResponse(onResponse);
+            } else if (object instanceof DownloadUnionPayRequest) {
+                DownloadUnionPayRequest unionRequest = (DownloadUnionPayRequest) object;
+                unionRequest.getDisposable();
+                unionRequest.setOnResponse(onResponse);
+            }
+        }
+    }
 }

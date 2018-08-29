@@ -42,13 +42,13 @@ android {
          * 4：荣成
          * 5：潍坊
          */
-        zibo_app {
-            versionCode 100
-            versionName "1.0.1"
-            buildConfigField 'String', 'LOG_TAG', '"zibo"'
-            buildConfigField 'String', 'BIN_NAME', '"zibo.bin"'
-            buildConfigField 'int', 'CITY', '0'
-        }
+//        zibo_app {
+//            versionCode 100
+//            versionName "1.0.1"
+//            buildConfigField 'String', 'LOG_TAG', '"zibo"'
+//            buildConfigField 'String', 'BIN_NAME', '"zibo.bin"'
+//            buildConfigField 'int', 'CITY', '0'
+//        }
 //
 //        taian_app {
 //            versionCode 100
@@ -58,13 +58,13 @@ android {
 //            buildConfigField 'int', 'CITY', '1'
 //        }
 
-//        zhaoyuan_app {
-//            versionCode 100
-//            versionName "1.0.5"
-//            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
-//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
-//            buildConfigField 'int', 'CITY', '3'
-//        }
+        zhaoyuan_app {
+            versionCode 100
+            versionName "1.0.5"
+            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
+            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
+            buildConfigField 'int', 'CITY', '3'
+        }
 
     }
 
@@ -96,8 +96,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     testCompile 'junit:junit:4.12'
     compile 'com.alibaba:fastjson:1.2.34'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.2.4'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
     compile 'com.google.code.gson:gson:2.2.4'
     //日志
     compile 'com.github.wuxinxi:MLog:1.0.3'

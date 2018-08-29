@@ -37,6 +37,8 @@ public class FTP {
     private String sinfileName;
     private List<InputStream> input;
 
+    private String tag = "TAG";
+
 
     private String[] ftpPaths;
     private String packgeName;
@@ -91,6 +93,15 @@ public class FTP {
 
     public FTP setPosSn(String posSn) {
         this.posSn = posSn;
+        return this;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public FTP setTag(String tag) {
+        this.tag = tag;
         return this;
     }
 
@@ -170,12 +181,12 @@ public class FTP {
             ftp.setDataTimeout(12000);
             //判断是否连接上ftp
             if (!FTPReply.isPositiveCompletion(reply)) {
-                SLog.d("FTP(download.java:163)FTP连接失败");
+                SLog.d("FTP(download.java:163)FTP连接失败>>tag=" + getTag());
                 ftp.disconnect();
                 return false;
             }
 
-            SLog.d("FTP(download.java:168)FTP连接成功");
+            SLog.d("FTP(download.java:168)FTP连接成功>>tag=" + getTag());
             ftp.enterLocalPassiveMode();
             ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
 
@@ -185,7 +196,7 @@ public class FTP {
             buffOut = new BufferedOutputStream(new FileOutputStream(path + sinfileName), 8 * 1024);
             success = ftp.retrieveFile(ftpPath, buffOut);
 
-            SLog.d("FTP(download.java:178)检索文件：" + success);
+            SLog.d("FTP(download.java:178)检索文件：" + success + ">>tag=" + getTag());
 
             buffOut.flush();
             buffOut.close();
@@ -197,13 +208,15 @@ public class FTP {
                 try {
                     ftp.disconnect();
                 } catch (IOException ioe) {
-                    SLog.d("FTP(download.java:188)IOException>>" + ioe.toString());
+                    ioe.printStackTrace();
+                    SLog.e("FTP(download.java:188)IOException>>>>tag=" + getTag() + ">>" + ioe.toString());
+                    success = false;
                 }
             }
         } catch (IOException e) {
             success = false;
-            SLog.d("FTP(download.java:193)FTP异常" + e.toString());
             e.printStackTrace();
+            SLog.e("FTP(download.java:193)FTP异常>>tag=" + getTag() + ">>>" + e.toString());
         }
 
         return success;

@@ -3,10 +3,9 @@ package com.szxb.buspay.util.rx;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.mlog.SLog;
 
-import rx.Observable;
-import rx.subjects.PublishSubject;
-import rx.subjects.SerializedSubject;
-import rx.subjects.Subject;
+import io.reactivex.Flowable;
+import io.reactivex.processors.FlowableProcessor;
+import io.reactivex.processors.PublishProcessor;
 
 /**
  * 作者: Tangren on 2017/7/31
@@ -18,11 +17,11 @@ import rx.subjects.Subject;
 public class RxBus {
 
     private static volatile RxBus instance;
-    private final Subject<Object, Object> bus;
+    private final FlowableProcessor<Object> bus;
 
     private RxBus() {
-        bus = new SerializedSubject<>(PublishSubject.create());
-        SLog.d("RxBus(RxBus.java:24)RxBus是否订阅成功>>" + bus.hasObservers());
+        bus = PublishProcessor.create().toSerialized();
+        SLog.d("RxBus(RxBus.java:24)RxBus是否订阅成功>>" + bus.hasSubscribers());
     }
 
     /**
@@ -47,9 +46,7 @@ public class RxBus {
      * @param o
      */
     public void send(QRScanMessage o) {
-        do {
-            bus.onNext(o);
-        } while (!hasObservers());
+        bus.onNext(o);
     }
 
     /**
@@ -68,15 +65,19 @@ public class RxBus {
      * @param <T>
      * @return
      */
-    public <T> Observable<T> toObservable(Class<T> eventType) {
+    public <T> Flowable<T> toObservable(Class<T> eventType) {
         return bus.ofType(eventType);
+    }
+
+    public Flowable<Object> toObservable() {
+        return bus;
     }
 
     /**
      * 判断是否有订阅者
      */
     public boolean hasObservers() {
-        return bus.hasObservers();
+        return bus.hasSubscribers();
     }
 
 }
