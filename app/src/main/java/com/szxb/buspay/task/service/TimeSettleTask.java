@@ -1,8 +1,7 @@
 package com.szxb.buspay.task.service;
 
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Intent;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.szxb.buspay.BusApp;
@@ -18,18 +17,17 @@ import java.util.concurrent.TimeUnit;
  * TODO:定时处理未按时结算的订单
  */
 
-public class TimeSettleTask extends Service {
+public class TimeSettleTask extends IntentService {
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    /**
+     * Creates an IntentService.  Invoked by your subclass's constructor.
+     */
+    public TimeSettleTask() {
+        super("TimeSettleTask");
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
+    protected void onHandleIntent(@Nullable Intent intent) {
         if (BusApp.getPosManager().isSuppScanPay()) {
             ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 30, 60, TimeUnit.SECONDS);
         }
@@ -42,7 +40,6 @@ public class TimeSettleTask extends Service {
             ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 30, 160, TimeUnit.SECONDS);
         }
     }
-
 
     @Override
     public void onDestroy() {
