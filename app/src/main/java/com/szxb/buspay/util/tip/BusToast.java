@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,16 +84,22 @@ public class BusToast extends Toast {
                     mToast = showTopay(context, text, isOk);
                     mToast.show();
                     firstTime = SystemClock.elapsedRealtime();
+                    Log.d("BusToast",
+                            "run(BusToast.java:88)mToast == null>>>提示" + text);
                 } else {
                     secondTime = System.currentTimeMillis();
                     if (text.equals(temStr)) {
                         if (secondTime - firstTime > Toast.LENGTH_SHORT) {
                             mToast.show();
+                            Log.d("BusToast",
+                                "run(BusToast.java:95)text.equals(temStr)>>>提示" + text);
                         }
                     } else {
                         temStr = (String) text;
-                        mToast.setView(getView(isOk, temStr));
+                        mToast.setView(getView(isOk, text));
                         mToast.show();
+                        Log.d("BusToast",
+                            "run(BusToast.java:102) temStr = (String) text>>>>"+text);
                     }
                 }
                 firstTime = secondTime;

@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class RecordThread extends Thread {
 
-    public RecordThread(String name) {
+    public  RecordThread(String name) {
         super(name);
     }
 
@@ -142,7 +142,7 @@ public class RecordThread extends Thread {
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
             try {
-                SLog.d("RecordThread(icRecordTask.java:111)" + execute.toString());
+                SLog.d("RecordThread(icRecordTask.java:111)" + execute.get().toJSONString());
                 JSONObject object = execute.get();
                 String rescode = object.getString("rescode");
                 if (TextUtils.equals(rescode, "0000")) {

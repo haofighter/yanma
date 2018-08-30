@@ -16,6 +16,8 @@ import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.tip.MainLooper;
+import com.szxb.buspay.util.tip.MyToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 
@@ -158,7 +160,9 @@ public class CommonBase {
      */
     public static void notice(int music, String tipVar, boolean isOk) {
         SoundPoolUtil.play(music);
-        BusToast.showToast(BusApp.getInstance(), tipVar, isOk);
+//        BusToast.showToast(BusApp.getInstance(), tipVar, isOk);
+        MyToast.showToast(BusApp.getInstance(), tipVar, isOk);
+
     }
 
     /**

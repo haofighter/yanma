@@ -127,7 +127,7 @@ public class LoopCardThread extends Thread {
             searchCard = null;
         } catch (Exception e) {
             e.printStackTrace();
-            SLog.d("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
+            SLog.e("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
         }
     }
 

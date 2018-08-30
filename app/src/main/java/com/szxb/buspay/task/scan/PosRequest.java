@@ -16,6 +16,7 @@ import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.tip.MyToast;
 import com.szxb.buspay.util.update.BaseRequest;
 import com.szxb.mlog.SLog;
 import com.yanzhenjie.nohttp.rest.Response;
@@ -56,7 +57,7 @@ public class PosRequest {
         switch (message.getResult()) {
             case QRCode.EC_SUCCESS:
                 SoundPoolUtil.play(SCAN_SUCCESS);
-                BusToast.showToast(BusApp.getInstance(), "扫码成功", true);
+                MyToast.showToast(BusApp.getInstance(), "扫码成功", true);
                 message.getPosRecord().setMch_trx_id(BusApp.getPosManager().getmchTrxId());
                 Map<String, Object> map = ParamsUtil.requestMap(message.getPosRecord());
                 requestTX(1000, Config.XBPAY, map);

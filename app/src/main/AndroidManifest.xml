@@ -19,6 +19,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".module.init.InitActivity">
@@ -50,7 +51,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".task.service.TimeSettleTask" />
+        <!--<service android:name=".task.service.TimeSettleTask" />-->
 
         <meta-data
             android:name="com.taobao.android.hotfix.IDSECRET"
