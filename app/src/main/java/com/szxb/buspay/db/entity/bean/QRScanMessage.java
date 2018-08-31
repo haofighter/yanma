@@ -16,7 +16,15 @@ public class QRScanMessage {
     private int result;
     private String key;
     private String message;
+    private boolean isOk;
 
+    public boolean isOk() {
+        return isOk;
+    }
+
+    public void setOk(boolean ok) {
+        isOk = ok;
+    }
 
     public PosRecord getPosRecord() {
         return posRecord;

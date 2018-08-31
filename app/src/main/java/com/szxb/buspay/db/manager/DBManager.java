@@ -451,7 +451,7 @@ public class DBManager {
         Query<ScanInfoEntity> qb = dao.queryBuilder()
                 .whereOr(ScanInfoEntityDao.Properties.Status.eq(1), ScanInfoEntityDao.Properties.Status.eq(4))
                 .where(ScanInfoEntityDao.Properties.Time.le(DateUtil.getCurrentDateLastMi(1)))
-                .limit(10).orderDesc(ScanInfoEntityDao.Properties.Id).build();
+                .limit(15).orderDesc(ScanInfoEntityDao.Properties.Id).build();
         return qb.list();
     }
 
@@ -463,7 +463,7 @@ public class DBManager {
         return dao.queryBuilder()
                 .where(ConsumeCardDao.Properties.UpStatus.eq(1))
                 .orderDesc(ConsumeCardDao.Properties.Id)
-                .limit(10).build().list();
+                .limit(15).build().list();
     }
 
 

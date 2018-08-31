@@ -46,17 +46,28 @@ public class MyToast extends Toast {
         MainLooper.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                cancelToast();
-                toast = new MyToast(context);
-                mInflater = LayoutInflater.from(context);
-                View view = getView(isOk, text);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.setDuration(LENGTH_SHORT);
-                toast.setView(view);
-                toast.show();
+                showToast2(context,text,isOk);
             }
         });
 
+    }
+
+
+    /**
+     * 初始化Toast
+     *
+     * @param context 上下文
+     * @param text    显示的文本
+     */
+    public static void showToast2(final Context context, final CharSequence text, final boolean isOk) {
+        cancelToast();
+        toast = new MyToast(context);
+        mInflater = LayoutInflater.from(context);
+        View view = getView(isOk, text);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setDuration(LENGTH_SHORT);
+        toast.setView(view);
+        toast.show();
     }
 
 

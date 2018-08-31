@@ -149,4 +149,7 @@ public class QRCode {
     public static final int KEY_CODE = 27;
 
     public static final int UPDATE_UNION_PARAMS = 28;
+
+    //tip
+    public static final int TIP = 29;
 }

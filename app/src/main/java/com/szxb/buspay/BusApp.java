@@ -196,7 +196,7 @@ public class BusApp extends Application {
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 30, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 20, TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppUnionPay()) {

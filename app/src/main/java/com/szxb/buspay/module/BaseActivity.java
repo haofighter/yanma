@@ -35,6 +35,7 @@ import com.szxb.buspay.util.adapter.HomeParentAdapter;
 import com.szxb.buspay.util.adapter.RecordAdapter;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.tip.MyToast;
 import com.szxb.buspay.util.update.BaseRequest;
 import com.szxb.buspay.util.update.OnResponse;
 import com.szxb.buspay.util.update.ResponseMessage;
@@ -234,6 +235,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                         } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
                             //网络状态发送改变
                             hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
+                        } else if (qrScanMessage.getResult() == QRCode.TIP) {
+                            //刷卡提示
+                            MyToast.showToast2(BusApp.getInstance(), qrScanMessage.getMessage(), qrScanMessage.isOk());
                         }
                     }
                 }, new Consumer<Throwable>() {
