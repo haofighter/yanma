@@ -2,6 +2,7 @@ package com.szxb.buspay.task.card.lw;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
@@ -66,6 +67,7 @@ public class LoopCardThread_GJ extends Thread {
 
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
+                Log.i("获取到卡状态GJ", "   " + searchBytes[0]);
                 return;
             }
 
@@ -286,7 +288,7 @@ public class LoopCardThread_GJ extends Thread {
             } else if (status.equalsIgnoreCase("FE")
                     || status.equalsIgnoreCase("FF")) {
                 //消费异常(重新刷卡)
-                notice(Config.IC_RE, "重新刷卡[" + status + "]", false);
+                notice(Config.IC_PUSH_MONEY, "重新刷卡[" + status + "]", false);
                 this.searchCard.cardNo = "0";
             }
 

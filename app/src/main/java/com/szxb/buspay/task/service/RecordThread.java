@@ -59,6 +59,7 @@ public class RecordThread extends Thread {
             } else if (TextUtils.equals(getName(), "union")) {
                 unionRecordTask();
             }
+            SLog.d("RecordThread(run.java:53)  任务标示:" + getName());
         } catch (Exception e) {
             SLog.d("RecordThread(run.java:53)" + getName() + "任务异常>>>" + e.toString());
         }
@@ -69,8 +70,11 @@ public class RecordThread extends Thread {
      * 刷卡
      */
     private void icRecordTask() {
+
         List<ConsumeCard> icList = DBManager.getICList();
+
         if (icList.size() == 0) {
+            SLog.d("RecordThread(icRecordTask.java:73)IC卡暂无数据上传");
             return;
         }
         JSONArray array = new JSONArray();
@@ -153,6 +157,7 @@ public class RecordThread extends Thread {
                         String pasmNumber = ob.getString("pasmNumber");
                         String cardTradeCount = ob.getString("cardTradeCount");
                         DBManager.updateCardInfo(tradeDate, pasmNumber, cardTradeCount);
+                        SLog.d("RecordThread(icRecordTask.java:114)IC卡上传成功   时间:" + tradeDate + " 序号：" + pasmNumber + "    " + cardTradeCount);
                     }
                 }
             } catch (Exception e) {
