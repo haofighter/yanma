@@ -2,6 +2,7 @@ package com.szxb.buspay.task.card.zibo;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
@@ -61,6 +62,7 @@ public class LoopCardThread extends Thread {
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
                 searchCard = null;
+                Log.i("获取到卡状态ZY", "   " + searchBytes[0]);
                 return;
             }
 

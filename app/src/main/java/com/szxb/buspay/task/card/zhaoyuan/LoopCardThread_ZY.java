@@ -2,6 +2,7 @@ package com.szxb.buspay.task.card.zhaoyuan;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
@@ -65,6 +66,7 @@ public class LoopCardThread_ZY extends Thread {
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
                 searchCard = null;
+                Log.i("获取到卡状态ZY", "   " + searchBytes[0]);
                 return;
             }
 
@@ -264,7 +266,7 @@ public class LoopCardThread_ZY extends Thread {
                         case "0A"://月票卡
                             String toast = "本次扣款:"
                                     + hex2Int(response.getPayFee()) + "次\n余额:"
-                                    + hex2Int(response.getCardBalance()) + "次";
+                                    + response.getCardBalance() + "次";
                             notice(Config.IC_MONTH, toast, true);
                             saveRecord(response);
                             break;
@@ -299,10 +301,12 @@ public class LoopCardThread_ZY extends Thread {
             } else if (status.equalsIgnoreCase("F6")) {
                 //月票卡不能乘坐本线路
                 notice(Config.IC_PUSH_MONEY, "月票卡不能乘坐本线路[F6]", false);
-            } else if (status.equalsIgnoreCase("FE")
-                    || status.equalsIgnoreCase("FF")) {
+            } else if (status.equalsIgnoreCase("FE")) {
+//                notice(Config.IC_RE, "重新刷卡[" + status + "]", false);
+                this.searchCard.cardNo = "0";
+            } else if (status.equalsIgnoreCase("FF")) {
                 //消费异常(重新刷卡)
-                notice(Config.IC_RE, "重新刷卡[" + status + "]", false);
+//                notice(Config.IC_RE, "重新刷卡[" + status + "]", false);
                 this.searchCard.cardNo = "0";
             }
 
