@@ -164,7 +164,6 @@ public class CommonBase {
         message.setOk(isOk);
         RxBus.getInstance().send(message);
 
-
     }
 
     /**
