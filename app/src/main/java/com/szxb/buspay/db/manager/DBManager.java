@@ -474,11 +474,14 @@ public class DBManager {
      * @param pasmNumber     psamNo
      * @param cardTradeCount 用户卡脱机交易序号
      */
-    public static void updateCardInfo(String tradeDate, String pasmNumber, String cardTradeCount) {
+    public static void updateCardInfo(String tradeDate, String pasmNumber, String cardTradeCount, String busNo, String cardno) {
         ConsumeCardDao cardRecordDao = DBCore.getDaoSession().getConsumeCardDao();
-        ConsumeCard unique = cardRecordDao.queryBuilder().where(ConsumeCardDao.Properties.TransTime.eq(tradeDate),
-                ConsumeCardDao.Properties.PasmNo.eq(pasmNumber),
-                ConsumeCardDao.Properties.TransNo2.eq(cardTradeCount)).limit(1).build().unique();
+        ConsumeCard unique = cardRecordDao.queryBuilder()
+                .where(ConsumeCardDao.Properties.TransTime.eq(tradeDate),
+                        ConsumeCardDao.Properties.PasmNo.eq(pasmNumber),
+                        ConsumeCardDao.Properties.BusNo.eq(busNo),
+                        ConsumeCardDao.Properties.CardNo.eq(cardno),
+                        ConsumeCardDao.Properties.TransNo2.eq(cardTradeCount)).limit(1).build().unique();
         if (unique != null) {
             unique.setUpStatus(0);
             cardRecordDao.update(unique);

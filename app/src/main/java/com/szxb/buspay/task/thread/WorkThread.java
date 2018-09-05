@@ -100,7 +100,7 @@ public class WorkThread extends Thread {
         } else if (TextUtils.equals(name, "export_db")) {
             //导出数据库文件
             String posDirectory = "data/data/" + BusApp.getInstance().getPackageName() + "/databases";
-            String sdDirectory = "/databases";
+            String sdDirectory ="/databases/"+BusApp.getPosManager().getBusNo();
             exportFile(posDirectory, sdDirectory);
         } else if (TextUtils.equals(name, "pos_status_push")) {
             pushStatus();

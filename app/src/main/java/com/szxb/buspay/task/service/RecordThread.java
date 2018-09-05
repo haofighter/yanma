@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class RecordThread extends Thread {
 
-    public  RecordThread(String name) {
+    public RecordThread(String name) {
         super(name);
     }
 
@@ -146,7 +146,6 @@ public class RecordThread extends Thread {
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
             try {
-                SLog.d("RecordThread(icRecordTask.java:111)" + execute.get().toJSONString());
                 JSONObject object = execute.get();
                 String rescode = object.getString("rescode");
                 if (TextUtils.equals(rescode, "0000")) {
@@ -156,7 +155,10 @@ public class RecordThread extends Thread {
                         String tradeDate = ob.getString("tradeDate");
                         String pasmNumber = ob.getString("pasmNumber");
                         String cardTradeCount = ob.getString("cardTradeCount");
-                        DBManager.updateCardInfo(tradeDate, pasmNumber, cardTradeCount);
+                        String busNo = ob.getString("busNo");
+                        String cardNo = ob.getString("cardNo");
+
+                        DBManager.updateCardInfo(tradeDate, pasmNumber, cardTradeCount, busNo, cardNo);
                         SLog.d("RecordThread(icRecordTask.java:114)IC卡上传成功   时间:" + tradeDate + " 序号：" + pasmNumber + "    " + cardTradeCount);
                     }
                 }
