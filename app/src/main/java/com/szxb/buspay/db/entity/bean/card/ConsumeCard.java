@@ -607,4 +607,7 @@ public class ConsumeCard {
     public void setCompanyNo(String companyNo) {
         this.companyNo = companyNo;
     }
+
+
+
 }

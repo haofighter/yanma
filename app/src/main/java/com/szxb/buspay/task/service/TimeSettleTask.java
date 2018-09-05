@@ -34,11 +34,11 @@ public class TimeSettleTask extends IntentService {
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 30, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 20, 30, TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppUnionPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 30, 30, TimeUnit.SECONDS);
+            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 10, 30, TimeUnit.SECONDS);
         }
     }
 

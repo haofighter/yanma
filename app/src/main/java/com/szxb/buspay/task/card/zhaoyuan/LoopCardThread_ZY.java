@@ -72,6 +72,12 @@ public class LoopCardThread_ZY extends Thread {
 
             searchCard = new SearchCard(searchBytes);
 
+            if (searchCard.cardType.equals("0A")) {
+                Long s = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
+
+            }
+
+
             //拦截黑名单
             //do
             isBlack = DBManager.queryBlack(searchCard.cardNo);

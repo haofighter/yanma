@@ -96,6 +96,8 @@ public class CommonBase {
     }
 
 
+
+
     /**
      * 检查余额并做提示
      *

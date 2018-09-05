@@ -44,7 +44,7 @@ public class DateUtil {
         return format.format(new Date());
     }
 
-    //自定义格式获取当前日期
+    //自定义格式获取当前日期·
     public static String getCurrentDate(String format) {
         SimpleDateFormat ft = null;
         try {
