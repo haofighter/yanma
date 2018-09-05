@@ -188,6 +188,7 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
             case QRCode.TIMER:
                 String currentTime = String.format("%1$s", DateUtil.getMainTime());
                 time.setText(currentTime);
+                sign_time.setText(currentTime);
                 break;
             default:
 
