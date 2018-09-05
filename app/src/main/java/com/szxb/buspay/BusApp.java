@@ -13,6 +13,7 @@ import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
 import com.szxb.buspay.task.TaskDelFile;
 import com.szxb.buspay.task.service.RecordThread;
+import com.szxb.buspay.task.service.TimeSettleTask;
 import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
@@ -114,13 +115,11 @@ public class BusApp extends Application {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            // TODO Auto-generated method stub
             mService = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            // TODO Auto-generated method stub
             mService = IToolInterface.Stub.asInterface(service);
         }
     };
@@ -150,7 +149,6 @@ public class BusApp extends Application {
                 .fileName(BusApp.getPosManager().getBusNo())
                 .build();
         SLog.addLogAdapter(new DiskLogAdapter(formatStrategy));
-
         new TaskDelFile().del();
     }
 
