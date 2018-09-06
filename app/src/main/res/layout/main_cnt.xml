@@ -266,7 +266,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:lineSpacingExtra="5dp"
-        android:text="特别说明:\n仅汇总消费卡(不包含员工卡)"
+        android:text="特别说明:\n仅汇总消费卡(不包含员工卡、月票卡)"
         android:textColor="@color/colorAccent"
         android:textSize="16sp" />
 </LinearLayout>

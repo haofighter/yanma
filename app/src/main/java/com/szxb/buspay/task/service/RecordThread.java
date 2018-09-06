@@ -8,17 +8,22 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.ScanInfoEntityDao;
+import com.szxb.buspay.db.entity.bean.QRCode;
+import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.JsonRequest;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.param.ParamsUtil;
 import com.szxb.buspay.util.param.sign.ParamSingUtil;
+import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
 import com.szxb.unionpay.unionutil.ParseUtil;
@@ -54,12 +59,20 @@ public class RecordThread extends Thread {
             }
             if (TextUtils.equals(getName(), "scan")) {
                 scanRecordTask();
+
             } else if (TextUtils.equals(getName(), "ic")) {
-                icRecordTask();
+                List<ConsumeCard> icList = DBManager.getICList();
+                icRecordTask(0, icList);
+
+            } else if (TextUtils.equals(getName(), "sup_min")) {
+                //补采
+                List<ConsumeCard> icList = DBManager.getICSupMinList();
+                icRecordTask(1, icList);
+
             } else if (TextUtils.equals(getName(), "union")) {
                 unionRecordTask();
+
             }
-            SLog.d("RecordThread(run.java:53)  任务标示:" + getName());
         } catch (Exception e) {
             SLog.d("RecordThread(run.java:53)" + getName() + "任务异常>>>" + e.toString());
         }
@@ -69,12 +82,11 @@ public class RecordThread extends Thread {
     /**
      * 刷卡
      */
-    private void icRecordTask() {
-
-        List<ConsumeCard> icList = DBManager.getICList();
-
+    private void icRecordTask(final int type, List<ConsumeCard> icList) {
         if (icList.size() == 0) {
-            SLog.d("RecordThread(icRecordTask.java:73)IC卡暂无数据上传");
+            if (type == 1) {
+                stopSupMin();
+            }
             return;
         }
         JSONArray array = new JSONArray();
@@ -147,6 +159,7 @@ public class RecordThread extends Thread {
         if (execute.isSucceed()) {
             try {
                 JSONObject object = execute.get();
+                SLog.d("RecordThread(icRecordTask.java:158)"+object.toJSONString());
                 String rescode = object.getString("rescode");
                 if (TextUtils.equals(rescode, "0000")) {
                     JSONArray list = object.getJSONArray("dataList");
@@ -158,8 +171,11 @@ public class RecordThread extends Thread {
                         String busNo = ob.getString("busNo");
                         String cardNo = ob.getString("cardNo");
 
-                        DBManager.updateCardInfo(tradeDate, pasmNumber, cardTradeCount, busNo, cardNo);
-                        SLog.d("RecordThread(icRecordTask.java:114)IC卡上传成功   时间:" + tradeDate + " 序号：" + pasmNumber + "    " + cardTradeCount);
+                        DBManager.updateCardInfo(type, tradeDate, pasmNumber, cardTradeCount, busNo, cardNo);
+                        SLog.d("RecordThread(icRecordTask.java:114)IC卡上传成功   时间:" + tradeDate + " cardNo：" + cardNo + ",busNo" + busNo + ",上传方式=" + (type == 0 ? "正常上传" : "补采上传"));
+                    }
+                    if (type==1){
+                        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.FILL_PUSH_ING));
                     }
                 }
             } catch (Exception e) {
@@ -167,7 +183,34 @@ public class RecordThread extends Thread {
             }
 
         } else {
-            SLog.d("RecordThread(icRecordTask.java:124)IC卡上传网络异常" + execute.getException().getMessage());
+            SLog.d("RecordThread(icRecordTask.java:124)IC卡上传网络异常" + execute.toString());
+        }
+    }
+
+    /**
+     * 停止补采
+     */
+    private void stopSupMin() {
+        //补采结束通知后台
+        SLog.d("RecordThread(icRecordTask.java:87)停止补采任务>>>>>通知后台>>>");
+        String url = "http://112.74.102.125/bipbus/interaction/uploadterm";
+        Map<String, Object> params = new HashMap<>();
+        params.put("termid", BusApp.getPosManager().getPosSN());
+        params.put("appid", BusApp.getPosManager().getAppId());
+        JsonRequest request = new JsonRequest(url);
+        request.add(params);
+        Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
+        if (execute.isSucceed()) {
+            JSONObject jsonObject = execute.get();
+            SLog.d("RecordThread(stopSupMin.java:201)"+jsonObject.toJSONString());
+            if (TextUtils.equals(jsonObject.getString("rescode"), "00")
+                    || TextUtils.equals(jsonObject.getString("rescode"), "02")) {
+                SLog.d("RecordThread(icRecordTask.java:101)通知后台补采结束成功>>>>>>");
+                ThreadFactory.getScheduledPool().stopTask("sup_min");
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.FILL_PUSH_END));
+            }
+        }else {
+            SLog.d("RecordThread(stopSupMin.java:207)"+execute.getException().toString());
         }
     }
 

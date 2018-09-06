@@ -10,7 +10,7 @@ import com.szxb.buspay.db.entity.card.LineInfoEntity;
  */
 
 public interface IPosManager {
-    void loadFromPrefs(int city,String binName);
+    void loadFromPrefs(int city, String binName);
 
     String getLineName();
 
@@ -100,4 +100,16 @@ public interface IPosManager {
 
     String getLastParamsFileName();
 
+    //补采的flag
+    void setFlag(String flag);
+
+    String getFlag();
+
+    void setSupMinTims(String[] times);
+
+    String[] getTimes();
+
+    void setSupplementaryMiningCnt(long cnt);
+
+    long getSupplementaryMiningCnt();
 }

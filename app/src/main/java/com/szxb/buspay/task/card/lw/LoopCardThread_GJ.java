@@ -11,7 +11,7 @@ import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.manager.DBManager;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
@@ -459,7 +459,7 @@ public class LoopCardThread_GJ extends Thread {
      * @param consumeCard .
      */
     private void saveRecord(ConsumeCard consumeCard) {
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("zibo", consumeCard));
+        ThreadFactory.getScheduledPool().execute(new WorkThread("zibo", consumeCard));
         SLog.d("LoopCardThread(saveRecord.java:345)保存成功");
     }
 

@@ -11,7 +11,7 @@ import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
 import com.szxb.buspay.db.sp.FetchAppConfig;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 
@@ -178,9 +178,18 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     //递增流水号
     private int numSeq = 0;
 
+    //补采flag
+    private String flag = "0";
+
+    //补采时间
+    private String[] times = new String[]{"0", "0"};
+
+    //补采总数
+    private long SupplementaryMiningCn = 0;
+
     @Override
     public void loadFromPrefs(final int city, final String bin) {
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new Runnable() {
+        ThreadFactory.getScheduledPool().execute(new Runnable() {
             @Override
             public void run() {
                 //pos基础参数
@@ -216,7 +225,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         chineseName = FetchAppConfig.chinese_name();
         lastBlackVersion = FetchAppConfig.getLastBlackVersion();
 
-        lastParamsFileName=FetchAppConfig.getLastParamsFileName();
+        lastParamsFileName = FetchAppConfig.getLastParamsFileName();
     }
 
     private void config(int city) {
@@ -502,13 +511,43 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
 
     @Override
     public void setLastParamsFileName(String var) {
-        this.lastParamsFileName=var;
-        CommonSharedPreferences.put("last_params_file_name",var);
+        this.lastParamsFileName = var;
+        CommonSharedPreferences.put("last_params_file_name", var);
     }
 
     @Override
     public String getLastParamsFileName() {
         return lastParamsFileName;
+    }
+
+    @Override
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    @Override
+    public String getFlag() {
+        return flag;
+    }
+
+    @Override
+    public void setSupMinTims(String[] times) {
+        this.times = times;
+    }
+
+    @Override
+    public String[] getTimes() {
+        return times;
+    }
+
+    @Override
+    public void setSupplementaryMiningCnt(long cnt) {
+        this.SupplementaryMiningCn = cnt;
+    }
+
+    @Override
+    public long getSupplementaryMiningCnt() {
+        return SupplementaryMiningCn;
     }
 
     @Override

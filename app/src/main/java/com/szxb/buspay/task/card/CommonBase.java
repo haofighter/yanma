@@ -8,7 +8,7 @@ import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.entity.scan.PosRecord;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
@@ -90,7 +90,6 @@ public class CommonBase {
         byte[] sendData = HexUtil.mergeByte(amount, baseAmount, black, white, busNo, lineNo,
                 workStatus_, driverNo, direction, stationId, normalAmount, data);
 
-        SLog.d("CommonBase(response.java:86)发送的报文:" + HexUtil.printHexBinary(sendData));
         int ret = libszxb.qxcardprocess(sendData);
         return new ConsumeCard(sendData, isSign, "zibo", cardModuleType);
     }
@@ -174,7 +173,7 @@ public class CommonBase {
      * @param consumeCard .
      */
     public static void saveRecord(ConsumeCard consumeCard) {
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("zibo", consumeCard));
+        ThreadFactory.getScheduledPool().execute(new WorkThread("zibo", consumeCard));
     }
 
 

@@ -2,7 +2,6 @@ package com.szxb.buspay.task.card.zhaoyuan;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
@@ -66,17 +65,10 @@ public class LoopCardThread_ZY extends Thread {
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
                 searchCard = null;
-                Log.i("获取到卡状态ZY", "   " + searchBytes[0]);
                 return;
             }
 
             searchCard = new SearchCard(searchBytes);
-
-            if (searchCard.cardType.equals("0A")) {
-                Long s = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
-
-            }
-
 
             //拦截黑名单
             //do
@@ -113,8 +105,6 @@ public class LoopCardThread_ZY extends Thread {
 //                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }
-
-            SLog.d("LoopCardThread(run.java:82)寻卡数据>>>" + searchCard);
 
             //1.判断是否已签到
             //2.未签到
@@ -270,10 +260,10 @@ public class LoopCardThread_ZY extends Thread {
                             notice(Config.IC_BASE, "稽查卡", true);
                             break;
                         case "0A"://月票卡
-                            String toast = "本次扣款:"
-                                    + hex2Int(response.getPayFee()) + "次\n余额:"
-                                    + response.getCardBalance() + "次";
-                            notice(Config.IC_MONTH, toast, true);
+                            String toast = "本次消费："
+                                    + hex2Int(response.getPayFee()) + "次\n本月剩余次数："
+                                    + response.getCardBalance();
+                            notice(Config.IC_HIGHT_CARD, toast, true);
                             saveRecord(response);
                             break;
                         default://其他卡类型
@@ -294,7 +284,7 @@ public class LoopCardThread_ZY extends Thread {
 
             } else if (status.equalsIgnoreCase("F3")) {
                 //卡内余额不足
-                notice(Config.IC_PUSH_MONEY, "卡内余额不足[F3]", false);
+                notice(Config.IC_PUSH_MONEY, "卡内余额不足[F3]\n余额" + response.getCardBalance(), false);
                 this.searchCard.cardNo = "0";
             } else if (status.equalsIgnoreCase("F4")) {
                 //此卡为黑名单卡(已经锁了)
@@ -329,32 +319,32 @@ public class LoopCardThread_ZY extends Thread {
         int basePrices = BusApp.getPosManager().getBasePrice();
         switch (cardType) {
             case CardTypeTaian.CARD_NORMAL://普通卡 01
-                return string2Int(coefficent[0]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[0]) * basePrices / 100);
             case CardTypeTaian.CARD_STUDENT://学生卡
-                return string2Int(coefficent[1]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[1]) * basePrices / 100);
             case CardTypeTaian.CARD_OLD://老年卡
-                return string2Int(coefficent[2]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[2]) * basePrices / 100);
             case CardTypeTaian.CARD_FREE://免费卡
-                return string2Int(coefficent[3]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[3]) * basePrices / 100);
             case CardTypeTaian.CARD_EMP://员工卡
-                return string2Int(coefficent[5]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[5]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_1://优化卡1
-                return string2Int(coefficent[4]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[4]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_2://优化卡2
-                return string2Int(coefficent[6]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[6]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_3://优化卡3
-                return string2Int(coefficent[7]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[7]) * basePrices / 100);
             case CardTypeTaian.CARD_DEFECT://优抚卡
-                return string2Int(coefficent[10]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[10]) * basePrices / 100);
             case CardTypeTaian.CARD_MONTH://月票卡
-                return string2Int(coefficent[11]);
+                return (int) Math.round((double) string2Int(coefficent[11]));
             case CardTypeTaian.CARD_GATHER:
             case CardTypeTaian.CARD_SIGNED:
             case CardTypeTaian.CARD_CHECKED:
             case CardTypeTaian.CARD_CHECK:
                 return 0;
             default:
-                return string2Int(coefficent[0]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[0]) * basePrices / 100);
         }
     }
 

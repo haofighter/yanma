@@ -26,6 +26,7 @@ public class Config {
 
 
     private static final String IP = "http://111.230.85.238";//139.199.158.253
+//    private static final String IP = "http://blackskin.imwork.net:35540";//139.199.158.253
 
     //小兵mac
     public static final String MAC_KEY = IP + "/bipbus/interaction/getmackey";
@@ -107,6 +108,8 @@ public class Config {
 
     public static final int IC_ERROR = IC_LLLEGAL + 1;//错误
 
+    public static final int IC_HIGHT_CARD = IC_ERROR + 1;//.高中卡
+
 
     //菜单
     //公交卡刷卡
@@ -147,6 +150,9 @@ public class Config {
 
     //查看参数信息
     public static final int POSITION_READ_PARAM = POSITION_EXPORT_3_M + 1;
+
+    //补传
+    public static final int POSITION_PUSH_FILL = POSITION_READ_PARAM + 1;
 
     public static String tip() {
         return tip[(int) (Math.random() * 20)];

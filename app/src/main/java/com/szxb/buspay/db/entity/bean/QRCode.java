@@ -148,8 +148,15 @@ public class QRCode {
     //按键
     public static final int KEY_CODE = 27;
 
+    //更新参数
     public static final int UPDATE_UNION_PARAMS = 28;
 
     //tip
     public static final int TIP = 29;
+
+    //补采开始通知
+    public static final int FILL_PUSH_ING = 30;
+
+    //补采结束通知
+    public static final int FILL_PUSH_END = 31;
 }

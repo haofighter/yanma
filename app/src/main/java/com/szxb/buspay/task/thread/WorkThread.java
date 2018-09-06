@@ -4,22 +4,27 @@ import android.os.Environment;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.entity.bean.CntEntity;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.bean.SupplementaryMiningResponse;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.card.BlackListCard;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.JsonRequest;
+import com.szxb.buspay.task.service.RecordThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.mlog.SLog;
 import com.szxb.unionpay.entity.UnionPayEntity;
 import com.yanzhenjie.nohttp.RequestMethod;
 import com.yanzhenjie.nohttp.rest.Response;
@@ -31,6 +36,7 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
 import static com.szxb.buspay.util.DateUtil.setTime;
@@ -46,9 +52,15 @@ public class WorkThread extends Thread {
 
     private Object record;
     private List<BlackListCard> list;
+    private int type;
 
     public WorkThread(String name) {
         super(name);
+    }
+
+    public WorkThread(String name, int type) {
+        super(name);
+        this.type = type;
     }
 
     public WorkThread(String name, Object record) {
@@ -87,6 +99,7 @@ public class WorkThread extends Thread {
             dao.deleteAll();
             List<BlackListCard> bl = list;
             dao.insertOrReplaceInTx(bl);
+
         } else if (TextUtils.equals(name, "cnt")) {
             //汇总
             CntEntity cntEntity = DBManager.getCnt();
@@ -97,21 +110,68 @@ public class WorkThread extends Thread {
             String posPath = Environment.getExternalStorageDirectory() + "/BJLogger";
             String sdDirectory = "/log";
             exportFile(posPath, sdDirectory);
+
         } else if (TextUtils.equals(name, "export_db")) {
             //导出数据库文件
             String posDirectory = "data/data/" + BusApp.getInstance().getPackageName() + "/databases";
-            String sdDirectory ="/databases/"+BusApp.getPosManager().getBusNo();
+            String sdDirectory = "/databases/" + BusApp.getPosManager().getBusNo();
             exportFile(posDirectory, sdDirectory);
+
         } else if (TextUtils.equals(name, "pos_status_push")) {
             pushStatus();
+
         } else if (TextUtils.equals(name, "app_reg_time")) {
             //校准时钟(不提示)
             retTime(false);
+
         } else if (TextUtils.equals(name, "reg_time")) {
             //校准时钟
             retTime(true);
-        }
 
+        } else if (TextUtils.equals(name, "check_fill")) {
+            //检查补采
+            checkSupplementaryMining();
+
+        }
+    }
+
+    /**
+     * 检查补采
+     */
+    private void checkSupplementaryMining() {
+        String url = "http://112.74.102.125/bipbus/interaction/uploadinfo";
+        Map<String, Object> params = new HashMap<>();
+        params.put("termid", BusApp.getPosManager().getPosSN());
+        params.put("appid", BusApp.getPosManager().getAppId());
+        JsonRequest request = new JsonRequest(url);
+        request.add(params);
+        Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
+        if (execute.isSucceed()) {
+            SupplementaryMiningResponse response = new Gson().fromJson(execute.get().toJSONString(), SupplementaryMiningResponse.class);
+            if (response != null) {
+                SLog.d("WorkThread(checkSupplementaryMining.java:140)" + execute.get().toJSONString());
+                if (response.isOk()) {
+                    SLog.d("WorkThread(checkSupplementaryMining.java:140)开启补采任务>>>>");
+                    String[] times = new String[]{"0", "0"};
+                    List<SupplementaryMiningResponse.DatalistBean> datalist = response.getDatalist();
+                    for (SupplementaryMiningResponse.DatalistBean list : datalist) {
+                        times[0] = list.getStartime().replace("-", "").replace(" ", "").replace(":", "").trim();
+                        times[1] = list.getEndtime().replace("-", "").replace(" ", "").replace(":", "").trim();
+                        BusApp.getPosManager().setFlag(list.getFlag());
+                    }
+                    BusApp.getPosManager().setSupMinTims(times);
+                    RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.FILL_PUSH_ING));
+                    if (!ThreadFactory.getScheduledPool().isRunningInPool("sup_min")) {
+                        BusApp.getPosManager().setSupplementaryMiningCnt(DBManager.getSupplementaryMining());
+                        ThreadFactory.getScheduledPool().executeCycle(new RecordThread("sup_min"), 10, 15, "sup_min", TimeUnit.SECONDS);
+                    }
+                } else {
+                    if (type == 1) {
+                        BusToast.showToast(BusApp.getInstance().getApplicationContext(), response.getResult() + "[" + response.getRescode() + "]", false);
+                    }
+                }
+            }
+        }
     }
 
     /**

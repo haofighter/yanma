@@ -65,6 +65,7 @@ public class ParamsUtil {
         JSONArray cord = new JSONArray();
         cord.add(record.getRecord());
         object.put("record", cord);
+
         DBManager.insert(object, record.getMch_trx_id(),
                 record.getOpen_id(), record.getQr_code(),record.getPay_fee());//存储乘车记录
 

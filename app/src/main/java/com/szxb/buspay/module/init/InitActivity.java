@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.MainActivity;
 import com.szxb.buspay.R;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.tip.BusToast;
@@ -27,6 +27,7 @@ import com.szxb.mlog.SLog;
 import com.szxb.unionpay.unionutil.ParseUtil;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 作者：Tangren on 2018-08-03
@@ -41,7 +42,7 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
     private boolean binOk = false;
 
     private TextView update_info;
-    private volatile int taskSize;
+    private AtomicInteger taskSize;
 
     private AnimationDrawable drawable;
 
@@ -65,13 +66,13 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
 
     private void setTaskList() {
         List<BaseRequest> taskList = AppUtil.getRequestList();
-        taskSize = taskList.size();
+        taskSize = new AtomicInteger(taskList.size());
         AppUtil.run(taskList, this);
     }
 
 
     private void initBin() {
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new Runnable() {
+        ThreadFactory.getScheduledPool().execute(new Runnable() {
             @Override
             public void run() {
                 String lastVersion = BusApp.getPosManager().getLastVersion();
@@ -80,21 +81,21 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
                     AssetManager ass = BusApp.getInstance().getAssets();
                     int k = libszxb.ymodemUpdate(ass, binName);
                     BusApp.getPosManager().setLastVersion(binName);
-                    binOk = true;
+
                     BusToast.showToast(BusApp.getInstance(), "固件更新成功", true);
-                    if (updateOk) {
-                        startActivity(new Intent(InitActivity.this, MainActivity.class));
-                        finish();
-                    }
-                } else {
-                    binOk = true;
                 }
+                binOk = true;
                 MainLooper.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         update_info.append("bin更新完成\n");
                     }
                 });
+
+                if (updateOk) {
+                    startActivity(new Intent(InitActivity.this, MainActivity.class));
+                    finish();
+                }
             }
         });
     }
@@ -126,9 +127,9 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
     @Override
     public void response(boolean success, ResponseMessage response) {
         SLog.d("InitActivity(response.java:179)" + response);
-        taskSize -= 1;
+        taskSize.getAndDecrement();
         update_info.append(response.getMsg() + "\n");
-        if (taskSize <= 0) {
+        if (taskSize.get() <= 0) {
             updateOk = true;
             if (binOk) {
                 startActivity(new Intent(InitActivity.this, MainActivity.class));

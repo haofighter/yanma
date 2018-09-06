@@ -22,7 +22,7 @@ import com.szxb.buspay.task.card.taian.LoopCardThread_TA;
 import com.szxb.buspay.task.card.zhaoyuan.LoopCardThread_ZY;
 import com.szxb.buspay.task.card.zibo.LoopCardThread;
 import com.szxb.buspay.task.scan.LoopScanThread;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
@@ -65,20 +65,18 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mHandler = new WeakHandler.MyHandler(this);
         initDate();
         initDatas();
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new LoopScanThread(), 1000, 200, TimeUnit.MILLISECONDS);
+        ThreadFactory.getScheduledPool().executeCycle(new LoopScanThread(), 1000, 200, "loop_scan", TimeUnit.MILLISECONDS);
         boolean isSuppIC = BusApp.getPosManager().isSuppIcPay();
         if (isSuppIC) {
             String appId = BusApp.getPosManager().getAppId();
-            ThreadScheduledExecutorUtil.getInstance().getService()
-                    .scheduleAtFixedRate(
-                            TextUtils.equals(appId, "10000009") ? new LoopCardThread()//淄博
-                                    : TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY()//莱芜长运
-                                    : TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA()//泰安
-                                    : TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
-                                    new LoopCardThread()
-                            , 1000, 200, TimeUnit.MILLISECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(
+                    TextUtils.equals(appId, "10000009") ? new LoopCardThread()//淄博
+                            : TextUtils.equals(appId, "10000010") ? new LoopCardThread_CY()//莱芜长运
+                            : TextUtils.equals(appId, "10000098") ? new LoopCardThread_TA()//泰安
+                            : TextUtils.equals(appId, "10000011") ? new LoopCardThread_ZY() ://招远
+                            new LoopCardThread()
+                    , 1000, 200, "loop_ic", TimeUnit.MILLISECONDS);
         }
-
     }
 
     private void initDatas() {
@@ -168,17 +166,19 @@ public class MainActivity extends BaseActivity implements OnReceiverMessageListe
         mList.add(new MainEntity("导出1个月记录"));
         mList.add(new MainEntity("导出3个月记录"));
         mList.add(new MainEntity("查看基础信息"));
+        mList.add(new MainEntity("手动补传"));
     }
 
 
     private void initDate() {
         DateUtil.setK21Time();
-        ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new Runnable() {
+        ThreadFactory.getScheduledPool().executeCycle(new Runnable() {
             @Override
             public void run() {
                 mHandler.sendEmptyMessage(QRCode.TIMER);
             }
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 1, "time", TimeUnit.SECONDS);
+
     }
 
 

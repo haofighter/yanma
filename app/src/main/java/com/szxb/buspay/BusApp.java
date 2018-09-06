@@ -13,8 +13,7 @@ import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.manager.PosManager;
 import com.szxb.buspay.task.TaskDelFile;
 import com.szxb.buspay.task.service.RecordThread;
-import com.szxb.buspay.task.service.TimeSettleTask;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
@@ -88,10 +87,6 @@ public class BusApp extends Application {
                 .networkExecutor(new OkHttpNetworkExecutor())
                 .connectionTimeout(15 * 1000)
                 .build());
-
-//        Intent timeSettleTaskIntent = new Intent(this, TimeSettleTask.class);
-//        startService(timeSettleTaskIntent);
-//        initService();
 
         SophixManager.getInstance().queryAndLoadNewPatch();
         CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
@@ -184,21 +179,24 @@ public class BusApp extends Application {
 
     private void initTask() {
         //状态上报
-        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
+        ThreadFactory.getScheduledPool().executeDelay(new WorkThread("pos_status_push"), 30, TimeUnit.SECONDS);
 
         //校准时间
-        ThreadScheduledExecutorUtil.getInstance().getService().schedule(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
+        ThreadFactory.getScheduledPool().executeDelay(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
+
+        //检查补采
+        ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill",0), 40, TimeUnit.SECONDS);
 
         if (BusApp.getPosManager().isSuppScanPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("scan"), 15, 30, TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("scan"), 15, 30, "scan", TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("ic"), 30, 20, TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("ic"), 30, 30, "ic", TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppUnionPay()) {
-            ThreadScheduledExecutorUtil.getInstance().getService().scheduleAtFixedRate(new RecordThread("union"), 45, 30, TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("union"), 45, 30, "union", TimeUnit.SECONDS);
         }
     }
 }

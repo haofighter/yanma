@@ -2,7 +2,7 @@ package com.szxb.buspay.task;
 
 import android.os.Environment;
 
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.mlog.SLog;
 
@@ -24,7 +24,7 @@ public class TaskDelFile {
 
 
     public void del() {
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new FileRunnable());
+        ThreadFactory.getScheduledPool().execute(new FileRunnable());
     }
 
     private static class FileRunnable implements Runnable {

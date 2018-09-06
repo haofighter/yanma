@@ -7,7 +7,7 @@ import android.util.Log;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.UnionAidEntityDao;
 import com.szxb.buspay.db.manager.DBCore;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
@@ -333,7 +333,7 @@ public class UnionCard {
                 payEntity.setTlv55(tlv);
                 payEntity.setSingleData(HexUtil.bytesToHexString(sendData));
 
-                ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("union", payEntity));
+                ThreadFactory.getScheduledPool().execute(new WorkThread("union", payEntity));
 
                 SLog.d("LoopCard(run.java:278)" + payEntity);
                 UnionPay.getInstance().exeSSL(UnionConfig.PAY, sendData);

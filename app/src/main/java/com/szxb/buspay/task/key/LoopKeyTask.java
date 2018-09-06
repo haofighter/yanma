@@ -9,7 +9,7 @@ import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.interfaces.OnKeyListener;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.CountTime;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.Util;
@@ -60,23 +60,20 @@ public class LoopKeyTask {
 
     public void startLoopKey() {
         libszxb.deviceSerialSetBaudrate(3, 115200);
-        scheduledFuture = ThreadScheduledExecutorUtil.getInstance()
-                .getService().scheduleAtFixedRate(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (BusApp.getPosManager().isSuppKeyBoard()) {
-                                keyBord();
-                            }
-                            enterKey();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            SLog.d("LoopKeyTask(run.java:58)按键出现异常>>" + e.toString());
-                        }
-
+        ThreadFactory.getScheduledPool().executeCycle(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (BusApp.getPosManager().isSuppKeyBoard()) {
+                        keyBord();
                     }
-                }, 500, 200, TimeUnit.MILLISECONDS);
-
+                    enterKey();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    SLog.d("LoopKeyTask(run.java:58)按键出现异常>>" + e.toString());
+                }
+            }
+        }, 500, 200, "key",TimeUnit.MILLISECONDS);
     }
 
 
@@ -90,7 +87,6 @@ public class LoopKeyTask {
                 TextUtils.equals(keycode, "00")) {
             return;
         }
-        SLog.d("LoopKeyTask(keyBord.java:89)" + keycode);
         switch (keycode) {
             case "2E"://.
             case "23"://#
@@ -229,12 +225,7 @@ public class LoopKeyTask {
 
     //取消
     public void cancel() {
-        if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
-            scheduledFuture.cancel(true);
-//            if (listener != null) {
-//                listener = null;
-//            }
-        }
+
     }
 
     private boolean filterRE() {

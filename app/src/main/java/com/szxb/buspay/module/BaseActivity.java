@@ -26,7 +26,7 @@ import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.interfaces.OnKeyListener;
 import com.szxb.buspay.task.key.LoopKeyTask;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Util;
@@ -45,6 +45,7 @@ import com.szxb.unionpay.entity.UnionPayEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -61,13 +62,13 @@ import static com.szxb.buspay.util.Config.POSITION_EXPORT_3_M;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_7;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_DB;
 import static com.szxb.buspay.util.Config.POSITION_EXPORT_LOG;
+import static com.szxb.buspay.util.Config.POSITION_PUSH_FILL;
 import static com.szxb.buspay.util.Config.POSITION_READ_PARAM;
 import static com.szxb.buspay.util.Config.POSITION_SCAN_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_TIME;
 import static com.szxb.buspay.util.Config.POSITION_UNION_RECORD;
 import static com.szxb.buspay.util.Config.POSITION_UPDATE_PARAMS;
 import static com.szxb.buspay.util.Util.fen2Yuan;
-import static com.szxb.buspay.util.Util.hex2Int;
 import static com.szxb.buspay.util.Util.string2Int;
 
 /**
@@ -82,7 +83,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     //菜单view
     protected RecyclerView recyclerView;
 
+    //网络状态
     private TextView net_status;
+    //补采状态
+    private TextView fill_status;
 
     //记录view
     protected RecyclerView recycler_view_record;
@@ -167,6 +171,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     protected void initView() {
         net_status = (TextView) findViewById(R.id.net_status);
+        fill_status = (TextView) findViewById(R.id.fill_status);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recycler_view_record = (RecyclerView) findViewById(R.id.recycler_view_record);
         main_record = findViewById(R.id.main_record);
@@ -235,6 +240,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                         } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
                             //网络状态发送改变
                             hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
+                        } else if (qrScanMessage.getResult() == QRCode.FILL_PUSH_ING
+                                || qrScanMessage.getResult() == QRCode.FILL_PUSH_END) {
+                            //补采通知
+                            fillPush(qrScanMessage.getResult());
                         } else if (qrScanMessage.getResult() == QRCode.TIP) {
                             //刷卡提示
                             MyToast.showToast2(BusApp.getInstance(), qrScanMessage.getMessage(), qrScanMessage.isOk());
@@ -338,8 +347,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                     mainEntity.setCard_id(consumeCard.getCardNo());
                     if (TextUtils.equals(consumeCard.getCardType(), "0A")) {
                         //次数卡
-                        mainEntity.setCard_money(hex2Int(consumeCard.getCardBalance()) + "");
-                        mainEntity.setPay_money(hex2Int(consumeCard.getPayFee()) + "");
+                        mainEntity.setCard_money(string2Int(consumeCard.getCardBalance()) + "");
+                        mainEntity.setPay_money(string2Int(consumeCard.getPayFee()) + "");
                     } else {
                         mainEntity.setCard_money(fen2Yuan(string2Int(consumeCard.getCardBalance())));
                         mainEntity.setPay_money(fen2Yuan(string2Int(consumeCard.getPayFee())));
@@ -399,23 +408,23 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             childViewShow = true;
             setViewStatus(main_cnt, true);
             record_type_cnt.setText("当天汇总");
-            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("cnt"));
+            ThreadFactory.getScheduledPool().execute(new WorkThread("cnt"));
         } else if (position == POSITION_UPDATE_PARAMS) {//手动更新参数
             BusToast.showToast(BusApp.getInstance(), "开始更新请稍后", true);
             List<BaseRequest> taskList = AppUtil.getRequestList();
             AppUtil.run(taskList, this);
             onKeyCancel();
         } else if (position == POSITION_EXPORT_DB) {//数据库导出
-            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_db"));
+            ThreadFactory.getScheduledPool().execute(new WorkThread("export_db"));
         } else if (position == POSITION_EXPORT_LOG) {//日志导出
-            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("export_log"));
+            ThreadFactory.getScheduledPool().execute(new WorkThread("export_log"));
         } else if (position == POSITION_CHECK_NET) {//检测网络
             boolean b = AppUtil.getNetWorkState(getApplicationContext());
             BusToast.showToast(getApplicationContext(), b ? "网络已连接" : "未检测到网络", b);
             onKeyCancel();
         } else if (position == POSITION_TIME) {//校准时间
             BusToast.showToast(getApplicationContext(), "开始校准时间", true);
-            ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("reg_time"));
+            ThreadFactory.getScheduledPool().execute(new WorkThread("reg_time"));
             onKeyCancel();
         } else if (position == POSITION_EXPORT_7) {//导出7天记录
             export(7);
@@ -442,6 +451,14 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             bin_name.setText(String.format("BIN版本\n%1$s", BuildConfig.BIN_NAME));
             app_version.setText(String.format("软件版本\n%1$s", AppUtil.getVersionName(this)));
             sn.setText(String.format("SN编号\n%1$s", BusApp.getPosManager().getPosSN()));
+        } else if (position == POSITION_PUSH_FILL) {
+            if (ThreadFactory.getScheduledPool().isRunningInPool("sup_min")) {
+                BusToast.showToast(BusApp.getInstance().getApplicationContext(), "请勿重复启动补采任务", false);
+            } else {
+                BusToast.showToast(BusApp.getInstance().getApplicationContext(), "检查补采\n请稍后", true);
+                ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill",1), 0, TimeUnit.SECONDS);
+            }
+            onKeyCancel();
         }
     }
 
@@ -459,6 +476,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     @Override
     public void onKeyCancel() {
+
         if (recyclerView.getVisibility() == View.VISIBLE) {
             setViewStatus(recyclerView, false);
         }
@@ -525,6 +543,18 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
     private void hasNetWork(boolean b) {
         net_status.setVisibility(b ? View.GONE : View.VISIBLE);
+    }
+
+    private void fillPush(int code) {
+        long supplementaryMiningCnt = BusApp.getPosManager().getSupplementaryMiningCnt();
+        if (code == QRCode.FILL_PUSH_ING) {
+            fill_status.setVisibility(View.VISIBLE);
+            long supplementaryMining = DBManager.getSupplementaryMining();
+            fill_status.setText(supplementaryMiningCnt + "/" + supplementaryMining);
+        } else {
+            fill_status.setCompoundDrawablesRelativeWithIntrinsicBounds(R.mipmap.fill_end, 0, 0, 0);
+            fill_status.setText(String.format("%1$d/补采结束", supplementaryMiningCnt));
+        }
     }
 
     @Override

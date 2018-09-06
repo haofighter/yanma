@@ -2,6 +2,7 @@ package com.szxb.buspay.util.update;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.mlog.SLog;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -45,6 +46,7 @@ public abstract class BaseRequest {
         if (onResponse != null) {
             onResponse.response(true, t);
         } else {
+            SLog.e("BaseRequest(doAccept.java:49)response==null >>>>");
             BusToast.showToast(BusApp.getInstance().getApplicationContext(), response.getMsg(),
                     response.getStatus()
                             == ResponseMessage.SUCCESSFUL || response.getStatus()
@@ -58,6 +60,7 @@ public abstract class BaseRequest {
             response.setThrowable(t);
             onResponse.response(false, response);
         } else {
+            SLog.e("BaseRequest(doThrowable.java:61)onResponse==null 异常>>>");
             BusToast.showToast(BusApp.getInstance(), "任务异常\n" + t.toString(), false);
         }
     }

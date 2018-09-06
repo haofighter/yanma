@@ -9,7 +9,7 @@ import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.http.CallServer;
 import com.szxb.buspay.http.HttpListener;
 import com.szxb.buspay.http.JsonRequest;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
@@ -86,7 +86,7 @@ public class PosRequest {
                 if (Calendar.getInstance().get(Calendar.YEAR) < 2018) {
                     noticeStr = "正在校准时间[请重试]";
                     SLog.d("PosRequest(request.java:83)二维码过期[10006]>>>并且当前时间小于2018>>开始校准时间");
-                    ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("reg_time"));
+                    ThreadFactory.getScheduledPool().execute(new WorkThread("reg_time"));
                 } else {
                     noticeStr = "二维码过期[10006]";
                     SoundPoolUtil.play(Config.EC_RE_QR_CODE);

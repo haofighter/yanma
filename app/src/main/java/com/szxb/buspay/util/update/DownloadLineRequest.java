@@ -52,6 +52,7 @@ public class DownloadLineRequest extends BaseRequest {
             downloadPoint();
         }
         e.onNext(response);
+        SLog.d("DownloadLineRequest(doSubscribe.java:55)线路响应");
     }
 
     /**
@@ -134,6 +135,8 @@ public class DownloadLineRequest extends BaseRequest {
                 BusApp.getPosManager().setLineInfoEntity();
                 response.setStatus(ResponseMessage.SUCCESSFUL);
                 response.setMsg("线路文件更新成功");
+            } else {
+                response.setMsg("解析异常");
             }
         } else {
             response.setMsg("线路文件同步失败");

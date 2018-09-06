@@ -2,10 +2,10 @@ package com.szxb.buspay.db.manager;
 
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.dao.BlackListEntityDao;
 import com.szxb.buspay.db.dao.ConsumeCardDao;
@@ -21,7 +21,7 @@ import com.szxb.buspay.db.entity.scan.BlackListEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
 import com.szxb.buspay.db.entity.scan.PublicKeyEntity;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
@@ -60,10 +60,7 @@ public class DBManager {
         infoEntity.setQrcode(qrCode);
         infoEntity.setPay_fee(pay_fee);
 
-        Log.d("TenPosReportManager",
-                "posScan(TenPosReportManager.java:64)微信实际扣款=" + pay_fee);
-
-        ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("weChat", infoEntity));
+        ThreadFactory.getScheduledPool().execute(new WorkThread("weChat", infoEntity));
     }
 
     /**
@@ -161,6 +158,8 @@ public class DBManager {
             if (tr_status != null)
                 entity.setTr_status(tr_status);
             dao.update(entity);
+
+//            ThreadFactory.getScheduledPool().
         }
     }
 
@@ -456,12 +455,26 @@ public class DBManager {
     }
 
     /**
-     * @return 扫码未上传的前10条数据
+     * @return 刷卡未上传的前15条数据
      */
     public static List<ConsumeCard> getICList() {
         ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
         return dao.queryBuilder()
                 .where(ConsumeCardDao.Properties.UpStatus.eq(1))
+                .orderDesc(ConsumeCardDao.Properties.Id)
+                .limit(15).build().list();
+    }
+
+    /**
+     * @return 刷卡补采的前15条数据
+     */
+    public static List<ConsumeCard> getICSupMinList() {
+        String[] times = BusApp.getPosManager().getTimes();
+        String flag = BusApp.getPosManager().getFlag();
+        ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
+        return dao.queryBuilder()
+                .where(ConsumeCardDao.Properties.TransTime.between(times[0], times[1]))
+                .whereOr(ConsumeCardDao.Properties.Reserve_1.isNull(), ConsumeCardDao.Properties.Reserve_1.notEq(flag))
                 .orderDesc(ConsumeCardDao.Properties.Id)
                 .limit(15).build().list();
     }
@@ -474,7 +487,7 @@ public class DBManager {
      * @param pasmNumber     psamNo
      * @param cardTradeCount 用户卡脱机交易序号
      */
-    public static void updateCardInfo(String tradeDate, String pasmNumber, String cardTradeCount, String busNo, String cardno) {
+    public static void updateCardInfo(int type, String tradeDate, String pasmNumber, String cardTradeCount, String busNo, String cardno) {
         ConsumeCardDao cardRecordDao = DBCore.getDaoSession().getConsumeCardDao();
         ConsumeCard unique = cardRecordDao.queryBuilder()
                 .where(ConsumeCardDao.Properties.TransTime.eq(tradeDate),
@@ -484,6 +497,9 @@ public class DBManager {
                         ConsumeCardDao.Properties.TransNo2.eq(cardTradeCount)).limit(1).build().unique();
         if (unique != null) {
             unique.setUpStatus(0);
+            if (type == 1) {
+                unique.setReserve_1(BusApp.getPosManager().getFlag());
+            }
             cardRecordDao.update(unique);
         }
     }
@@ -516,5 +532,18 @@ public class DBManager {
     public static boolean queryBlack(String cardNo) {
         BlackListCardDao dao = DBCore.getDaoSession().getBlackListCardDao();
         return dao.queryBuilder().where(BlackListCardDao.Properties.Card_id.eq(cardNo)).count() > 0;
+    }
+
+    /**
+     * @return 补采总数
+     */
+    public static long getSupplementaryMining() {
+        String[] times = BusApp.getPosManager().getTimes();
+        String flag = BusApp.getPosManager().getFlag();
+        ConsumeCardDao dao = DBCore.getDaoSession().getConsumeCardDao();
+        return dao.queryBuilder()
+                .where(ConsumeCardDao.Properties.TransTime.between(times[0], times[1]))
+                .whereOr(ConsumeCardDao.Properties.Reserve_1.isNull(), ConsumeCardDao.Properties.Reserve_1.notEq(flag))
+                .count();
     }
 }

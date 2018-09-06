@@ -15,10 +15,25 @@
         android:layout_width="match_parent"
         android:layout_height="23dp"
         android:background="@color/colorEx"
-        android:text="网络连接异常"
         android:gravity="center"
+        android:text="网络连接异常"
         android:textColor="@color/colorWhite"
         android:textSize="18sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/fill_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/net_status"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="25dp"
+        android:drawableLeft="@mipmap/fill_ing"
+        android:drawablePadding="10dp"
+        android:text="0/0"
+        android:textColor="@color/colorAccent"
+        android:textSize="20sp"
+        android:textStyle="italic"
         android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView

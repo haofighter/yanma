@@ -8,7 +8,7 @@ import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.BlackListCardDao;
 import com.szxb.buspay.db.entity.bean.BlackList;
 import com.szxb.buspay.db.entity.card.BlackListCard;
-import com.szxb.buspay.task.thread.ThreadScheduledExecutorUtil;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.HexUtil;
 import com.szxb.buspay.util.Util;
@@ -61,7 +61,7 @@ public class DownloadBlackRequest extends BaseRequest {
                                     bl.add(blackListCard);
                                 }
                                 BusApp.getPosManager().setBlackVersion(version);
-                                ThreadScheduledExecutorUtil.getInstance().getService().submit(new WorkThread("black_list", bl));
+                                ThreadFactory.getScheduledPool().execute(new WorkThread("black_list", bl));
                                 response.setStatus(ResponseMessage.SUCCESSFUL);
                                 response.setMsg("黑名单更新成功");
                             }

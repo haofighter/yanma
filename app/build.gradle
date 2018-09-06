@@ -42,13 +42,13 @@ android {
          * 4：荣成
          * 5：潍坊
          */
-        zibo_app {
-            versionCode 100
-            versionName "1.0.1"
-            buildConfigField 'String', 'LOG_TAG', '"zibo"'
-            buildConfigField 'String', 'BIN_NAME', '"zibo.bin"'
-            buildConfigField 'int', 'CITY', '0'
-        }
+//        zibo_app {
+//            versionCode 100
+//            versionName "1.0.1"
+//            buildConfigField 'String', 'LOG_TAG', '"zibo"'
+//            buildConfigField 'String', 'BIN_NAME', '"zibo.bin"'
+//            buildConfigField 'int', 'CITY', '0'
+//        }
 //
 //        taian_app {
 //            versionCode 100
@@ -58,13 +58,13 @@ android {
 //            buildConfigField 'int', 'CITY', '1'
 //        }
 
-//        zhaoyuan_app {
-//            versionCode 100
-//            versionName "1.0.5"
-//            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
-//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan.bin"'
-//            buildConfigField 'int', 'CITY', '3'
-//        }
+        zhaoyuan_app {
+            versionCode 100
+            versionName "1.0.6"
+            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
+            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_05.bin"'
+            buildConfigField 'int', 'CITY', '3'
+        }
 
     }
 
