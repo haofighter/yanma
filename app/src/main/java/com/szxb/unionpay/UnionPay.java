@@ -59,11 +59,11 @@ public class UnionPay {
         return instance;
     }
 
-    //重试时间
-    private int tryTime = 2000;
-    private int tryCnt = 10;
+    public  void exeSSL(int what, byte[] sendData) {
+        exeSSL(what, sendData, false);
+    }
 
-    public void exeSSL(int what, byte[] sendData) {
+    public void exeSSL(int what, byte[] sendData, final boolean isTip) {
 
         String url = BusllPosManage.getPosManager().getUnionPayUrl();
         final Request<byte[]> request = NoHttp.createByteArrayRequest(url, RequestMethod.POST);
@@ -98,7 +98,11 @@ public class UnionPay {
                             if (message0810.getValue(39).getValue().equals("00")) {
                                 String batchNum = message0810.getValue(60).getValue().substring(2, 8);
                                 BusllPosManage.getPosManager().setBatchNum(batchNum);
-                                parseMackey(message0810.getValue(62).getValue());
+                                parseMackey(message0810.getValue(62).getValue(), isTip);
+                            } else {
+                                if (isTip) {
+                                    BusToast.showToast(BusApp.getInstance().getApplicationContext(), "银联签到失败[" + message0810.getValue(39).getValue() + "]", false);
+                                }
                             }
                         } else if (what == UnionConfig.PAY) {//消费
                             String pay_fee = message0810.getValue(4).getValue();

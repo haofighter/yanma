@@ -366,7 +366,7 @@ public class Util {
             SLog.d("Util(updateUnionParam.java:334)银联参数设置成功>>>马上签到");
             BusllPosManage.getPosManager().setTradeSeq();
             Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
-            UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes());
+            UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes(),true);
 
         }
     }

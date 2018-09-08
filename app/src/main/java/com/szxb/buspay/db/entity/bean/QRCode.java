@@ -159,4 +159,10 @@ public class QRCode {
 
     //补采结束通知
     public static final int FILL_PUSH_END = 31;
+
+    //启动Dialog
+    public static final int START_DIALOG = 32;
+
+    //关闭Dialog
+    public static final int STOP_DIALOG = 33;
 }

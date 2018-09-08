@@ -47,7 +47,7 @@ import static java.lang.System.arraycopy;
 
 public class ParseUtil {
 
-    public static void parseMackey(String value) {
+    public static void parseMackey(String value, boolean isTip) {
         byte[] field_60_data = hex2byte(value);
         int i = 0;
         byte[] pinKey = new byte[16];
@@ -75,7 +75,9 @@ public class ParseUtil {
             arraycopy(crcdata, 0, macCrc, 0, macCrc.length);
             if (Arrays.equals(macCrc, macKeyCrc)) {
                 BusllPosManage.getPosManager().setMacKey(macKeyHex);
-//                BusToast.showToast(BusApp.getInstance(), "银联签到成功", true);
+                if (isTip) {
+                    BusToast.showToast(BusApp.getInstance(), "银联签到成功", true);
+                }
                 SLog.d("ParseUtil(parseMackey.java:74)银联Mac 保存成功");
             } else {
                 BusToast.showToast(BusApp.getInstance(), "银联签到失败[NEQ]", false);
@@ -146,7 +148,7 @@ public class ParseUtil {
                     if (message0810.getValue(39).getValue().equals("00")) {
                         String batchNum = message0810.getValue(60).getValue().substring(2, 8);
                         BusllPosManage.getPosManager().setBatchNum(batchNum);
-                        parseMackey(message0810.getValue(62).getValue());
+                        parseMackey(message0810.getValue(62).getValue(),false);
                     }
                     SLog.d("InitZipActivity(call.java:89)签到\n" + message0810.toFormatString());
                 }

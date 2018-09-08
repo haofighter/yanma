@@ -93,6 +93,11 @@ public class WorkThread extends Thread {
             UnionPayEntity unionPayEntity = (UnionPayEntity) record;
             getDaoSession().getUnionPayEntityDao().insertOrReplaceInTx(unionPayEntity);
 
+        } else if (TextUtils.equals(name, "update_union")) {
+            //修改银联交易
+            UnionPayEntity unionPayEntity = (UnionPayEntity) record;
+            getDaoSession().getUnionPayEntityDao().update(unionPayEntity);
+
         } else if (TextUtils.equals(name, "black_list")) {
             //更新黑名单
             BlackListCardDao dao = DBCore.getDaoSession().getBlackListCardDao();

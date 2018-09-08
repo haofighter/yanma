@@ -4,11 +4,14 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -30,6 +33,7 @@ import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.WaitDialog;
 import com.szxb.buspay.util.WriteRecordToSD;
 import com.szxb.buspay.util.adapter.HomeParentAdapter;
 import com.szxb.buspay.util.adapter.RecordAdapter;
@@ -169,6 +173,9 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     private RecordAdapter recordAdapter;
     private List<MainEntity> mRecordList = new ArrayList<>();
 
+    //dialog
+    private WaitDialog waitDialog;
+
     protected void initView() {
         net_status = (TextView) findViewById(R.id.net_status);
         fill_status = (TextView) findViewById(R.id.fill_status);
@@ -220,6 +227,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
         initAnimation();
 
+        waitDialog = new WaitDialog();
+
     }
 
     private void initRx() {
@@ -229,24 +238,36 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<QRScanMessage>() {
                     @Override
-                    public void accept(@NonNull QRScanMessage qrScanMessage) throws Exception {
-                        message(qrScanMessage);
-                        if (qrScanMessage.getResult() == QRCode.STOP_CNT) {
-                            //关闭菜单页
-                            onKeyCancel();
-                        } else if (qrScanMessage.getResult() == QRCode.CNT) {
-                            //汇总
-                            showCnt(qrScanMessage.getCntEntity());
-                        } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
-                            //网络状态发送改变
-                            hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
-                        } else if (qrScanMessage.getResult() == QRCode.FILL_PUSH_ING
-                                || qrScanMessage.getResult() == QRCode.FILL_PUSH_END) {
-                            //补采通知
-                            fillPush(qrScanMessage.getResult());
-                        } else if (qrScanMessage.getResult() == QRCode.TIP) {
-                            //刷卡提示
-                            MyToast.showToast2(BusApp.getInstance(), qrScanMessage.getMessage(), qrScanMessage.isOk());
+                    public void accept(@NonNull QRScanMessage qrScanMessage) {
+                        try {
+                            message(qrScanMessage);
+                            if (qrScanMessage.getResult() == QRCode.STOP_CNT) {
+                                //关闭菜单页
+                                onKeyCancel();
+                            } else if (qrScanMessage.getResult() == QRCode.CNT) {
+                                //汇总
+                                showCnt(qrScanMessage.getCntEntity());
+                            } else if (qrScanMessage.getResult() == QRCode.NET_STATUS) {
+                                //网络状态发送改变
+                                hasNetWork(AppUtil.getNetWorkState(getApplicationContext()));
+                            } else if (qrScanMessage.getResult() == QRCode.FILL_PUSH_ING
+                                    || qrScanMessage.getResult() == QRCode.FILL_PUSH_END) {
+                                //补采通知
+                                fillPush(qrScanMessage.getResult());
+                            } else if (qrScanMessage.getResult() == QRCode.TIP) {
+                                //刷卡提示
+                                MyToast.showToast2(BusApp.getInstance(), qrScanMessage.getMessage(), qrScanMessage.isOk());
+                            } else if (qrScanMessage.getResult() == QRCode.START_DIALOG) {
+                                //启动Dialog
+                                showDialog();
+                            } else if (qrScanMessage.getResult() == QRCode.STOP_DIALOG) {
+                                //关闭Dialog
+                                closeDialog();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            SLog.d("BaseActivity(accept.java:271)Rx异常>" + e.toString());
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -456,7 +477,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
                 BusToast.showToast(BusApp.getInstance().getApplicationContext(), "请勿重复启动补采任务", false);
             } else {
                 BusToast.showToast(BusApp.getInstance().getApplicationContext(), "检查补采\n请稍后", true);
-                ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill",1), 0, TimeUnit.SECONDS);
+                ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill", 1), 0, TimeUnit.SECONDS);
             }
             onKeyCancel();
         }
@@ -545,6 +566,11 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         net_status.setVisibility(b ? View.GONE : View.VISIBLE);
     }
 
+    /**
+     * 补采通知
+     *
+     * @param code .
+     */
     private void fillPush(int code) {
         long supplementaryMiningCnt = BusApp.getPosManager().getSupplementaryMiningCnt();
         if (code == QRCode.FILL_PUSH_ING) {
@@ -557,6 +583,42 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         }
     }
 
+    /**
+     * 显示dialog
+     */
+    private void showDialog() {
+        FragmentTransaction mFragTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("tip");
+        if (fragment != null) {
+            mFragTransaction.remove(fragment);
+        }
+        waitDialog.show(mFragTransaction, "tip");
+        waitDialog.start();
+    }
+
+    /**
+     * 关闭dialog
+     */
+    private void closeDialog() {
+        if (waitDialog != null && waitDialog.isAdded()) {
+            waitDialog.disDialog();
+            Log.d("BaseActivity",
+                    "closeDialog(BaseActivity.java:599)关闭");
+        }
+        Log.d("BaseActivity",
+                "closeDialog(BaseActivity.java:603)=============");
+    }
+
+
+    @Override
+    public void response(boolean success, ResponseMessage response) {
+        BusToast.showToast(getApplicationContext(), response.getMsg(),
+                response.getStatus()
+                        == ResponseMessage.SUCCESSFUL || response.getStatus()
+                        == ResponseMessage.SUCCESS || response.getStatus()
+                        == ResponseMessage.NOUPDATE);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -567,12 +629,4 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
         }
     }
 
-    @Override
-    public void response(boolean success, ResponseMessage response) {
-        BusToast.showToast(getApplicationContext(), response.getMsg(),
-                response.getStatus()
-                        == ResponseMessage.SUCCESSFUL || response.getStatus()
-                        == ResponseMessage.SUCCESS || response.getStatus()
-                        == ResponseMessage.NOUPDATE);
-    }
 }

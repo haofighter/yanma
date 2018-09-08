@@ -25,7 +25,7 @@ public class NetChangeReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
             boolean netWorkState = AppUtil.getNetWorkState(context);
             SLog.d("NetChangeReceiver(onReceive.java:22)网络状态发送了改变>>>" + netWorkState);
-            RxBus.getInstance().sendSingle(new QRScanMessage(new PosRecord(), QRCode.NET_STATUS));
+            RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.NET_STATUS));
         }
     }
 }

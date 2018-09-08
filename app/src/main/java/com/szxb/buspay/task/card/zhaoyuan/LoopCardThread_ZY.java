@@ -4,8 +4,11 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.db.entity.bean.QRCode;
+import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
+import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.task.card.CommonBase;
 import com.szxb.buspay.task.card.taian.CardTypeTaian;
@@ -13,10 +16,12 @@ import com.szxb.buspay.task.card.zibo.CardTypeZiBo;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
-import com.szxb.unionpay.UnionCard;
+import com.szxb.unionpay.dispose.BankCardParse;
+import com.szxb.unionpay.dispose.BankICResponse;
 
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
 import static com.szxb.buspay.task.card.CommonBase.empSign;
@@ -43,6 +48,7 @@ public class LoopCardThread_ZY extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
+    private BankICResponse bankICResponse;
 
     @Override
     public void run() {
@@ -135,7 +141,7 @@ public class LoopCardThread_ZY extends Thread {
             searchCard = null;
         } catch (Exception e) {
             e.printStackTrace();
-            SLog.d("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
+            SLog.e("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
         }
     }
 
@@ -184,7 +190,26 @@ public class LoopCardThread_ZY extends Thread {
         }
         if (TextUtils.equals(searchCard.cardModuleType, "F0")) {
             //银联卡
-            UnionCard.getInstance().run(searchCard.cityCode + searchCard.cardNo);
+            try {
+
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.START_DIALOG));
+                boolean isNull = bankICResponse == null;
+                BankCardParse cardParse = new BankCardParse();
+                bankICResponse = cardParse.parseResponse(bankICResponse,
+                        isNull ? "0" : bankICResponse.getMainCardNo(),
+                        isNull ? 0 : bankICResponse.getLastTime(), 1, searchCard.cityCode + searchCard.cardNo);
+                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.STOP_DIALOG));
+
+                if (bankICResponse.getResCode() > 0) {
+                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), true);
+                } else {
+                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), false);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                BusToast.showToast(BusApp.getInstance(), "", false);
+            }
         } else {
             int pay_fee = payFee(searchCard.cardType);
             int normal_pay = payFee("01");
