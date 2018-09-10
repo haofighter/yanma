@@ -8,7 +8,6 @@ import android.util.Log;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
-import com.szxb.buspay.util.Config;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.BankPay;
 import com.szxb.java8583.module.BusCard;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.szxb.buspay.task.card.CommonBase.notice;
 import static com.szxb.buspay.util.DateUtil.getCurrentDate;
 
 /**
@@ -67,9 +65,16 @@ public class BankCardParse {
     private int ret = 0;
 
     synchronized public BankICResponse parseResponse(BankICResponse icResponse, String lastMainCardNo, long lastTime, int amount, String aid) throws Exception {
+        icResponse.setMsg("参数错误");
+        if (TextUtils.isEmpty(aid)) {
+            icResponse.setResCode(ERROR_9);
+            icResponse.setMsg("AID参数错误");
+            return icResponse;
+        }
+
         if (amount > 1500) {
-            notice(Config.EC_FEE, "金额超出最大限制[" + amount + "]", false);
             icResponse.setResCode(ERROR_AMOUNT_OUT);
+            icResponse.setMsg( "金额超出最大限制[" + amount + "]");
             return icResponse;
         }
 
@@ -98,8 +103,6 @@ public class BankCardParse {
         mapTLV = TLV.decodingTLV(listTLV);
 
         listTLV = TLV.decodingPDOL(mapTLV.get("9f38"));
-
-        SLog.d("UnionCard(run.java:126)9f38>>" + mapTLV.get("9f38"));
 
         mapTLV = TLV.decodingTLV(listTLV);
 
@@ -265,14 +268,14 @@ public class BankCardParse {
 
         SLog.d("wuxinxi(LoopThread.java:233)mainCardNo=" + mainCardNo +
                 ",cardNum=" + cardNum + ",batch=" + BusllPosManage.getPosManager().getBatchNum()
-                + ",seq=" + busCard.getTradeSeq()+",key="+BusllPosManage.getPosManager().getMacKey());
+                + ",seq=" + busCard.getTradeSeq() + ",key=" + BusllPosManage.getPosManager().getMacKey());
 
 
         Iso8583Message iso8583Message = BankPay.getInstance().payMessage(busCard);
         byte[] sendData = iso8583Message.getBytes();
 
 
-        saveUnionPayEntity(amount, mainCardNo, tlv, sendData);
+        saveUnionPayEntity(amount, mainCardNo, tlv, sendData, cardNum);
 
         SyncSSLRequest syncSSLRequest = new SyncSSLRequest();
         icResponse = syncSSLRequest.request(sendData);
@@ -288,7 +291,7 @@ public class BankCardParse {
      * @return 记录
      */
     @NonNull
-    private void saveUnionPayEntity(int amount, String mainCardNo, String tlv, byte[] sendData) {
+    private void saveUnionPayEntity(int amount, String mainCardNo, String tlv, byte[] sendData, String cardNum) {
         UnionPayEntity payEntity = new UnionPayEntity();
         payEntity.setMchId(BusllPosManage.getPosManager().getMchId());
         payEntity.setUnionPosSn(BusllPosManage.getPosManager().getPosSn());
@@ -300,6 +303,8 @@ public class BankCardParse {
         payEntity.setTime(getCurrentDate());
         payEntity.setTradeSeq(String.format("%06d", BusllPosManage.getPosManager().getTradeSeq()));
         payEntity.setMainCardNo(mainCardNo);
+        //Reserve_1 cardNum
+        payEntity.setReserve_1(cardNum);
         payEntity.setBatchNum(BusllPosManage.getPosManager().getBatchNum());
         payEntity.setBus_line_name(BusApp.getPosManager().getChinese_name());
         payEntity.setBus_line_no(BusApp.getPosManager().getLineNo());

@@ -13,6 +13,7 @@ import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.task.card.CommonBase;
 import com.szxb.buspay.task.card.taian.CardTypeTaian;
 import com.szxb.buspay.task.card.zibo.CardTypeZiBo;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
@@ -48,7 +49,7 @@ public class LoopCardThread_ZY extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
-    private BankICResponse bankICResponse;
+    private BankICResponse bankICResponse = new BankICResponse();
 
     @Override
     public void run() {
@@ -192,8 +193,13 @@ public class LoopCardThread_ZY extends Thread {
             //银联卡
             try {
 
+                if (!AppUtil.checkNetStatus()) {
+                    BusToast.showToast(BusApp.getInstance(), "网络异常\n请选择其他方式乘车", false);
+                    return;
+                }
+
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.START_DIALOG));
-                boolean isNull = bankICResponse == null;
+                boolean isNull = bankICResponse.getResCode() == -999;
                 BankCardParse cardParse = new BankCardParse();
                 bankICResponse = cardParse.parseResponse(bankICResponse,
                         isNull ? "0" : bankICResponse.getMainCardNo(),
@@ -203,7 +209,7 @@ public class LoopCardThread_ZY extends Thread {
                 if (bankICResponse.getResCode() > 0) {
                     BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), true);
                 } else {
-                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), false);
+                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg()+"["+bankICResponse.getResCode()+"]", false);
                 }
 
             } catch (Exception e) {

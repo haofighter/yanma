@@ -8,7 +8,7 @@ package com.szxb.unionpay.dispose;
  */
 
 public class BankICResponse {
-    private int resCode = -99;
+    private int resCode = -999;
     private String mainCardNo = "0";
     private long lastTime = 0;
     private String msg = "未知错误[" + resCode + "]";

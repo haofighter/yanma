@@ -628,5 +628,4 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             subscribe.dispose();
         }
     }
-
 }

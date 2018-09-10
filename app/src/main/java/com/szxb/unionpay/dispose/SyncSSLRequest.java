@@ -65,6 +65,8 @@ public class SyncSSLRequest {
         request.setHostnameVerifier(SSLContextUtil.getHostnameVerifier());
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();
         request.setSSLSocketFactory(socketFactory);
+        request.setConnectTimeout(3000);
+        request.setReadTimeout(3000);
 
         Response<byte[]> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
@@ -122,16 +124,16 @@ public class SyncSSLRequest {
                     UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes(), true);
                     break;
                 case "94"://重复交易（流水号重复）
-                    icResponse.setResCode(94);
+                    icResponse.setResCode(-94);
                     icResponse.setMsg("流水号重复\n请重刷");
                     break;
                 case "51"://余额不足
-                    icResponse.setResCode(51);
-                    icResponse.setMsg("余额不足[51]");
+                    icResponse.setResCode(-51);
+                    icResponse.setMsg("余额不足");
                     break;
                 case "54"://卡过期
-                    icResponse.setResCode(54);
-                    icResponse.setMsg("卡过期[54]");
+                    icResponse.setResCode(-54);
+                    icResponse.setMsg("卡过期");
                     break;
                 default:
                     icResponse.setResCode(BankCardParse.ERROR_ELSE);

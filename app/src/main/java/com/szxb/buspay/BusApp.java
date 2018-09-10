@@ -25,6 +25,7 @@ import com.szxb.mlog.FormatStrategy;
 import com.szxb.mlog.PrettyFormatStrategy;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.config.UnionPayManager;
+import com.szxb.unionpay.dispose.BankRefund;
 import com.taobao.sophix.PatchStatus;
 import com.taobao.sophix.SophixManager;
 import com.taobao.sophix.listener.PatchLoadStatusListener;
@@ -185,14 +186,15 @@ public class BusApp extends Application {
         ThreadFactory.getScheduledPool().executeDelay(new WorkThread("app_reg_time"), 1, TimeUnit.MINUTES);
 
         //检查补采
-        ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill",0), 40, TimeUnit.SECONDS);
+        ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill", 0), 40, TimeUnit.SECONDS);
 
         if (BusApp.getPosManager().isSuppScanPay()) {
-            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("scan"), 15, 30, "scan", TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("scan"), 13, 30, "scan", TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {
-            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("ic"), 30, 30, "ic", TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("ic"), 30, 35, "ic", TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new BankRefund(), 60, 37, "union_refund", TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppUnionPay()) {

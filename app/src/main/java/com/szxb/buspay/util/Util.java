@@ -208,6 +208,8 @@ public class Util {
         switch (resCode) {
             case "00":
                 return "已扣款";
+            case "444":
+                return "已冲正";
             case "03":
                 return "无效商户";
             case "04":
@@ -366,7 +368,7 @@ public class Util {
             SLog.d("Util(updateUnionParam.java:334)银联参数设置成功>>>马上签到");
             BusllPosManage.getPosManager().setTradeSeq();
             Iso8583Message message = SignIn.getInstance().message(BusllPosManage.getPosManager().getTradeSeq());
-            UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes(),true);
+            UnionPay.getInstance().exeSSL(UnionConfig.SIGN, message.getBytes(), true);
 
         }
     }
@@ -392,8 +394,8 @@ public class Util {
 
     /**
      * @param forceUpdate 是否强制更新
-     * @param ftpPath  ftp路径
-     * @param tag      tag
+     * @param ftpPath     ftp路径
+     * @param tag         tag
      * @return 下载
      */
     public static int downUnionPayParasFile(boolean forceUpdate, String ftpPath, String tag) {

@@ -1,6 +1,9 @@
 package com.szxb.buspay.task.thread;
 
+import com.szxb.buspay.db.entity.bean.ThreadConfig;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -27,6 +30,15 @@ public class ScheduledThreadPool {
     public void executeCycle(Runnable runnable, int delay, int period, String tag, TimeUnit unit) {
         Future future = this.scheduledThreadPool.scheduleAtFixedRate(runnable, delay, period, unit);
         futureMap.put(tag, future);
+    }
+
+    /**
+     * @param manyThread 多任务
+     */
+    public void executeManyCycle(List<ThreadConfig> manyThread) {
+        for (ThreadConfig config : manyThread) {
+            executeCycle(config.getRunnable(), config.getDelay(), config.getPeriod(), config.getTag(), config.getUnit());
+        }
     }
 
     //延迟执行
@@ -57,4 +69,5 @@ public class ScheduledThreadPool {
             this.scheduledThreadPool.shutdown();
         }
     }
+
 }
