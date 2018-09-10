@@ -107,7 +107,7 @@ public class BankRefund extends Thread {
             Iso8583Message message0810 = factory.parse(response.get());
             SLog.d("HttpResponseListener(success.java:97)" + message0810.toFormatString());
             String value = message0810.getValue(39).getValue();
-            if (value.equals("00")) {
+            if (value.equals("00")||value.equals("25")||value.equals("12")) {
                 //冲正成功
                 payEntity.setResCode("444");
                 ThreadFactory.getScheduledPool().execute(new WorkThread("update_union", payEntity));
