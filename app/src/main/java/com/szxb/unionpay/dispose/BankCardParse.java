@@ -62,7 +62,6 @@ public class BankCardParse {
     private Map<String, String> mapTLV;
     private TERM_INFO term_info = new TERM_INFO();
     private PassCode retPassCode = new PassCode();
-    private int ret = 0;
 
     synchronized public BankICResponse parseResponse(BankICResponse icResponse, String lastMainCardNo, long lastTime, int amount, String aid) throws Exception {
         icResponse.setMsg("参数错误");

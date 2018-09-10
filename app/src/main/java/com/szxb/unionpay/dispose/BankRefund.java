@@ -110,6 +110,7 @@ public class BankRefund extends Thread {
             if (value.equals("00")||value.equals("25")||value.equals("12")) {
                 //冲正成功
                 payEntity.setResCode("444");
+                payEntity.setUpStatus(1);
                 ThreadFactory.getScheduledPool().execute(new WorkThread("update_union", payEntity));
             } else {
                 payEntity.setResCode(value + "[冲正失败]");
