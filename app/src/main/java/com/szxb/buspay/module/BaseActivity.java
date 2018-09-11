@@ -412,7 +412,7 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
             List<UnionPayEntity> unionPayEntityList = DBManager.queryUnionPayRecord();
             for (UnionPayEntity unionPayEntity : unionPayEntityList) {
                 MainEntity mainEntity = new MainEntity();
-                mainEntity.setType(1);
+                mainEntity.setType(TextUtils.isEmpty(unionPayEntity.getReserve_2()) ? 2 : 3);
                 mainEntity.setStatus(unionPayEntity.getUpStatus());
                 mainEntity.setTime(unionPayEntity.getTime());
                 mainEntity.setCard_id(unionPayEntity.getMainCardNo());

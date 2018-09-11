@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 作者：Tangren on 2018-07-17
@@ -411,4 +413,14 @@ public class Util {
                 .downUnionPayParasFile(forceUpdate);
     }
 
+
+    /**
+     * @param var .
+     * @return 是否是全数字
+     */
+    public static boolean isAllNum(String var) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher matcher = pattern.matcher(var);
+        return matcher.matches();
+    }
 }

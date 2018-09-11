@@ -1,6 +1,7 @@
 package com.szxb.buspay.util.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 
 import com.szxb.buspay.R;
@@ -48,6 +49,13 @@ public class RecordAdapter extends BaseAdapter {
                 null);
 
         holder.card_money.setText(t.getCard_money());
+        if (t.getType()==2){
+         holder.card_id.setTextColor(Color.parseColor("#FFFFFF"));
+        }else if (t.getType()==3){
+            holder.card_id.setTextColor(Color.parseColor("#EEEE00"));
+        }else {
+            holder.card_id.setTextColor(Color.parseColor("#FFFFFF"));
+        }
         holder.card_id.setText(t.getCard_id());
         holder.pay_money.setText(t.getPay_money());
         holder.time.setText(t.getTime());

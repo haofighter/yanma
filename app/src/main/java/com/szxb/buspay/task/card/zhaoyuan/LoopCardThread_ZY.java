@@ -22,7 +22,7 @@ import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.dispose.BankCardParse;
-import com.szxb.unionpay.dispose.BankICResponse;
+import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
 import static com.szxb.buspay.task.card.CommonBase.empSign;
@@ -49,7 +49,7 @@ public class LoopCardThread_ZY extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
-    private BankICResponse bankICResponse = new BankICResponse();
+    private BankResponse bankICResponse = new BankResponse();
 
     @Override
     public void run() {

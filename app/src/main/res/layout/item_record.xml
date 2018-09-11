@@ -9,12 +9,13 @@
         android:id="@+id/card_id"
         android:layout_width="0dp"
         android:layout_height="35dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="10dp"
         android:layout_weight="1"
         android:gravity="center|left"
         android:drawablePadding="5dp"
         android:lines="1"
         android:maxLength="20"
+        android:ellipsize="middle"
         android:textColor="@color/colorWhite"
         android:textSize="18sp" />
 

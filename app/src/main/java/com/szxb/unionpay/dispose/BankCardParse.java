@@ -6,8 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.task.thread.ThreadFactory;
-import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.util.Config;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.BankPay;
 import com.szxb.java8583.module.BusCard;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.szxb.buspay.db.manager.DBCore.getDaoSession;
 import static com.szxb.buspay.util.DateUtil.getCurrentDate;
 
 /**
@@ -63,7 +63,7 @@ public class BankCardParse {
     private TERM_INFO term_info = new TERM_INFO();
     private PassCode retPassCode = new PassCode();
 
-    synchronized public BankICResponse parseResponse(BankICResponse icResponse, String lastMainCardNo, long lastTime, int amount, String aid) throws Exception {
+    synchronized public BankResponse parseResponse(BankResponse icResponse, String lastMainCardNo, long lastTime, int amount, String aid) throws Exception {
         icResponse.setMsg("参数错误");
         if (TextUtils.isEmpty(aid)) {
             icResponse.setResCode(ERROR_9);
@@ -73,7 +73,7 @@ public class BankCardParse {
 
         if (amount > 1500) {
             icResponse.setResCode(ERROR_AMOUNT_OUT);
-            icResponse.setMsg( "金额超出最大限制[" + amount + "]");
+            icResponse.setMsg("金额超出最大限制[" + amount + "]");
             return icResponse;
         }
 
@@ -277,7 +277,7 @@ public class BankCardParse {
         saveUnionPayEntity(amount, mainCardNo, tlv, sendData, cardNum);
 
         SyncSSLRequest syncSSLRequest = new SyncSSLRequest();
-        icResponse = syncSSLRequest.request(sendData);
+        icResponse = syncSSLRequest.request(Config.PAY_TYPE_BANK_IC, sendData);
 
         return icResponse;
     }
@@ -313,7 +313,8 @@ public class BankCardParse {
         payEntity.setUniqueFlag(String.format("%06d", BusllPosManage.getPosManager().getTradeSeq()) + BusllPosManage.getPosManager().getBatchNum());
         payEntity.setTlv55(tlv);
         payEntity.setSingleData(HexUtil.bytesToHexString(sendData));
-        ThreadFactory.getScheduledPool().execute(new WorkThread("union", payEntity));
+        //记录也同步保存
+        getDaoSession().getUnionPayEntityDao().insertOrReplaceInTx(payEntity);
     }
 
 

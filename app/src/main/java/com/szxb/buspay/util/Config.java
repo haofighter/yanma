@@ -182,4 +182,9 @@ public class Config {
             "文明在于一言一行，安全源于一点一滴！"
     };
 
+    //银联卡
+    public static final int PAY_TYPE_BANK_IC = "BANK_IC".hashCode();
+    //银联二维码
+    public static final int PAY_TYPE_BANK_QR = "BANK_QR".hashCode();
+
 }

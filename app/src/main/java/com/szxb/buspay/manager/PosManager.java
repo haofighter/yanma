@@ -140,7 +140,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     private String lastParamsFileName;
 
     /**
-     * ################淄博      栖霞、招远           莱芜                泰安、沂源
+     * ################淄博      栖霞、               莱芜                泰安、沂源、招远
      * coefficient[0]:普通卡      普通卡              普通卡                 普通卡
      * coefficient[1]:学生卡      学生卡              学生卡                 学生卡
      * coefficient[2]:老年卡      老年卡              老年卡                 老年卡
@@ -149,10 +149,11 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
      * coefficient[5]:优惠1       员工卡              员工卡                 员工卡
      * coefficient[6]:优惠2       优惠2               优惠2                  优惠2
      * coefficient[7]:优惠3       优惠3               优惠3                  优惠3
-     * coefficient[8]:微信        微信                银联                    银联
-     * coefficient[9]:银联        银联                济南卡                  济南卡
-     * coefficient[10]########################################################优抚卡
+     * coefficient[8]:微信        微信                微信                    微信
+     * coefficient[9]:银联        银联                银联                    银联
+     * coefficient[10]############################### 济南卡 #################优抚卡
      * coefficient[11]#######################################################月票卡
+     * coefficient[12]######################################################银联二维码
      */
     private String[] coefficient;
 

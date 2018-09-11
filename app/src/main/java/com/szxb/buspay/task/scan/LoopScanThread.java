@@ -7,10 +7,13 @@ import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.scan.PosRecord;
+import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
+import com.szxb.unionpay.dispose.BankQRParse;
+import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.util.Util.checkQR;
 import static com.szxb.buspay.util.Util.checkQRMy;
@@ -28,6 +31,8 @@ public class LoopScanThread extends Thread {
     //每次扫码后的时间
     private long lastTime = 0;
 
+    private BankResponse response = new BankResponse();
+
     @Override
     public void run() {
         super.run();
@@ -42,10 +47,7 @@ public class LoopScanThread extends Thread {
                         BusToast.showToast(BusApp.getInstance(), "本线路暂不支持扫码乘车", false);
                         return;
                     }
-                    if (filterCheck(result)) {
-                        return;
-                    }
-                    if (checkLine()) {
+                    if (filter(result)) {
                         return;
                     }
 
@@ -55,6 +57,24 @@ public class LoopScanThread extends Thread {
                         return;
                     }
                     PosScanManager.getInstance().xbposScan(result);
+                } else if (Util.isAllNum(result)) {
+
+                    if (!BusApp.getPosManager().isSuppUnionPay()) {
+                        BusToast.showToast(BusApp.getInstance(), "本线路暂不支持银联二维码乘车", false);
+                        return;
+                    }
+                    if (filter(result)) {
+                        return;
+                    }
+
+                    BankQRParse qrParse = new BankQRParse();
+                    response = qrParse.parseResponse(BusApp.getPosManager().getBasePrice(), result);
+
+                    if (response.getResCode() > 0) {
+                        BusToast.showToast(BusApp.getInstance(), response.getMsg(), true);
+                    } else {
+                        BusToast.showToast(BusApp.getInstance(), response.getMsg() + "[" + response.getResCode() + "]", false);
+                    }
                 } else {
 //                    BusToast.showToast(BusApp.getInstance(), "二维码有误", false);
                 }
@@ -65,6 +85,10 @@ public class LoopScanThread extends Thread {
             e.printStackTrace();
             SLog.d("LoopScanThread(run.java:58)" + e.toString());
         }
+    }
+
+    private boolean filter(String result) {
+        return filterCheck(result) || checkLine();
     }
 
 

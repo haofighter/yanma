@@ -198,7 +198,7 @@ public class DBManager {
      */
     public static List<ConsumeCard> queryCardRecord(String type) {
         ConsumeCardDao dao = getDaoSession().getConsumeCardDao();
-        return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(50).build().list();
+        return dao.queryBuilder().orderDesc(ConsumeCardDao.Properties.Id).limit(25).build().list();
     }
 
     /**
@@ -206,7 +206,7 @@ public class DBManager {
      */
     public static List<ScanInfoEntity> queryScanRecord() {
         ScanInfoEntityDao dao = getDaoSession().getScanInfoEntityDao();
-        return dao.queryBuilder().orderDesc(ScanInfoEntityDao.Properties.Id).limit(50).build().list();
+        return dao.queryBuilder().orderDesc(ScanInfoEntityDao.Properties.Id).limit(25).build().list();
     }
 
     /**
@@ -214,7 +214,7 @@ public class DBManager {
      */
     public static List<UnionPayEntity> queryUnionPayRecord() {
         UnionPayEntityDao dao = getDaoSession().getUnionPayEntityDao();
-        return dao.queryBuilder().orderDesc(UnionPayEntityDao.Properties.Id).limit(50).build().list();
+        return dao.queryBuilder().orderDesc(UnionPayEntityDao.Properties.Id).limit(25).build().list();
     }
 
     /**

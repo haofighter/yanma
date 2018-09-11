@@ -42,8 +42,18 @@ public class PosScanManager {
         return qrcode != null && qrcode.indexOf("TX") == 0;
     }
 
-
+    //腾讯
     public void txposScan(String qrcode) {
+        //当为配置参数时提示
+        if (BusApp.getPosManager().getLineInfoEntity() == null) {
+            BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
+        } else {
+            TenPosReportManager.getInstance().posScan(qrcode);
+        }
+    }
+
+    //银联
+    public void ylposScan(String qrcode) {
         //当为配置参数时提示
         if (BusApp.getPosManager().getLineInfoEntity() == null) {
             BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);

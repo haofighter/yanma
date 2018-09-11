@@ -159,7 +159,7 @@ public class RecordThread extends Thread {
         if (execute.isSucceed()) {
             try {
                 JSONObject object = execute.get();
-                SLog.d("RecordThread(icRecordTask.java:158)"+object.toJSONString());
+                SLog.d("RecordThread(icRecordTask.java:158)" + object.toJSONString());
                 String rescode = object.getString("rescode");
                 if (TextUtils.equals(rescode, "0000")) {
                     JSONArray list = object.getJSONArray("dataList");
@@ -174,7 +174,7 @@ public class RecordThread extends Thread {
                         DBManager.updateCardInfo(type, tradeDate, pasmNumber, cardTradeCount, busNo, cardNo);
                         SLog.d("RecordThread(icRecordTask.java:114)IC卡上传成功   时间:" + tradeDate + " cardNo：" + cardNo + ",busNo" + busNo + ",上传方式=" + (type == 0 ? "正常上传" : "补采上传"));
                     }
-                    if (type==1){
+                    if (type == 1) {
                         RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.FILL_PUSH_ING));
                     }
                 }
@@ -202,15 +202,15 @@ public class RecordThread extends Thread {
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
         if (execute.isSucceed()) {
             JSONObject jsonObject = execute.get();
-            SLog.d("RecordThread(stopSupMin.java:201)"+jsonObject.toJSONString());
+            SLog.d("RecordThread(stopSupMin.java:201)" + jsonObject.toJSONString());
             if (TextUtils.equals(jsonObject.getString("rescode"), "00")
                     || TextUtils.equals(jsonObject.getString("rescode"), "02")) {
                 SLog.d("RecordThread(icRecordTask.java:101)通知后台补采结束成功>>>>>>");
                 ThreadFactory.getScheduledPool().stopTask("sup_min");
                 RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.FILL_PUSH_END));
             }
-        }else {
-            SLog.d("RecordThread(stopSupMin.java:207)"+execute.getException().toString());
+        } else {
+            SLog.d("RecordThread(stopSupMin.java:207)" + execute.getException().toString());
         }
     }
 
@@ -243,6 +243,8 @@ public class RecordThread extends Thread {
             object.put("unitno", payEntity.getUnitno());
             object.put("upStatus", payEntity.getUpStatus());
             object.put("uniqueFlag", payEntity.getUniqueFlag());
+            //卡填1，二维码填2
+            object.put("tranType", TextUtils.isEmpty(payEntity.getReserve_2()) ? "1" : "2");
             array.add(object);
         }
         map.put("data", array.toJSONString());

@@ -7,10 +7,11 @@ package com.szxb.unionpay.dispose;
  * TODO:一句话描述
  */
 
-public class BankICResponse {
+public class BankResponse {
     private int resCode = -999;
     private String mainCardNo = "0";
     private long lastTime = 0;
+    private int type;
     private String msg = "未知错误[" + resCode + "]";
 
     public String getMsg() {
@@ -27,6 +28,14 @@ public class BankICResponse {
 
     public void setResCode(int resCode) {
         this.resCode = resCode;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getMainCardNo() {

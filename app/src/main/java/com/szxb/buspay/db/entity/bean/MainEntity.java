@@ -14,7 +14,7 @@ public class MainEntity {
     private String time;
     private String cardType;
     private int status;
-    private int type;//0:刷卡，1：扫码，2：银联卡
+    private int type;//0:刷卡，1：扫码，2：银联卡，3：银联二维码
 
     public MainEntity(String card_id) {
         this.card_id = card_id;
