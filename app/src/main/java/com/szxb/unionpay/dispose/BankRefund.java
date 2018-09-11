@@ -55,7 +55,7 @@ public class BankRefund extends Thread {
             for (UnionPayEntity payEntity : list) {
                 Iso8583Message refund = PosRefund.getInstance().refund(
                         payEntity.getMainCardNo(), payEntity.getReserve_1(),
-                        Util.string2Int(payEntity.getTradeSeq()), payEntity.getBatchNum(), "00",
+                        Util.string2Int(payEntity.getTradeSeq()), BusllPosManage.getPosManager().getBatchNum(), "00",
                         Util.string2Int(payEntity.getPayFee()));
                 requestRefund(what.get(), refund.getBytes(), payEntity);
                 what.getAndDecrement();
