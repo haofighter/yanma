@@ -32,6 +32,10 @@ public interface IPosManager {
 
     int getUnionPayPrice();
 
+    void setUnionScanPrice(int price);
+
+    int getUnionScanPrice();
+
     String getMac(String keyId);
 
     String getPublicKey(String keyId);

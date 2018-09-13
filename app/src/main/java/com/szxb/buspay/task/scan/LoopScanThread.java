@@ -68,7 +68,7 @@ public class LoopScanThread extends Thread {
                     }
 
                     BankQRParse qrParse = new BankQRParse();
-                    response = qrParse.parseResponse(BusApp.getPosManager().getBasePrice(), result);
+                    response = qrParse.parseResponse(BusApp.getPosManager().getUnionScanPrice(), result);
 
                     if (response.getResCode() > 0) {
                         BusToast.showToast(BusApp.getInstance(), response.getMsg(), true);

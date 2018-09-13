@@ -14,6 +14,7 @@ import com.szxb.buspay.db.sp.FetchAppConfig;
 import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
+import com.szxb.mlog.SLog;
 
 import java.util.List;
 
@@ -62,6 +63,11 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
      * 银联实际扣款
      */
     private int unionPaymarkedPrice;
+
+    /**
+     * 银联二维码
+     */
+    private int unionScanPrice;
 
     /**
      * 370300zibo  371200laiwu
@@ -257,6 +263,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         }
         paymarkedPrice = string2Int(coefficient[8]) * basePrice / 100;
         unionPaymarkedPrice = string2Int(coefficient[9]) * basePrice / 100;
+        unionScanPrice = string2Int(coefficient[12]) * basePrice / 100;
     }
 
     private void initSn() {
@@ -324,6 +331,16 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     @Override
     public int getUnionPayPrice() {
         return unionPaymarkedPrice;
+    }
+
+    @Override
+    public void setUnionScanPrice(int price) {
+        this.unionScanPrice = price;
+    }
+
+    @Override
+    public int getUnionScanPrice() {
+        return unionScanPrice;
     }
 
     @Override
@@ -487,7 +504,7 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
 
     @Override
     public void setCoefficent(String coefficent) {
-        coefficent = Util.addZeroRight(coefficent, 36);
+        coefficent = Util.addZeroRight(coefficent, 39);
         int len = coefficent.length() / 3;
         coefficient = new String[len];
         int index = 0;
@@ -496,7 +513,12 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         }
         setWcPrice(string2Int(coefficient[8]) * basePrice / 100);
         setUnionPayPrice(string2Int(coefficient[9]) * basePrice / 100);
+        setUnionScanPrice(string2Int(coefficient[12]) * basePrice / 100);
         CommonSharedPreferences.put("coefficient", coefficent);
+
+//        090 090 090 090 100 100 100 100 090 090 100 001 100
+//        095 050 000 100 050 100 100 100 100 100 000 001 100
+        SLog.d("PosManager(setCoefficent.java:501)coefficent=" + coefficent);
     }
 
     @Override

@@ -4,11 +4,8 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.db.entity.bean.QRCode;
-import com.szxb.buspay.db.entity.bean.QRScanMessage;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
-import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.task.card.CommonBase;
 import com.szxb.buspay.task.card.taian.CardTypeTaian;
@@ -17,11 +14,9 @@ import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
-import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
-import com.szxb.unionpay.dispose.BankCardParse;
 import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
@@ -56,7 +51,7 @@ public class LoopCardThread_ZY extends Thread {
         super.run();
         try {
 
-            byte[] searchBytes = new byte[16];
+            byte[] searchBytes = new byte[40];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
                 if (status == -2) {
@@ -64,7 +59,6 @@ public class LoopCardThread_ZY extends Thread {
                     SLog.d("LoopCardThread_ZY(run.java:55)status==2>>尝试重启K21");
                     libszxb.deviceReset();
                 }
-                SLog.e("LoopCardThread_ZY(run.java:19)寻卡状态=" + status);
                 searchCard = null;
                 return;
             }
@@ -198,23 +192,11 @@ public class LoopCardThread_ZY extends Thread {
                     return;
                 }
 
-                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.START_DIALOG));
-                boolean isNull = bankICResponse.getResCode() == -999;
-                BankCardParse cardParse = new BankCardParse();
-                bankICResponse = cardParse.parseResponse(bankICResponse,
-                        isNull ? "0" : bankICResponse.getMainCardNo(),
-                        isNull ? 0 : bankICResponse.getLastTime(), 1, searchCard.cityCode + searchCard.cardNo);
-                RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.STOP_DIALOG));
-
-                if (bankICResponse.getResCode() > 0) {
-                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), true);
-                } else {
-                    BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg()+"["+bankICResponse.getResCode()+"]", false);
-                }
+                bankICResponse = CommonBase.unionDispose(bankICResponse, searchCard);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                BusToast.showToast(BusApp.getInstance(), "", false);
+                BusToast.showToast(BusApp.getInstance(), "银联模块异常\n" + e.toString(), false);
             }
         } else {
             int pay_fee = payFee(searchCard.cardType);
@@ -341,6 +323,7 @@ public class LoopCardThread_ZY extends Thread {
 
     }
 
+
     /**
      * @param cardType 卡类型
      * @return .
@@ -368,7 +351,7 @@ public class LoopCardThread_ZY extends Thread {
             case CardTypeTaian.CARD_DEFECT://优抚卡
                 return (int) Math.round((double) string2Int(coefficent[10]) * basePrices / 100);
             case CardTypeTaian.CARD_MONTH://月票卡
-                return (int) Math.round((double) string2Int(coefficent[11]));
+                return string2Int(coefficent[11]);
             case CardTypeTaian.CARD_GATHER:
             case CardTypeTaian.CARD_SIGNED:
             case CardTypeTaian.CARD_CHECKED:

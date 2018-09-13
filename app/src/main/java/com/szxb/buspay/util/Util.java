@@ -174,7 +174,7 @@ public class Util {
         int strLen = str.length();
         if (strLen < strLength) {
             while (strLen < strLength) {
-                str = str + "0";
+                str = str + "100";
                 strLen = str.length();
             }
         }

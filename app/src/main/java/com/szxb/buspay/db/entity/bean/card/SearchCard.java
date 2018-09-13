@@ -23,6 +23,17 @@ public class SearchCard {
     //卡模块类型CPU/M1
     public String cardModuleType;
 
+    //方向
+    public String direction;
+    //站点
+    public String stationID;
+    //上下车标志
+    public String upDnFlag;
+    //银联AID长度
+    public int aidLength;
+    //AID
+    public String aid;
+
     public SearchCard(byte[] datas) {
         int index = 0;
         byte[] status_byte = new byte[1];
@@ -44,6 +55,19 @@ public class SearchCard {
         byte[] card_module_type_byte = new byte[1];
         arraycopy(datas, index + card_type_byte.length, card_module_type_byte, 0, card_module_type_byte.length);
         cardModuleType = HexUtil.printHexBinary(card_module_type_byte);
+
+//        00A00000033301010100F000000008A0000003330101010000000000000000000000000000000000
+
+        index += 5;
+        byte[] aidLen = new byte[1];
+        arraycopy(datas, index, aidLen, 0, aidLen.length);
+        aidLength = Integer.valueOf(HexUtil.printHexBinary(aidLen));
+
+        byte[] aid_byte = new byte[aidLength];
+        arraycopy(datas, index + aidLen.length, aid_byte, 0, aid_byte.length);
+        aid = HexUtil.printHexBinary(aid_byte);
+
+
     }
 
     @Override
@@ -54,6 +78,8 @@ public class SearchCard {
                 ", 卡号='" + cardNo + '\'' +
                 ", 卡类型='" + cardType + '\'' +
                 ", 卡结构类型='" + cardModuleType + '\'' +
+                ", AID长度='" + aidLength + '\'' +
+                ", AID='" + aid + '\'' +
                 ']';
     }
 }

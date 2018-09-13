@@ -2,20 +2,20 @@ package com.szxb.buspay.task.card.zibo;
 
 import android.os.SystemClock;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.card.ConsumeCard;
 import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.task.card.CommonBase;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
-import com.szxb.unionpay.UnionCard;
+import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
 import static com.szxb.buspay.task.card.CommonBase.empSign;
@@ -41,12 +41,13 @@ public class LoopCardThread extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
+    private BankResponse bankICResponse = new BankResponse();
 
     @Override
     public void run() {
         super.run();
         try {
-            byte[] searchBytes = new byte[16];
+            byte[] searchBytes = new byte[40];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
                 if (status == -2) {
@@ -62,7 +63,6 @@ public class LoopCardThread extends Thread {
             if (searchBytes[0] != (byte) 0x00) {
                 //如果寻卡状态不等于00..无法处理此卡
                 searchCard = null;
-                Log.i("获取到卡状态ZY", "   " + searchBytes[0]);
                 return;
             }
 
@@ -169,7 +169,19 @@ public class LoopCardThread extends Thread {
 
         if (TextUtils.equals(searchCard.cardModuleType, "F0")) {
             //银联卡
-            UnionCard.getInstance().run(searchCard.cityCode + searchCard.cardNo);
+            try {
+
+                if (!AppUtil.checkNetStatus()) {
+                    BusToast.showToast(BusApp.getInstance(), "网络异常\n请选择其他方式乘车", false);
+                    return;
+                }
+
+                bankICResponse = CommonBase.unionDispose(bankICResponse, searchCard);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                BusToast.showToast(BusApp.getInstance(), "银联模块异常\n" + e.toString(), false);
+            }
         } else {
             int pay_fee = payFee(searchCard.cardType);
             int normal_pay = payFee("01");

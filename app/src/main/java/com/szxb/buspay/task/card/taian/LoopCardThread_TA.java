@@ -9,13 +9,14 @@ import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.task.card.CommonBase;
 import com.szxb.buspay.task.card.zibo.CardTypeZiBo;
+import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
-import com.szxb.unionpay.UnionCard;
+import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
 import static com.szxb.buspay.task.card.CommonBase.empSign;
@@ -42,13 +43,14 @@ public class LoopCardThread_TA extends Thread {
     private String cardNoTemp = "0";
     private long lastTime = 0;
     private SearchCard searchCard;
+    private BankResponse bankICResponse = new BankResponse();
 
     @Override
     public void run() {
         super.run();
         try {
 
-            byte[] searchBytes = new byte[16];
+            byte[] searchBytes = new byte[40];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
                 if (status == -2) {
@@ -56,7 +58,6 @@ public class LoopCardThread_TA extends Thread {
                     SLog.d("LoopCardThread_TA(run.java:55)status==2>>尝试重启K21");
                     libszxb.deviceReset();
                 }
-                SLog.e("LoopCardThread_TA(run.java:19)寻卡状态=" + status);
                 searchCard = null;
                 return;
             }
@@ -103,8 +104,6 @@ public class LoopCardThread_TA extends Thread {
 //                BusToast.showToast(BusApp.getInstance(), "您已刷过[" + searchCard.cardType + "]", false);
                 return;
             }
-
-            SLog.d("LoopCardThread(run.java:82)寻卡数据>>>" + searchCard);
 
             //1.判断是否已签到
             //2.未签到
@@ -178,7 +177,19 @@ public class LoopCardThread_TA extends Thread {
 
         if (TextUtils.equals(searchCard.cardModuleType, "F0")) {
             //银联卡
-            UnionCard.getInstance().run(searchCard.cityCode + searchCard.cardNo);
+            try {
+
+                if (!AppUtil.checkNetStatus()) {
+                    BusToast.showToast(BusApp.getInstance(), "网络异常\n请选择其他方式乘车", false);
+                    return;
+                }
+
+                bankICResponse = CommonBase.unionDispose(bankICResponse, searchCard);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                BusToast.showToast(BusApp.getInstance(), "银联模块异常\n" + e.toString(), false);
+            }
         } else {
             int pay_fee = payFee(searchCard.cardType);
             int normal_pay = payFee("01");
@@ -294,7 +305,7 @@ public class LoopCardThread_TA extends Thread {
             } else if (status.equalsIgnoreCase("FE")
                     || status.equalsIgnoreCase("FF")) {
                 //消费异常(重新刷卡)
-                notice(Config.IC_RE, "重新刷卡[" + status + "]", false);
+                SLog.d("LoopCardThread_TA(elseCardControl.java:296)status=" + status);
                 this.searchCard.cardNo = "0";
             }
 
@@ -311,23 +322,23 @@ public class LoopCardThread_TA extends Thread {
         int basePrices = BusApp.getPosManager().getBasePrice();
         switch (cardType) {
             case CardTypeTaian.CARD_NORMAL://普通卡 01
-                return string2Int(coefficent[0]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[0]) * basePrices / 100);
             case CardTypeTaian.CARD_STUDENT://学生卡
-                return string2Int(coefficent[1]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[1]) * basePrices / 100);
             case CardTypeTaian.CARD_OLD://老年卡
-                return string2Int(coefficent[2]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[2]) * basePrices / 100);
             case CardTypeTaian.CARD_FREE://免费卡
-                return string2Int(coefficent[3]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[3]) * basePrices / 100);
             case CardTypeTaian.CARD_EMP://员工卡
-                return string2Int(coefficent[5]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[5]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_1://优化卡1
-                return string2Int(coefficent[4]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[4]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_2://优化卡2
-                return string2Int(coefficent[6]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[6]) * basePrices / 100);
             case CardTypeTaian.CARD_DIS_3://优化卡3
-                return string2Int(coefficent[7]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[7]) * basePrices / 100);
             case CardTypeTaian.CARD_DEFECT://优抚卡
-                return string2Int(coefficent[10]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[10]) * basePrices / 100);
             case CardTypeTaian.CARD_MONTH://月票卡
                 return string2Int(coefficent[11]);
             case CardTypeTaian.CARD_GATHER:
@@ -336,7 +347,7 @@ public class LoopCardThread_TA extends Thread {
             case CardTypeTaian.CARD_CHECK:
                 return 0;
             default:
-                return string2Int(coefficent[0]) * basePrices / 100;
+                return (int) Math.round((double) string2Int(coefficent[0]) * basePrices / 100);
         }
     }
 

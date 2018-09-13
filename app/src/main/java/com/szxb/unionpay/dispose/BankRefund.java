@@ -1,5 +1,7 @@
 package com.szxb.unionpay.dispose;
 
+import android.text.TextUtils;
+
 import com.szxb.buspay.db.dao.UnionPayEntityDao;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.http.BaseByteRequest;
@@ -13,6 +15,7 @@ import com.szxb.buspay.util.Util;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.core.Iso8583MessageFactory;
 import com.szxb.java8583.module.PosRefund;
+import com.szxb.java8583.module.PosScanRefund;
 import com.szxb.java8583.module.manager.BusllPosManage;
 import com.szxb.java8583.quickstart.SingletonFactory;
 import com.szxb.java8583.quickstart.special.SpecialField62;
@@ -30,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 作者：Tangren on 2018-09-10
  * 包名：com.szxb.unionpay.dispose
  * 邮箱：996489865@qq.com
- * TODO:一句话描述
+ * TODO:银联冲正（刷卡、二维码）
  */
 
 public class BankRefund extends Thread {
@@ -53,10 +56,7 @@ public class BankRefund extends Thread {
 
             AtomicInteger what = new AtomicInteger(111);
             for (UnionPayEntity payEntity : list) {
-                Iso8583Message refund = PosRefund.getInstance().refund(
-                        payEntity.getMainCardNo(), payEntity.getReserve_1(),
-                        Util.string2Int(payEntity.getTradeSeq()), BusllPosManage.getPosManager().getBatchNum(), "00",
-                        Util.string2Int(payEntity.getPayFee()));
+                Iso8583Message refund = getIso8583Message(payEntity);
                 requestRefund(what.get(), refund.getBytes(), payEntity);
                 what.getAndDecrement();
             }
@@ -65,6 +65,13 @@ public class BankRefund extends Thread {
             e.printStackTrace();
             SLog.e("BankRefund(run.java:76)" + e.toString());
         }
+    }
+
+
+    private Iso8583Message getIso8583Message(UnionPayEntity payEntity) {
+        return TextUtils.isEmpty(payEntity.getReserve_2())
+                ? PosRefund.getInstance().refund(payEntity.getMainCardNo(), payEntity.getReserve_1(), Util.string2Int(payEntity.getTradeSeq()), BusllPosManage.getPosManager().getBatchNum(), "00", Util.string2Int(payEntity.getPayFee()))
+                : PosScanRefund.getInstance().refun(Util.string2Int(payEntity.getTradeSeq()), payEntity.getMainCardNo(), "00", Util.string2Int(payEntity.getPayFee()));
     }
 
     private void requestRefund(int what, byte[] sendData, UnionPayEntity entity) {
@@ -96,7 +103,7 @@ public class BankRefund extends Thread {
                 payEntity.setUpStatus(1);
                 ThreadFactory.getScheduledPool().execute(new WorkThread("update_union", payEntity));
             } else {
-                payEntity.setResCode(value + "[冲正失败]");
+                payEntity.setResCode(value + "[ERROR]");
                 ThreadFactory.getScheduledPool().execute(new WorkThread("update_union", payEntity));
             }
         }

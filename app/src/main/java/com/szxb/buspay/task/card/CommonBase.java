@@ -18,6 +18,8 @@ import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
+import com.szxb.unionpay.dispose.BankCardParse;
+import com.szxb.unionpay.dispose.BankResponse;
 
 import static com.szxb.buspay.util.Util.fen2Yuan;
 import static com.szxb.buspay.util.Util.string2Int;
@@ -93,8 +95,6 @@ public class CommonBase {
         int ret = libszxb.qxcardprocess(sendData);
         return new ConsumeCard(sendData, isSign, "zibo", cardModuleType);
     }
-
-
 
 
     /**
@@ -177,4 +177,25 @@ public class CommonBase {
     }
 
 
+    /**
+     * @param bankICResponse .
+     * @param searchCard     .
+     * @throws Exception .
+     */
+    public static BankResponse unionDispose(BankResponse bankICResponse, SearchCard searchCard) throws Exception {
+        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.START_DIALOG));
+        boolean isNull = bankICResponse.getResCode() == -999;
+        BankCardParse cardParse = new BankCardParse();
+        bankICResponse = cardParse.parseResponse(bankICResponse,
+                isNull ? "0" : bankICResponse.getMainCardNo(),
+                isNull ? 0 : bankICResponse.getLastTime(), BusApp.getPosManager().getUnionPayPrice(), searchCard.cityCode + searchCard.cardNo);
+        RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.STOP_DIALOG));
+
+        if (bankICResponse.getResCode() > 0) {
+            BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg(), true);
+        } else {
+            BusToast.showToast(BusApp.getInstance(), bankICResponse.getMsg() + "[" + bankICResponse.getResCode() + "]", false);
+        }
+        return bankICResponse;
+    }
 }

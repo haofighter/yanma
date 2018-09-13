@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.util.Config;
 import com.szxb.java8583.core.Iso8583Message;
@@ -245,15 +246,25 @@ public class BankCardParse {
         String cardData = retPassCode.getTAG57();
         String tlv = retPassCode.toString();
 
+
+        if (BuildConfig.BIN_NAME.contains("zhaoyuan")) {
+            //如果是招远则做卡限制
+            if (cardNum.indexOf("62232006") != 0 || cardNum.indexOf("62232006") != 0) {
+                icResponse.setResCode(ERROR_10);
+                icResponse.setMsg("暂不支持此银联卡");
+                return icResponse;
+            }
+        }
+
         //重刷拦截
         if (TextUtils.equals(mainCardNo, lastMainCardNo)) {
             if (SystemClock.elapsedRealtime() - lastTime < 10000) {
-                SLog.d("LoopCardThread_ZY(scan.java:1790)相同码3000ms连刷被拦截>>>GG");
                 icResponse.setResCode(ERROR_REPEAT);
                 icResponse.setMsg("禁止连续刷卡");
                 return icResponse;
             }
         }
+
 
         BusCard busCard = new BusCard();
         busCard.setMainCardNo(mainCardNo);
@@ -264,15 +275,8 @@ public class BankCardParse {
         busCard.setMoney(amount);
         busCard.setTradeSeq(BusllPosManage.getPosManager().getTradeSeq());
 
-
-        SLog.d("wuxinxi(LoopThread.java:233)mainCardNo=" + mainCardNo +
-                ",cardNum=" + cardNum + ",batch=" + BusllPosManage.getPosManager().getBatchNum()
-                + ",seq=" + busCard.getTradeSeq() + ",key=" + BusllPosManage.getPosManager().getMacKey());
-
-
         Iso8583Message iso8583Message = BankPay.getInstance().payMessage(busCard);
         byte[] sendData = iso8583Message.getBytes();
-
 
         saveUnionPayEntity(amount, mainCardNo, tlv, sendData, cardNum);
 

@@ -1,7 +1,6 @@
 package com.szxb.buspay.task.service;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -143,7 +142,6 @@ public class RecordThread extends Thread {
             object.put("termseq", Util.Random(10));
             object.put("mchid", cardRecord.getMchId());
 
-
             object.put("halfprice", cardRecord.getIsHalfPrices());
             object.put("keytype", TextUtils.equals(cardRecord.getCardModuleType(), "08") ? "0" : "31");
             object.put("citycode", cardRecord.getCardNo().substring(0, 4));
@@ -268,7 +266,7 @@ public class RecordThread extends Thread {
                 SLog.d("RecordThread(unionRecordTask.java:116)银联卡上传异常>>" + e.toString());
             }
         } else {
-            SLog.d("RecordThread(unionRecordTask.java:187)银联卡上传网络异常");
+            SLog.d("RecordThread(unionRecordTask.java:187)银联卡上传网络异常"+execute.getException().toString());
         }
     }
 
@@ -279,8 +277,6 @@ public class RecordThread extends Thread {
     private void scanRecordTask() {
         List<ScanInfoEntity> swipeList = DBManager.getSwipeList();
         if (swipeList.size() == 0) {
-            Log.d("RecordThread",
-                    "scanRecordTask(RecordThread.java:60)扫码暂无未上传数据>>>");
             return;
         }
         JsonRequest request = new JsonRequest(Config.XBPAY, RequestMethod.POST);

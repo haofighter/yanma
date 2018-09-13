@@ -47,6 +47,7 @@ public class BankQRParse {
         payEntity.setTime(getCurrentDate());
         payEntity.setTradeSeq(String.format("%06d", BusllPosManage.getPosManager().getTradeSeq()));
         payEntity.setMainCardNo(qrCode);
+        payEntity.setReserve_1(qrCode);
         payEntity.setBatchNum(BusllPosManage.getPosManager().getBatchNum());
         payEntity.setBus_line_name(BusApp.getPosManager().getChinese_name());
         payEntity.setBus_line_no(BusApp.getPosManager().getLineNo());
