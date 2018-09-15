@@ -113,6 +113,7 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
         update_info.append("银联签到中\n");
         ParseUtil.initUnionPay();
         update_info.append("银联签到完成\n");
+
     }
 
 

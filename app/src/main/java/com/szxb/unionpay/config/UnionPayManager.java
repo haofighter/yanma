@@ -2,6 +2,7 @@ package com.szxb.unionpay.config;
 
 import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
+import com.szxb.buspay.util.Util;
 import com.szxb.java8583.module.manager.IManager;
 
 /**
@@ -38,7 +39,7 @@ public class UnionPayManager implements IManager {
     /**
      * 银联分配
      */
-    private String TPDU="0000000000";
+    private String TPDU = "0000000000";
 
     /**
      * 银联分配设备号
@@ -168,10 +169,14 @@ public class UnionPayManager implements IManager {
 
     @Override
     public void setTradeSeq() {
-        if (tradeSeq >= 999999) {
-            tradeSeq = 0;
+        String seq = String.format("%06d", tradeSeq);
+        int incSeq = Util.string2Int(seq.substring(3, 6));
+        if (incSeq >= 998) {
+            incSeq = 1;
         }
-        tradeSeq += 1;
+        incSeq += 1;
+        String randomNumStr = String.format("%03d", (int) (Math.random() * 999)) + String.format("%03d", incSeq);
+        this.tradeSeq = Util.string2Int(randomNumStr);
         CommonSharedPreferences.put("trade_seq", tradeSeq);
     }
 

@@ -27,6 +27,9 @@ public class BaseByteRequest extends ByteArrayRequest {
         this.setHeader("HOST", "120.204.69.139:30000");
 
         SSLContext sslContext = SSLContextUtil.getSSLContext(BusApp.getInstance().getApplicationContext());
+        if (sslContext == null) {
+            sslContext = SSLContextUtil.getDefaultSLLContext();
+        }
         this.setHostnameVerifier(SSLContextUtil.getHostnameVerifier());
         SSLSocketFactory socketFactory = sslContext.getSocketFactory();
         this.setSSLSocketFactory(socketFactory);

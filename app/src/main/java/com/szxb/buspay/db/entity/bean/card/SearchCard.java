@@ -67,7 +67,6 @@ public class SearchCard {
         arraycopy(datas, index + aidLen.length, aid_byte, 0, aid_byte.length);
         aid = HexUtil.printHexBinary(aid_byte);
 
-
     }
 
     @Override

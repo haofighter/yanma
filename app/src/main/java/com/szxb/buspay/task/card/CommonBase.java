@@ -159,7 +159,6 @@ public class CommonBase {
      */
     public static void notice(int music, String tipVar, boolean isOk) {
         SoundPoolUtil.play(music);
-//        BusToast.showToast(BusApp.getInstance(), tipVar, isOk);
         QRScanMessage message = new QRScanMessage(new PosRecord(), QRCode.TIP);
         message.setMessage(tipVar);
         message.setOk(isOk);

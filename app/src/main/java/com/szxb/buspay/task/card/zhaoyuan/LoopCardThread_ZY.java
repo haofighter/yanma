@@ -278,6 +278,7 @@ public class LoopCardThread_ZY extends Thread {
                                     + response.getCardBalance();
                             notice(Config.IC_HIGHT_CARD, toast, true);
                             saveRecord(response);
+
                             break;
                         default://其他卡类型
                             zeroDis(response);

@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 public class TaskDelFile {
 
-
     public void del() {
         ThreadFactory.getScheduledPool().execute(new FileRunnable());
     }

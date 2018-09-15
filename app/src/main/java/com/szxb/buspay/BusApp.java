@@ -80,6 +80,7 @@ public class BusApp extends Application {
         manager = new PosManager();
         manager.loadFromPrefs(city, binName);
 
+
         initLog();
 
         SoundPoolUtil.init(this);

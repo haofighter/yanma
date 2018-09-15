@@ -116,7 +116,7 @@ public class BankCardParse {
                     pDOLBuilder.append(term_info.ttq);
                     break;
                 case "9f02"://授权金额（支付金额）
-                    String payMoney = String.format("%012d", 1);
+                    String payMoney = String.format("%012d", amount);
                     pDOLBuilder.append(payMoney);
                     retPassCode.setTAG9F02(payMoney);
                     break;
@@ -276,6 +276,7 @@ public class BankCardParse {
         busCard.setTradeSeq(BusllPosManage.getPosManager().getTradeSeq());
 
         Iso8583Message iso8583Message = BankPay.getInstance().payMessage(busCard);
+
         byte[] sendData = iso8583Message.getBytes();
 
         saveUnionPayEntity(amount, mainCardNo, tlv, sendData, cardNum);
