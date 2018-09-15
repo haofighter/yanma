@@ -28,7 +28,13 @@
 2. 
 3. 
 
-#### 参与贡献
+#### 如何集成
+
+1. 依赖 compile 'com.github.wuxinxi:unionpay:1.1.0'  <br />
+2.初始化
+ ` UnionPayManager unionPayManager = new UnionPayManager();
+   BusllPosManage.init(unionPayManager);
+`
 
 1. Fork 本项目
 2. 新建 Feat_xxx 分支
