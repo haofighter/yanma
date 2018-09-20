@@ -66,7 +66,7 @@ public class TenPosReportManager {
                             , BusApp.getPosManager().getWcPayPrice()//金额
                             , (byte) 1
                             , (byte) 1
-                            , BusApp.getPosManager().getDriverNo()
+                            , BusApp.getPosManager().getPosSN()
                             , Util.Random(8)
                             , BusApp.getPosManager().getMac(mac_root_id));
 
