@@ -104,6 +104,8 @@ public class BankCardParse {
 
         listTLV = TLV.decodingPDOL(mapTLV.get("9f38"));
 
+        SLog.d("BankCardParse(parseResponse.java:107)9f38=" + mapTLV.get("9f38"));
+
         mapTLV = TLV.decodingTLV(listTLV);
 
         int len = 0;
