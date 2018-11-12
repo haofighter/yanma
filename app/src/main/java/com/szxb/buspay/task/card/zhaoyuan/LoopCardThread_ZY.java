@@ -19,6 +19,10 @@ import com.szxb.jni.libszxb;
 import com.szxb.mlog.SLog;
 import com.szxb.unionpay.dispose.BankResponse;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import static com.szxb.buspay.task.card.CommonBase.checkTheBalance;
 import static com.szxb.buspay.task.card.CommonBase.empSign;
 import static com.szxb.buspay.task.card.CommonBase.notice;
@@ -51,7 +55,7 @@ public class LoopCardThread_ZY extends Thread {
         super.run();
         try {
 
-            byte[] searchBytes = new byte[40];
+            byte[] searchBytes = new byte[120];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
                 if (status == -2) {
@@ -83,6 +87,13 @@ public class LoopCardThread_ZY extends Thread {
             String driverNo = BusApp.getPosManager().getDriverNo();
             if (TextUtils.equals(driverNo, String.format("%08d", 0))
                     && !TextUtils.equals(searchCard.cardType, "06")) {
+                return;
+            }
+
+            //如果是月票卡则判断此时间段是否允许用户乘车
+            boolean enable = checkMonthEnableTime(searchCard.cardType);
+            if (!enable) {
+                BusToast.showToast(BusApp.getInstance(), "本时间段不支持此卡刷卡乘车", false);
                 return;
             }
 
@@ -138,6 +149,30 @@ public class LoopCardThread_ZY extends Thread {
             e.printStackTrace();
             SLog.e("LoopCardThread(run.java:60)LoopCardThread出现异常>>>" + e.toString());
         }
+    }
+
+    private static SimpleDateFormat format = new SimpleDateFormat("HHmm", new Locale("zh", "CN"));
+
+    private boolean checkMonthEnableTime(String cardType) {
+        if (TextUtils.equals(cardType, "0A")) {
+            String monthEnableTime = BusApp.getPosManager().getZYMonthEnableTime();
+            if (TextUtils.equals(monthEnableTime, "0")) {
+                //未获取到时间段,允许刷
+                return true;
+            }
+            String[] times = monthEnableTime.split(",");
+            for (String time : times) {
+                int index = time.indexOf("-");
+                int startTime = Util.string2Int(time.substring(0, index));
+                int endTime = Util.string2Int(time.substring(index + 1, time.length()));
+                int currentTime = Util.string2Int(format.format(new Date()));
+                if (currentTime >= startTime && currentTime <= endTime) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -278,7 +313,6 @@ public class LoopCardThread_ZY extends Thread {
                                     + response.getCardBalance();
                             notice(Config.IC_HIGHT_CARD, toast, true);
                             saveRecord(response);
-
                             break;
                         default://其他卡类型
                             zeroDis(response);

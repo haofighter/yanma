@@ -251,7 +251,7 @@ public class BankCardParse {
 
         if (BuildConfig.BIN_NAME.contains("zhaoyuan")) {
             //如果是招远则做卡限制
-            if (cardNum.indexOf("62232006") != 0 || cardNum.indexOf("62232006") != 0) {
+            if (cardNum.indexOf("62232006") != 0 || cardNum.indexOf("62231906") != 0) {
                 icResponse.setResCode(ERROR_10);
                 icResponse.setMsg("暂不支持此银联卡");
                 return icResponse;

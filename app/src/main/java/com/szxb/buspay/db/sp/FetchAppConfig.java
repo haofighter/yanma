@@ -53,14 +53,13 @@ public class FetchAppConfig {
 
     //折扣
     public static String coefficient() {
-        return (String) CommonSharedPreferences.get("coefficient", "000000000000000000000000000000000000");
+        return (String) CommonSharedPreferences.get("coefficient", "000000000000000000000000000000000000000000000000000000000000000000000000");
     }
 
     //公司号
     public static String unitno() {
         return (String) CommonSharedPreferences.get("unitno", "0");
     }
-
 
 
     public static String getBinVersion() {
@@ -84,5 +83,9 @@ public class FetchAppConfig {
 
     public static String getLastParamsFileName() {
         return (String) CommonSharedPreferences.get("last_params_file_name", "0");
+    }
+
+    public static String getZYmonthEnableTime() {
+        return (String) CommonSharedPreferences.get("zy_month_enable_time", "0");
     }
 }

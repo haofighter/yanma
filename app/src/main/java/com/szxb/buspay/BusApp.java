@@ -94,6 +94,8 @@ public class BusApp extends Application {
         CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
 
         initTask();
+
+        initService();
     }
 
     //连接服务

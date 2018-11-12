@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.MainActivity;
 import com.szxb.buspay.R;
@@ -68,6 +69,7 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
         List<BaseRequest> taskList = AppUtil.getRequestList();
         taskSize = new AtomicInteger(taskList.size());
         AppUtil.run(taskList, this);
+
     }
 
 
@@ -76,7 +78,7 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
             @Override
             public void run() {
                 String lastVersion = BusApp.getPosManager().getLastVersion();
-                String binName = BusApp.getPosManager().getBinVersion();
+                String binName = BuildConfig.BIN_NAME;
                 if (!TextUtils.equals(lastVersion, binName)) {
                     AssetManager ass = BusApp.getInstance().getAssets();
                     int k = libszxb.ymodemUpdate(ass, binName);

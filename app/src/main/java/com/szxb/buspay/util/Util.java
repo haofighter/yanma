@@ -78,7 +78,7 @@ public class Util {
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("Util(string2Int.java:33)var=" + var + ",数字类型转换异常>>" + e.toString());
-            return 100;
+            return 0;
         }
     }
 
@@ -174,7 +174,7 @@ public class Util {
         int strLen = str.length();
         if (strLen < strLength) {
             while (strLen < strLength) {
-                str = str + "100";
+                str = str + "000";
                 strLen = str.length();
             }
         }

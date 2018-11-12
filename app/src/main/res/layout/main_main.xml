@@ -28,10 +28,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textStyle="italic"
             android:text="票价:0.00元"
             android:textColor="@color/colorBlack"
-            android:textSize="50sp"/>
+            android:textSize="50sp"
+            android:textStyle="italic" />
 
     </LinearLayout>
 
@@ -58,7 +58,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="10dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="30dp"
         android:lineSpacingExtra="2dp"
         android:text="车辆号:000000\n司机号:000000"
         android:textColor="@color/colorWhite"
@@ -75,5 +75,6 @@
         android:text="[1.0]"
         android:textColor="@color/colorWhite"
         android:textSize="17sp" />
+
 
 </RelativeLayout>
