@@ -172,7 +172,7 @@ public class LoopCardThread_ZY extends Thread {
             }
             return false;
         }
-        return false;
+        return true;
     }
 
     /**
