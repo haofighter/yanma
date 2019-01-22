@@ -165,4 +165,10 @@ public class QRCode {
 
     //关闭Dialog
     public static final int STOP_DIALOG = 33;
+
+    //关闭Dialog
+    public static final int SN = 34;
+
+    //银联刷卡
+    public static final int UN = 35;
 }

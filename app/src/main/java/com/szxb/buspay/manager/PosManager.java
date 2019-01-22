@@ -1,6 +1,7 @@
 package com.szxb.buspay.manager;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.zhoukai.modemtooltest.ModemToolTest;
 import com.google.gson.Gson;
@@ -11,6 +12,7 @@ import com.szxb.buspay.db.entity.card.LineInfoEntity;
 import com.szxb.buspay.db.manager.DBManager;
 import com.szxb.buspay.db.sp.CommonSharedPreferences;
 import com.szxb.buspay.db.sp.FetchAppConfig;
+import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.Util;
 import com.szxb.mlog.SLog;
@@ -193,25 +195,34 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     //补采总数
     private long SupplementaryMiningCn = 0;
 
-    //招远月票卡允许使用的时间
-    private String zy_month_enable_time;
+
+    private int id;
 
     @Override
     public void loadFromPrefs(final int city, final String bin) {
-        //pos基础参数
-        initBase(bin);
+        Log.d("PosManager",
+            "loadFromPrefs(PosManager.java:204)city="+city);
+        ThreadFactory.getScheduledPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                //pos基础参数
+                initBase(bin);
 
-        //初始化SN号
-        initSn();
+                //初始化SN号
+                initSn();
 
-        //初始化折扣
-        initDis();
+                //初始化折扣
+                initDis();
 
-        //读取配置参数
-        config(city);
+                //读取配置参数
+                config(city);
 
-        //读取线路信息
-        lineInfoEntity = DBManager.readLine();
+                //读取线路信息
+                lineInfoEntity = DBManager.readLine();
+
+                id = (int) CommonSharedPreferences.get("pos_id", 0);
+            }
+        });
     }
 
     private void initBase(String bin) {
@@ -230,8 +241,6 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
         lastBlackVersion = FetchAppConfig.getLastBlackVersion();
 
         lastParamsFileName = FetchAppConfig.getLastParamsFileName();
-
-        zy_month_enable_time = FetchAppConfig.getZYmonthEnableTime();
     }
 
     private void config(int city) {
@@ -573,18 +582,6 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     }
 
     @Override
-    public void setZYMonthEnableTime(String str) {
-        this.zy_month_enable_time = str;
-        CommonSharedPreferences.get("zy_month_enable_time", str);
-    }
-
-    @Override
-    public String getZYMonthEnableTime() {
-        return zy_month_enable_time;
-    }
-
-
-    @Override
     public void setFtpIp(String ip) {
         this.ftpIP = ip;
         CommonSharedPreferences.put("ftp_ip", ip);
@@ -681,4 +678,5 @@ public class PosManager implements IPosManager, IAddRess, ISwitch {
     public boolean isSuppKeyBoard() {
         return isSuppKeyBoard;
     }
+
 }

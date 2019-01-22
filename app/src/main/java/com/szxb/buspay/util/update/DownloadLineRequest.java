@@ -127,11 +127,6 @@ public class DownloadLineRequest extends BaseRequest {
                 onLineInfo.setFixed_price(object.getString("fixed_price"));
                 onLineInfo.setCoefficient(object.getString("coefficient"));
                 onLineInfo.setShortcut_price(object.getString("shortcut_price"));
-                if (object.containsKey("month_enable_time")) {
-                    onLineInfo.setRmk1(object.getString("month_enable_time"));
-                } else {
-                    onLineInfo.setRmk1("0");
-                }
                 onLineInfo.setFileName(fileName);
                 //先删除所有
                 dao.deleteAll();

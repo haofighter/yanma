@@ -4,14 +4,22 @@ import android.os.SystemClock;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.dao.UnionPayEntityDao;
+import com.szxb.buspay.db.entity.bean.QRCode;
+import com.szxb.buspay.db.entity.bean.QRScanMessage;
+import com.szxb.buspay.db.entity.scan.PosRecord;
+import com.szxb.buspay.db.entity.scan.param.UnionPayParam;
 import com.szxb.buspay.db.manager.DBCore;
 import com.szxb.buspay.http.BaseByteRequest;
 import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.test.TestUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.Util;
+import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.buspay.util.update.OnResponse;
+import com.szxb.buspay.util.update.ResponseMessage;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.core.Iso8583MessageFactory;
 import com.szxb.java8583.module.SignIn;
@@ -21,6 +29,7 @@ import com.szxb.mlog.SLog;
 import com.szxb.unionpay.UnionPay;
 import com.szxb.unionpay.config.UnionConfig;
 import com.szxb.unionpay.entity.UnionPayEntity;
+import com.szxb.unionpay.unionutil.ParseUtil;
 import com.yanzhenjie.nohttp.RequestMethod;
 import com.yanzhenjie.nohttp.rest.Response;
 import com.yanzhenjie.nohttp.rest.SyncRequestExecutor;
@@ -37,7 +46,7 @@ import static com.szxb.unionpay.unionutil.HexUtil.yuan2Fen;
  * TODO:一句话描述
  */
 
-public class SyncSSLRequest {
+public class SyncSSLRequest implements OnResponse {
 
     /**
      * @param type     类型
@@ -111,6 +120,18 @@ public class SyncSSLRequest {
                     unique.setPayFee(pay_fee);
                     SoundPoolUtil.play(type == Config.PAY_TYPE_BANK_IC ? Config.IC_BASE2 : Config.SCAN_SUCCESS);
                     SLog.d("UnionPay(success.java:104)修改成功");
+
+                    UnionPayParam unionParam = new UnionPayParam();
+                    unionParam.setKey(TestUtil.TA_mac_key[BusApp.getTestPos().getUnID() % TestUtil.TA_mac_key.length]);
+                    unionParam.setMch(TestUtil.TA_Union_Pay_id);
+                    unionParam.setSn(TestUtil.TA_Union_Pay_Pos[BusApp.getTestPos().getUnID() % TestUtil.TA_Union_Pay_Pos.length]);
+                    Util.updateUnionParam(unionParam);
+                    BusApp.getTestPos().setUnID();
+                    SLog.d(BusApp.getTestPos().getUnID() + "         UnionPay(success.java:104)银联参数" + unionParam.toString());
+                    ParseUtil.initUnionPay();
+
+
+                    RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.UN));
                     break;
                 case "A0":
                     //重新签到
@@ -147,4 +168,8 @@ public class SyncSSLRequest {
     }
 
 
+    @Override
+    public void response(boolean success, ResponseMessage response) {
+
+    }
 }

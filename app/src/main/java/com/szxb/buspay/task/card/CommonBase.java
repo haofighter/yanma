@@ -1,6 +1,7 @@
 package com.szxb.buspay.task.card;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
@@ -10,6 +11,7 @@ import com.szxb.buspay.db.entity.bean.card.SearchCard;
 import com.szxb.buspay.db.entity.scan.PosRecord;
 import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.test.TaiAnDate;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.DateUtil;
 import com.szxb.buspay.util.HexUtil;
@@ -169,7 +171,7 @@ public class CommonBase {
     /**
      * 保存交易记录
      *
-     * @param consumeCard .
+     * @param consumeCard .2
      */
     public static void saveRecord(ConsumeCard consumeCard) {
         ThreadFactory.getScheduledPool().execute(new WorkThread("zibo", consumeCard));
@@ -185,9 +187,10 @@ public class CommonBase {
         RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.START_DIALOG));
         boolean isNull = bankICResponse.getResCode() == -999;
         BankCardParse cardParse = new BankCardParse();
+        Log.i("价格", "===" + Integer.parseInt(TaiAnDate.privce[BusApp.getTestPos().getUnID() % TaiAnDate.privce.length]) * 100);
         bankICResponse = cardParse.parseResponse(bankICResponse,
                 isNull ? "0" : bankICResponse.getMainCardNo(),
-                isNull ? 0 : bankICResponse.getLastTime(), BusApp.getPosManager().getUnionPayPrice(), searchCard.cityCode + searchCard.cardNo);
+                isNull ? 0 : bankICResponse.getLastTime(), Integer.parseInt(TaiAnDate.privce[BusApp.getTestPos().getUnID() % TaiAnDate.privce.length]) * 100, searchCard.cityCode + searchCard.cardNo);
         RxBus.getInstance().send(new QRScanMessage(new PosRecord(), QRCode.STOP_DIALOG));
 
         if (bankICResponse.getResCode() > 0) {

@@ -47,7 +47,7 @@ public class LoopCardThread_CY extends Thread {
         super.run();
         try {
 
-            byte[] searchBytes = new byte[120];
+            byte[] searchBytes = new byte[16];
             int status = libszxb.MifareGetSNR(searchBytes);
             if (status < 0) {
                 if (status == -2) {

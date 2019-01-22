@@ -23,7 +23,7 @@ public class FetchAppConfig {
 
     //获取票价
     public static int getBasePrice() {
-        return (Integer) CommonSharedPreferences.get("base_price", 0);
+        return (Integer) CommonSharedPreferences.get("base_price", 100);
     }
 
     //司机tac
@@ -48,12 +48,12 @@ public class FetchAppConfig {
 
     //线路名称说明
     public static String chinese_name() {
-        return (String) CommonSharedPreferences.get("chinese_name", "请先设置线路信息");
+        return (String) CommonSharedPreferences.get("chinese_name", "欢迎乘车");
     }
 
     //折扣
     public static String coefficient() {
-        return (String) CommonSharedPreferences.get("coefficient", "000000000000000000000000000000000000000000000000000000000000000000000000");
+        return (String) CommonSharedPreferences.get("coefficient", "000000000000000000000000000000000000000");
     }
 
     //公司号
@@ -83,9 +83,5 @@ public class FetchAppConfig {
 
     public static String getLastParamsFileName() {
         return (String) CommonSharedPreferences.get("last_params_file_name", "0");
-    }
-
-    public static String getZYmonthEnableTime() {
-        return (String) CommonSharedPreferences.get("zy_month_enable_time", "0");
     }
 }

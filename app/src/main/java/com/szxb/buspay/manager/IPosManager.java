@@ -116,11 +116,4 @@ public interface IPosManager {
     void setSupplementaryMiningCnt(long cnt);
 
     long getSupplementaryMiningCnt();
-
-    /**
-     * @param str 招远月票卡允许使用的时间段
-     */
-    void setZYMonthEnableTime(String str);
-
-    String getZYMonthEnableTime();
 }

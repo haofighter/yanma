@@ -243,7 +243,6 @@ public class HexUtil {
         BusApp.getPosManager().setBasePrice(Util.string2Int(onLineInfo.getFixed_price()));
         BusApp.getPosManager().setLineName(onLineInfo.getChinese_name());
         BusApp.getPosManager().setCoefficent(onLineInfo.getCoefficient());
-        BusApp.getPosManager().setZYMonthEnableTime(onLineInfo.getRmk1());
         String lineNo = onLineInfo.getLine();
         BusApp.getPosManager().setLineNo(lineNo);
         if (lineNo.length() >= 2) {

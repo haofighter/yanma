@@ -41,7 +41,7 @@ public class LineInfoEntity {
     private String coefficient;//8种卡折扣率，依次为普通卡、学生卡、老年卡、免费卡、员工卡、优惠卡1、优惠卡2、优惠卡3、微信支付
     private String shortcut_price;//快捷票价,通过小键盘按键输入，数字1-9，直接代表金额，以分为单位。
     private String fileName;//文件名
-    private String rmk1;//month_enable_time 月票支持日期
+    private String rmk1;
     private String rmk2;
     private String rmk3;
     @Generated(hash = 1085203862)

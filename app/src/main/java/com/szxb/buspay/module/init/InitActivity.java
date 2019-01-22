@@ -10,11 +10,11 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.BusApp;
-import com.szxb.buspay.MainActivity;
 import com.szxb.buspay.R;
+import com.szxb.buspay.task.scan.PosScanManager;
 import com.szxb.buspay.task.thread.ThreadFactory;
+import com.szxb.buspay.test.TestActivity;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.tip.BusToast;
@@ -62,14 +62,19 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
         update_info.append("线路文件同步中\n");
         initBin();
         setTaskList();
-        initUnionPay();
+//        initUnionPay();
+        initLine();
     }
 
     private void setTaskList() {
         List<BaseRequest> taskList = AppUtil.getRequestList();
-        taskSize = new AtomicInteger(taskList.size());
+        taskSize = new AtomicInteger(1);
         AppUtil.run(taskList, this);
+    }
 
+
+    private void initLine(){
+        PosScanManager.getInstance().xbposScan("szxb{\"l\":\"6363\",\"n\":\"999999\"}");
     }
 
 
@@ -78,7 +83,7 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
             @Override
             public void run() {
                 String lastVersion = BusApp.getPosManager().getLastVersion();
-                String binName = BuildConfig.BIN_NAME;
+                String binName = BusApp.getPosManager().getBinVersion();
                 if (!TextUtils.equals(lastVersion, binName)) {
                     AssetManager ass = BusApp.getInstance().getAssets();
                     int k = libszxb.ymodemUpdate(ass, binName);
@@ -95,7 +100,8 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
                 });
 
                 if (updateOk) {
-                    startActivity(new Intent(InitActivity.this, MainActivity.class));
+                    BusApp.getPosManager().setDriverNo("99999999","99999999");
+                    startActivity(new Intent(InitActivity.this, TestActivity.class));
                     finish();
                 }
             }
@@ -132,12 +138,12 @@ public class InitActivity extends AppCompatActivity implements OnResponse {
         SLog.d("InitActivity(response.java:179)" + response);
         taskSize.getAndDecrement();
         update_info.append(response.getMsg() + "\n");
-        if (taskSize.get() <= 0) {
-            updateOk = true;
-            if (binOk) {
-                startActivity(new Intent(InitActivity.this, MainActivity.class));
-                finish();
-            }
+        updateOk = true;
+        if (binOk) {
+            BusApp.getPosManager().setDriverNo("99999999","99999999");
+            startActivity(new Intent(InitActivity.this, TestActivity.class));
+            finish();
         }
+
     }
 }

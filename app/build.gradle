@@ -26,6 +26,7 @@ android {
 
     }
 
+
     greendao {
         schemaVersion 1
         daoPackage 'com.szxb.buspay.db.dao'
@@ -57,14 +58,88 @@ android {
 //            buildConfigField 'String', 'BIN_NAME', '"taian_0.0.4.bin"'
 //            buildConfigField 'int', 'CITY', '1'
 //        }
+
+//        zhaoyuan_app {
+//            versionCode 100
+//            versionName "1.0.7"
+//            buildConfigField 'String', 'LOG_TAG', '"招远"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '3'
+//            buildConfigField 'String', 'FILE_NAME', '"zhaoyuan.txt"'
+//        }
+//        zhaoyuan_app_new {
+//            versionCode 100
+//            versionName "1.0.7"
+//            buildConfigField 'String', 'LOG_TAG', '"招远"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '3'
+//            buildConfigField 'String', 'FILE_NAME', '"zhaoyuan.txt"'
+//        }
+
+//        lwgj_1_app {
+//            versionCode 100
+//            versionName "1.0.0"
+//            buildConfigField 'String', 'LOG_TAG', '"莱芜长运"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '8'
+//            buildConfigField 'String', 'FILE_NAME', '"pos_sn_lwcy_1030_142.txt"'
+//        }
+//        zibo_app {
+//            versionCode 100
+//            versionName "1.0.1"
+//            buildConfigField 'String', 'LOG_TAG', '"zibo"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '0'
+//            buildConfigField 'String', 'FILE_NAME', '"zibo_posn.txt"'
+////            buildConfigField 'String', 'FILE_NAME', '"zibo_pos_sn1.txt"'
+////            buildConfigField 'String', 'FILE_NAME', '"zibo_pos_sn2.txt"'
+////            buildConfigField 'String', 'FILE_NAME', '"zibo_pos_sn3.txt"'
+////            buildConfigField 'String', 'FILE_NAME', '"zibo_pos_sn4.txt"'
+//    }
 //
-        zhaoyuan_app {
+        taian_app {
             versionCode 100
-            versionName "1.0.7"
-            buildConfigField 'String', 'LOG_TAG', '"zhaoyuan"'
-            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
-            buildConfigField 'int', 'CITY', '3'
+            versionName "1.0.1"
+            buildConfigField 'String', 'LOG_TAG', '"taian"'
+            buildConfigField 'String', 'BIN_NAME', '"taian_0.0.4.bin"'
+            buildConfigField 'int', 'CITY', '1'
+            buildConfigField 'String', 'FILE_NAME', '"taian_pos_sn.txt"'
         }
+//
+//        rc_app {
+//            versionCode 100
+//            versionName "1.0.1"
+//            buildConfigField 'String', 'LOG_TAG', '"荣成"'
+//            buildConfigField 'String', 'BIN_NAME', '"rc_bin.bin"'
+//            buildConfigField 'int', 'CITY', '4'
+//            buildConfigField 'String', 'FILE_NAME', '"rc_pos_sn.txt"'
+//        }
+//        lwgj_2_app {
+//            versionCode 100
+//            versionName "1.0.0"
+//            buildConfigField 'String', 'LOG_TAG', '"lawugj"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '6'
+//            buildConfigField 'String', 'FILE_NAME', '"pos_sn_5.txt"'
+//        }
+
+//        qixia_app {
+//            versionCode 100
+//            versionName "1.0.0"
+//            buildConfigField 'String', 'LOG_TAG', '"栖霞"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '7'
+//            buildConfigField 'String', 'FILE_NAME', '"qixia.txt"'
+//        }
+//        qixia_app {
+//            versionCode 100
+//            versionName "1.0.0"
+//            buildConfigField 'String', 'LOG_TAG', '"栖霞"'
+//            buildConfigField 'String', 'BIN_NAME', '"zhaoyuan_0.0.6.bin"'
+//            buildConfigField 'int', 'CITY', '7'
+//            buildConfigField 'String', 'FILE_NAME', '"qx_pos_sn.txt"'
+//        }
+
 
     }
 
@@ -79,7 +154,7 @@ android {
         }
     }
 
-    //打包命令:gradlew.bat assembleDebug
+//打包命令:gradlew.bat assembleDebug
 }
 
 static def debugTime() {
@@ -101,6 +176,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     //日志
     compile 'com.github.wuxinxi:MLog:1.0.3'
+    //日志
     //银联卡支付
     compile 'com.github.wuxinxi:unionpay:1.1.0'
     //网络请求

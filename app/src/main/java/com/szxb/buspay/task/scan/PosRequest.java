@@ -14,6 +14,7 @@ import com.szxb.buspay.task.thread.WorkThread;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.Config;
 import com.szxb.buspay.util.param.ParamsUtil;
+import com.szxb.buspay.util.rx.RxBus;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.buspay.util.tip.BusToast;
 import com.szxb.buspay.util.tip.MyToast;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import static com.szxb.buspay.util.Config.QR_ERROR;
 import static com.szxb.buspay.util.Config.SCAN_SUCCESS;
+import static com.szxb.buspay.util.Util.Random;
 
 /**
  * 作者: Tangren on 2017-09-27
@@ -57,10 +59,14 @@ public class PosRequest {
         switch (message.getResult()) {
             case QRCode.EC_SUCCESS:
                 SoundPoolUtil.play(SCAN_SUCCESS);
-                MyToast.showToast(BusApp.getInstance(), "扫码成功", true);
-                message.getPosRecord().setMch_trx_id(BusApp.getPosManager().getmchTrxId());
+                message.getPosRecord().setMch_trx_id(Random(20));
                 Map<String, Object> map = ParamsUtil.requestMap(message.getPosRecord());
                 requestTX(1000, Config.XBPAY, map);
+                BusApp.getTestPos().setSNID();
+
+                MyToast.showToast(BusApp.getInstance(), "扫码成功\nSN=" + message.getPosRecord().getPos_no() + "--" + BusApp.getTestPos().getSNID(), true);
+                SLog.d("PosRequest(request.java:66)posSN号=" + message.getPosRecord().getPos_no() + ",id=" + BusApp.getTestPos().getSNID());
+                RxBus.getInstance().send(new QRScanMessage(message.getPosRecord(), QRCode.SN));
                 break;
             case QRCode.QR_ERROR://非腾讯或者小兵二维码
             case QRCode.EC_CARD_CERT_SIGN_ALG_NOT_SUPPORT://卡证书签名算法不支持

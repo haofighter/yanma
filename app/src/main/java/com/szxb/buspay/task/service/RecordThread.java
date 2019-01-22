@@ -1,6 +1,7 @@
 package com.szxb.buspay.task.service;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -266,7 +267,7 @@ public class RecordThread extends Thread {
                 SLog.d("RecordThread(unionRecordTask.java:116)银联卡上传异常>>" + e.toString());
             }
         } else {
-            SLog.d("RecordThread(unionRecordTask.java:187)银联卡上传网络异常"+execute.getException().toString());
+            SLog.d("RecordThread(unionRecordTask.java:187)银联卡上传网络异常" + execute.getException().toString());
         }
     }
 
@@ -286,10 +287,12 @@ public class RecordThread extends Thread {
             array.add(JSON.parse(swipeList.get(i).getBiz_data_single()));
         }
         order_list.put("order_list", array);
+
         String timestamp = DateUtil.getCurrentDate();
         Map<String, Object> debitMap = ParamsUtil.commonMap(BusApp.getPosManager().getAppId(), timestamp);
         debitMap.put("sign", ParamSingUtil.getSign(BusApp.getPosManager().getAppId(), timestamp, order_list, Config.private_key));
         debitMap.put("biz_data", order_list);
+        Log.i("上传参数", debitMap.toString());
         request.add(debitMap);
         request.setCacheMode(CacheMode.ONLY_REQUEST_NETWORK);
         Response<JSONObject> execute = SyncRequestExecutor.INSTANCE.execute(request);
@@ -321,7 +324,7 @@ public class RecordThread extends Thread {
                 SLog.d("RecordThread(scanRecordTask.java:171)扫码延迟扣款异常>>" + e.toString());
             }
         } else {
-            SLog.d("RecordThread(scanRecordTask.java:244)扫码延迟扣款网络异常");
+            SLog.d("RecordThread(scanRecordTask.java:244)扫码延迟扣款网络异常     " + execute.get() + ".....");
         }
     }
 }

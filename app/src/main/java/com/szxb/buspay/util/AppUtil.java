@@ -142,8 +142,8 @@ public class AppUtil {
             taskList.add(lineRequest);
         }
 
-        DownloadBlackRequest blackRequest = new DownloadBlackRequest();
-        taskList.add(blackRequest);
+//        DownloadBlackRequest blackRequest = new DownloadBlackRequest();
+//        taskList.add(blackRequest);
 
         DownloadScanRequest scanRequest = new DownloadScanRequest();
         taskList.add(scanRequest);

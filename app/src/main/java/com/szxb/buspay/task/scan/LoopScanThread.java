@@ -88,7 +88,8 @@ public class LoopScanThread extends Thread {
     }
 
     private boolean filter(String result) {
-        return filterCheck(result) || checkLine();
+//        return filterCheck(result) || checkLine();
+        return filterCheck(result);
     }
 
 

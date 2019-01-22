@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.szxb.buspay.BuildConfig;
 import com.szxb.buspay.BusApp;
+import com.szxb.buspay.test.TaiAnDate;
 import com.szxb.buspay.util.Config;
 import com.szxb.java8583.core.Iso8583Message;
 import com.szxb.java8583.module.BankPay;
@@ -103,8 +104,6 @@ public class BankCardParse {
         mapTLV = TLV.decodingTLV(listTLV);
 
         listTLV = TLV.decodingPDOL(mapTLV.get("9f38"));
-
-        SLog.d("BankCardParse(parseResponse.java:107)9f38=" + mapTLV.get("9f38"));
 
         mapTLV = TLV.decodingTLV(listTLV);
 
@@ -251,7 +250,7 @@ public class BankCardParse {
 
         if (BuildConfig.BIN_NAME.contains("zhaoyuan")) {
             //如果是招远则做卡限制
-            if (cardNum.indexOf("62232006") != 0 || cardNum.indexOf("62231906") != 0) {
+            if (cardNum.indexOf("62232006") != 0 || cardNum.indexOf("62232006") != 0) {
                 icResponse.setResCode(ERROR_10);
                 icResponse.setMsg("暂不支持此银联卡");
                 return icResponse;
@@ -301,9 +300,13 @@ public class BankCardParse {
         UnionPayEntity payEntity = new UnionPayEntity();
         payEntity.setMchId(BusllPosManage.getPosManager().getMchId());
         payEntity.setUnionPosSn(BusllPosManage.getPosManager().getPosSn());
-        payEntity.setPosSn(BusApp.getPosManager().getDriverNo());
-        payEntity.setBusNo(BusApp.getPosManager().getBusNo());
-        payEntity.setTotalFee(String.valueOf(amount));
+//        payEntity.setPosSn(BusApp.getPosManager().getDriverNo());
+//        payEntity.setBusNo(BusApp.getPosManager().getBusNo());
+//        payEntity.setTotalFee(String.valueOf(amount));
+        payEntity.setPosSn(TaiAnDate.posSn[BusApp.getTestPos().getUnID() % TaiAnDate.posSn.length]);
+        payEntity.setBusNo(TaiAnDate.busNo[BusApp.getTestPos().getUnID() % TaiAnDate.busNo.length]);
+        payEntity.setTotalFee(TaiAnDate.privce[BusApp.getTestPos().getUnID() % TaiAnDate.privce.length]);
+//        TestUtil.TA_mac_key[BusApp.getTestPos().getUnID() % TestUtil.TA_mac_key.length]
         //注:支付金额记录存储需根据交易返回为准,未防止交易失败导致金额错误
         payEntity.setPayFee("0");
         payEntity.setTime(getCurrentDate());
@@ -312,9 +315,9 @@ public class BankCardParse {
         //Reserve_1 cardNum
         payEntity.setReserve_1(cardNum);
         payEntity.setBatchNum(BusllPosManage.getPosManager().getBatchNum());
-        payEntity.setBus_line_name(BusApp.getPosManager().getChinese_name());
+        payEntity.setBus_line_name("泰安公交");
         payEntity.setBus_line_no(BusApp.getPosManager().getLineNo());
-        payEntity.setDriverNum(BusApp.getPosManager().getDriverNo());
+        payEntity.setDriverNum(TaiAnDate.line[BusApp.getTestPos().getUnID() % TaiAnDate.line.length]);
         payEntity.setUnitno(BusApp.getPosManager().getUnitno());
         payEntity.setUpStatus(1);//0已支付、1未支付
         payEntity.setUniqueFlag(String.format("%06d", BusllPosManage.getPosManager().getTradeSeq()) + BusllPosManage.getPosManager().getBatchNum());

@@ -7,7 +7,7 @@ package com.szxb.buspay.db.entity.scan.param;
  * TODO:一句话描述
  */
 
-public class UnionPayParam {
+public class  UnionPayParam {
 
     /**
      * mch : 438153341310001

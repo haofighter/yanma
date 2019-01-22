@@ -78,7 +78,7 @@ public class Util {
         } catch (Exception e) {
             e.printStackTrace();
             SLog.d("Util(string2Int.java:33)var=" + var + ",数字类型转换异常>>" + e.toString());
-            return 0;
+            return 100;
         }
     }
 
@@ -128,7 +128,7 @@ public class Util {
         char[] ss = new char[length];
         int i = 0;
         while (i < length) {
-            int f = (int) (Math.random() * 5);
+            int f = (int) (Math.random() * 8);
             if (f == 0)
                 ss[i] = (char) ('A' + Math.random() * 26);
             else if (f == 1)
@@ -174,7 +174,7 @@ public class Util {
         int strLen = str.length();
         if (strLen < strLength) {
             while (strLen < strLength) {
-                str = str + "000";
+                str = str + "100";
                 strLen = str.length();
             }
         }
@@ -422,5 +422,14 @@ public class Util {
         Pattern pattern = Pattern.compile("[0-9]*");
         Matcher matcher = pattern.matcher(var);
         return matcher.matches();
+    }
+
+
+    public static String fromatBusNo(String no) {
+        String nowNo = no;
+        for (int i = 0; i < 6 - no.length(); i++) {
+            nowNo = "0" + nowNo;
+        }
+        return nowNo;
     }
 }

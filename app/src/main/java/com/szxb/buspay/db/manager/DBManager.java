@@ -116,13 +116,13 @@ public class DBManager {
     }
 
     public static boolean filterOpenID(String open_id) {
-        ScanInfoEntity unique = getDaoSession().getScanInfoEntityDao().queryBuilder().limit(1).orderDesc(ScanInfoEntityDao.Properties.Id).build().unique();
-        if (unique != null) {
-            if (!TextUtils.isEmpty(unique.getOpenid()))
-                if (unique.getOpenid().equals(open_id)) {
-                    return DateUtil.getMILLISECOND(DateUtil.getCurrentDate(), unique.getTime()) <= 6;
-                }
+        List<ScanInfoEntity> list = getDaoSession().getScanInfoEntityDao().queryBuilder().limit(30).orderDesc(ScanInfoEntityDao.Properties.Id).build().list();
+        for (ScanInfoEntity info : list) {
+            if (info.getOpenid().equals(open_id)) {
+                return DateUtil.getMILLISECOND(DateUtil.getCurrentDate(), info.getTime()) <= 10;
+            }
         }
+
         return false;
     }
 
@@ -450,7 +450,7 @@ public class DBManager {
         Query<ScanInfoEntity> qb = dao.queryBuilder()
                 .whereOr(ScanInfoEntityDao.Properties.Status.eq(1), ScanInfoEntityDao.Properties.Status.eq(4))
                 .where(ScanInfoEntityDao.Properties.Time.le(DateUtil.getCurrentDateLastMi(1)))
-                .limit(15).orderDesc(ScanInfoEntityDao.Properties.Id).build();
+                .limit(5).orderDesc(ScanInfoEntityDao.Properties.Id).build();
         return qb.list();
     }
 

@@ -114,6 +114,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
     protected TextView pos_sn, black_version, black_cnt;
     protected TextView bin_name, app_version, sn;
 
+    protected TextView textView;
+
     private void initCntView() {
         ic_card_swipe_cnt = (TextView) findViewById(R.id.ic_card_swipe_cnt);
         ic_card_amount_cnt = (TextView) findViewById(R.id.ic_card_amount_cnt);
@@ -133,6 +135,8 @@ public abstract class BaseActivity extends AppCompatActivity implements OnKeyLis
 
         time_cnt = (TextView) findViewById(R.id.time_cnt);
         time_amount_cnt = (TextView) findViewById(R.id.time_amount_cnt);
+
+        textView= (TextView) findViewById(R.id.textView);
     }
 
     private void initMainInfoView() {

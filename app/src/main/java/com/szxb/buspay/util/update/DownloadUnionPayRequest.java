@@ -39,6 +39,8 @@ public class DownloadUnionPayRequest extends BaseRequest {
             byte[] params = FileByte.File2byte(Environment.getExternalStorageDirectory() + "/" + lastParamsFileName);
             JSONObject object = HexUtil.parseObject(params);
             if (object != null) {
+
+
                 UnionPayParam unionParam = new Gson().fromJson(object.toJSONString(), UnionPayParam.class);
                 Util.updateUnionParam(unionParam);
                 response.setStatus(ResponseMessage.SUCCESSFUL);

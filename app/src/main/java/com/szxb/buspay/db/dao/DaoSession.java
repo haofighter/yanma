@@ -15,6 +15,7 @@ import com.szxb.buspay.db.entity.scan.BlackListEntity;
 import com.szxb.buspay.db.entity.scan.MacKeyEntity;
 import com.szxb.buspay.db.entity.scan.PublicKeyEntity;
 import com.szxb.buspay.db.entity.scan.ScanInfoEntity;
+import com.szxb.buspay.test.PosSnEntity;
 import com.szxb.unionpay.entity.UnionAidEntity;
 import com.szxb.unionpay.entity.UnionPayEntity;
 
@@ -25,6 +26,7 @@ import com.szxb.buspay.db.dao.BlackListEntityDao;
 import com.szxb.buspay.db.dao.MacKeyEntityDao;
 import com.szxb.buspay.db.dao.PublicKeyEntityDao;
 import com.szxb.buspay.db.dao.ScanInfoEntityDao;
+import com.szxb.buspay.db.dao.PosSnEntityDao;
 import com.szxb.buspay.db.dao.UnionAidEntityDao;
 import com.szxb.buspay.db.dao.UnionPayEntityDao;
 
@@ -44,6 +46,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig macKeyEntityDaoConfig;
     private final DaoConfig publicKeyEntityDaoConfig;
     private final DaoConfig scanInfoEntityDaoConfig;
+    private final DaoConfig posSnEntityDaoConfig;
     private final DaoConfig unionAidEntityDaoConfig;
     private final DaoConfig unionPayEntityDaoConfig;
 
@@ -54,6 +57,7 @@ public class DaoSession extends AbstractDaoSession {
     private final MacKeyEntityDao macKeyEntityDao;
     private final PublicKeyEntityDao publicKeyEntityDao;
     private final ScanInfoEntityDao scanInfoEntityDao;
+    private final PosSnEntityDao posSnEntityDao;
     private final UnionAidEntityDao unionAidEntityDao;
     private final UnionPayEntityDao unionPayEntityDao;
 
@@ -82,6 +86,9 @@ public class DaoSession extends AbstractDaoSession {
         scanInfoEntityDaoConfig = daoConfigMap.get(ScanInfoEntityDao.class).clone();
         scanInfoEntityDaoConfig.initIdentityScope(type);
 
+        posSnEntityDaoConfig = daoConfigMap.get(PosSnEntityDao.class).clone();
+        posSnEntityDaoConfig.initIdentityScope(type);
+
         unionAidEntityDaoConfig = daoConfigMap.get(UnionAidEntityDao.class).clone();
         unionAidEntityDaoConfig.initIdentityScope(type);
 
@@ -95,6 +102,7 @@ public class DaoSession extends AbstractDaoSession {
         macKeyEntityDao = new MacKeyEntityDao(macKeyEntityDaoConfig, this);
         publicKeyEntityDao = new PublicKeyEntityDao(publicKeyEntityDaoConfig, this);
         scanInfoEntityDao = new ScanInfoEntityDao(scanInfoEntityDaoConfig, this);
+        posSnEntityDao = new PosSnEntityDao(posSnEntityDaoConfig, this);
         unionAidEntityDao = new UnionAidEntityDao(unionAidEntityDaoConfig, this);
         unionPayEntityDao = new UnionPayEntityDao(unionPayEntityDaoConfig, this);
 
@@ -105,6 +113,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(MacKeyEntity.class, macKeyEntityDao);
         registerDao(PublicKeyEntity.class, publicKeyEntityDao);
         registerDao(ScanInfoEntity.class, scanInfoEntityDao);
+        registerDao(PosSnEntity.class, posSnEntityDao);
         registerDao(UnionAidEntity.class, unionAidEntityDao);
         registerDao(UnionPayEntity.class, unionPayEntityDao);
     }
@@ -117,6 +126,7 @@ public class DaoSession extends AbstractDaoSession {
         macKeyEntityDaoConfig.clearIdentityScope();
         publicKeyEntityDaoConfig.clearIdentityScope();
         scanInfoEntityDaoConfig.clearIdentityScope();
+        posSnEntityDaoConfig.clearIdentityScope();
         unionAidEntityDaoConfig.clearIdentityScope();
         unionPayEntityDaoConfig.clearIdentityScope();
     }
@@ -147,6 +157,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public ScanInfoEntityDao getScanInfoEntityDao() {
         return scanInfoEntityDao;
+    }
+
+    public PosSnEntityDao getPosSnEntityDao() {
+        return posSnEntityDao;
     }
 
     public UnionAidEntityDao getUnionAidEntityDao() {

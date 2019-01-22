@@ -28,6 +28,7 @@ public class DaoMaster extends AbstractDaoMaster {
         MacKeyEntityDao.createTable(db, ifNotExists);
         PublicKeyEntityDao.createTable(db, ifNotExists);
         ScanInfoEntityDao.createTable(db, ifNotExists);
+        PosSnEntityDao.createTable(db, ifNotExists);
         UnionAidEntityDao.createTable(db, ifNotExists);
         UnionPayEntityDao.createTable(db, ifNotExists);
     }
@@ -41,6 +42,7 @@ public class DaoMaster extends AbstractDaoMaster {
         MacKeyEntityDao.dropTable(db, ifExists);
         PublicKeyEntityDao.dropTable(db, ifExists);
         ScanInfoEntityDao.dropTable(db, ifExists);
+        PosSnEntityDao.dropTable(db, ifExists);
         UnionAidEntityDao.dropTable(db, ifExists);
         UnionPayEntityDao.dropTable(db, ifExists);
     }
@@ -68,6 +70,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(MacKeyEntityDao.class);
         registerDaoClass(PublicKeyEntityDao.class);
         registerDaoClass(ScanInfoEntityDao.class);
+        registerDaoClass(PosSnEntityDao.class);
         registerDaoClass(UnionAidEntityDao.class);
         registerDaoClass(UnionPayEntityDao.class);
     }

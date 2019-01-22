@@ -193,7 +193,11 @@ public class FTP {
             ftp.setBufferSize(1024);
             ftp.setControlEncoding("UTF-8");
             ftp.enterLocalPassiveMode();
+            Log.d("FTP",
+                "download(FTP.java:197)"+path + sinfileName);
             buffOut = new BufferedOutputStream(new FileOutputStream(path + sinfileName), 8 * 1024);
+            Log.d("FTP",
+                "download(FTP.java:200)"+ftpPath);
             success = ftp.retrieveFile(ftpPath, buffOut);
 
             SLog.d("FTP(download.java:178)检索文件：" + success + ">>tag=" + getTag());

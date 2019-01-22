@@ -3,6 +3,7 @@ package com.szxb.buspay.task.scan;
 import com.szxb.buspay.BusApp;
 import com.szxb.buspay.db.entity.bean.QRCode;
 import com.szxb.buspay.util.tip.BusToast;
+import com.szxb.mlog.SLog;
 
 /**
  * 作者: Tangren on 2017-09-08
@@ -44,12 +45,16 @@ public class PosScanManager {
 
     //腾讯
     public void txposScan(String qrcode) {
+        
+        SLog.d("PosScanManager(txposScan.java:48)"+qrcode);
         //当为配置参数时提示
-        if (BusApp.getPosManager().getLineInfoEntity() == null) {
-            BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
-        } else {
-            TenPosReportManager.getInstance().posScan(qrcode);
-        }
+//        if (BusApp.getPosManager().getLineInfoEntity() == null) {
+//            BusToast.showToast(BusApp.getInstance(), "请先配置线路信息", false);
+//        } else {
+//            TenPosReportManager.getInstance().posScan(qrcode);
+//        }
+
+        TenPosReportManager.getInstance().posScan(qrcode);
     }
 
     //银联

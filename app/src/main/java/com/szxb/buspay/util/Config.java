@@ -26,7 +26,7 @@ public class Config {
 
 
     private static final String IP = "http://111.230.85.238";//139.199.158.253
-//    private static final String IP = "http://112.74.102.125";
+////    private static final String IP = "http://112.74.102.125";
 //    private static final String IP = "http://2t183d9338.iask.in:27781";
 
     //小兵mac

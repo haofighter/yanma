@@ -15,6 +15,7 @@ import com.szxb.buspay.task.TaskDelFile;
 import com.szxb.buspay.task.service.RecordThread;
 import com.szxb.buspay.task.thread.ThreadFactory;
 import com.szxb.buspay.task.thread.WorkThread;
+import com.szxb.buspay.test.TestPos;
 import com.szxb.buspay.util.AppUtil;
 import com.szxb.buspay.util.sound.SoundPoolUtil;
 import com.szxb.java8583.module.manager.BusllPosManage;
@@ -46,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class BusApp extends Application {
     private static BusApp instance;
     private static PosManager manager;
+    private static TestPos testPos;
     //服务操作
     private IToolInterface mService;
 
@@ -72,13 +74,16 @@ public class BusApp extends Application {
         super.onCreate();
         instance = this;
 
-        DBCore.init(this, "databases_bus_.db");
+        DBCore.init(this, "databases_bus_new.db");
 
         UnionPayManager unionPayManager = new UnionPayManager();
         BusllPosManage.init(unionPayManager);
 
         manager = new PosManager();
         manager.loadFromPrefs(city, binName);
+
+        testPos = new TestPos();
+        testPos.load();
 
 
         initLog();
@@ -94,8 +99,6 @@ public class BusApp extends Application {
         CrashReport.initCrashReport(getApplicationContext(), "e95522befa", false);
 
         initTask();
-
-        initService();
     }
 
     //连接服务
@@ -134,6 +137,14 @@ public class BusApp extends Application {
             manager.loadFromPrefs(city, binName);
         }
         return manager;
+    }
+
+    public static TestPos getTestPos() {
+        if (testPos == null) {
+            testPos = new TestPos();
+            testPos.load();
+        }
+        return testPos;
     }
 
     private void initLog() {
@@ -192,7 +203,7 @@ public class BusApp extends Application {
         ThreadFactory.getScheduledPool().executeDelay(new WorkThread("check_fill", 0), 40, TimeUnit.SECONDS);
 
         if (BusApp.getPosManager().isSuppScanPay()) {
-            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("scan"), 13, 30, "scan", TimeUnit.SECONDS);
+            ThreadFactory.getScheduledPool().executeCycle(new RecordThread("scan"), 3, 10, "scan", TimeUnit.SECONDS);
         }
 
         if (BusApp.getPosManager().isSuppIcPay()) {

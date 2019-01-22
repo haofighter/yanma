@@ -83,6 +83,48 @@
       "is_supp_union_pay":false,
       "is_supp_key_board":false,
       "city": "潍坊[5]"
+    },
+    {
+      "ip": "222.134.206.204",
+      "port": 26,
+      "user": "ydtcommserver\\ftp",
+      "psw": "ftp1234!@#$",
+      "mch_id": "10000093",
+      "city_code": "371200",
+      "url_ip": "111.230.85.238",
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":false,
+      "is_supp_union_pay":false,
+      "is_supp_key_board":false,
+      "city": "莱芜公交[6]"
+    },
+    {
+      "ip": "222.134.206.204",
+      "port": 26,
+      "user": "ydtcommserver\\ftp",
+      "psw": "ftp1234!@#$",
+      "mch_id": "10000094",
+      "city_code": "370686",
+      "url_ip": "111.230.85.238",
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":false,
+      "is_supp_union_pay":false,
+      "is_supp_key_board":false,
+      "city": "栖霞[7]"
+    },
+    {
+      "ip": "222.134.206.204",
+      "port": 26,
+      "user": "ydtcommserver\\ftp",
+      "psw": "ftp1234!@#$",
+      "mch_id": "10000010",
+      "city_code": "371200",
+      "url_ip": "111.230.85.238",
+      "is_supp_scan_pay":true,
+      "is_supp_ic_pay":false,
+      "is_supp_union_pay":false,
+      "is_supp_key_board":false,
+      "city": "长运[8]"
     }
   ]
 }
